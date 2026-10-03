@@ -41,23 +41,24 @@ class Updater(private val context: Context, private val isCancelled: () -> Boole
 
         // A staged APK counts as present, so we do not upload the same release again.
         val apkHave = maxOf(status.apkRelease, status.pendingApkRelease)
-        val (dash, apk) = InternetNetwork.acquire(cm, car.network)?.use { internet ->
+        // Upload order: the APK last, because installing it may restart the head unit app.
+        val have = linkedMapOf("dash" to status.dashRelease, "speedlimits" to status.speedLimitsRelease, "apk" to apkHave)
+        val files = InternetNetwork.acquire(cm, car.network)?.use { internet ->
             val github = GitHub(internet.network, repo, settings.token)
-            val picks = github.pick(status.dashRelease, apkHave, settings::log)
-            val files = listOfNotNull(picks.first, picks.second)
-            pruneCache(files)
-            files.forEach { fetch(github, it) }
-            picks
+            val picks = github.pick(have, settings::log)
+            val ordered = have.keys.mapNotNull { picks[it] }
+            pruneCache(ordered)
+            ordered.forEach { fetch(github, it) }
+            ordered
         } ?: throw IOException("No internet network (mobile data unavailable)")
 
-        if (dash == null && apk == null) {
+        if (files.isEmpty()) {
             settings.log("Car is up to date")
             return Outcome(null)
         }
 
-        // Dash first, then the APK (the APK install may restart the head unit app).
         val pushed = mutableListOf<String>()
-        for (file in listOfNotNull(dash, apk)) {
+        for (file in files) {
             if (isCancelled()) throw IOException("Stopped by the system")
             settings.log("Uploading ${file.name} to the car")
             when (car.upload(file.kind, file.release, file.sha256, cached(file), file.signature)) {

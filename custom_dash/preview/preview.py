@@ -80,6 +80,8 @@ SCENES = {
     "media": {"nav": True, "fh": "media"},
     "call": {"nav": True, "fh": "call"},
     "settings": {"nav": True, "fh": "settings", "gear": "D3", "rpm": 5200, "oil": 65},
+    "limit": {"nav": True, "fh": "limit130"},
+    "limit_over": {"nav": True, "fh": "limit60"},
     "service": {"service": True},
     "startup": {},
     # sport layout: gearbox in S / M; "cold" shows the warm-up redline

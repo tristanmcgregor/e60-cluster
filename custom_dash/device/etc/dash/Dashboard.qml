@@ -181,18 +181,31 @@ Window {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: stage.speedShown
-                color: "#f4f6f8"
+                color: stage.overLimit ? Theme.critical : "#f4f6f8"
                 font.pixelSize: 100
                 font.family: stage.fontName
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: car.useMph ? "mph" : "km/h"
+                opacity: stage.limitShown > 0 ? 0 : 1        // the limit sign sits here instead
                 color: "#aeb5bd"
                 font.pixelSize: 22
                 font.family: stage.fontName
             }
         }
+    }
+
+    // speed limit of the current road (head unit GPS + OpenStreetMap), below the digital speed
+    readonly property int limitShown: !car.speedLimitOn || navData.speedLimitKph <= 0 ? 0
+        : (car.useMph ? Math.round(navData.speedLimitKph / 1.609) : navData.speedLimitKph)
+    readonly property bool overLimit: limitShown > 0 && !stage.sweeping &&
+        stage.speedShown > limitShown + (car.useMph ? Math.round(car.speedLimitMargin / 1.609) : car.speedLimitMargin)
+    LimitSign {                                       // takes the place of the "km/h" label
+        x: stage.speedoX - width / 2
+        y: stage.dialY + 70
+        limit: stage.limitShown
+        over: stage.overLimit
     }
 
     // ── tachometer

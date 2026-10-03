@@ -76,6 +76,8 @@ class FakeHeadUnit:
             if MODE in ("media", "call"):
                 self._send({"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
                             "album": "After Hours", "playing": True})
+            if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits
+                self._send({"type": "limit", "kph": int(MODE[5:])})
             if MODE == "settings":      # as saved from the phone settings page
                 self._send({"type": "settings", "speedCorrection": 0, "sport": "always", "shiftLights": True,
                             "shiftWindow": 1500, "shiftMargin": 300, "redline": [[0, 5000], [60, 6000], [90, 7000]],

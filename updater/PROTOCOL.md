@@ -20,14 +20,17 @@ Assets:
    "apk":  {"name": "OpenHeadunit-e60-N.apk", "sha256": "<hex>", "size": 123, "versionCode": 200000,
             "sig": "<base64>"}}
   ```
-  `dash` and `apk` are each optional: a release may carry only one of them.
+  `dash`, `apk` and `speedlimits` are each optional. `speedlimits` (`speedlimits-N.bin.gz`) is gzip-compressed road speed-limit data built by `updater/speedlimits.py`.
   `sig` is the release signature; see "Signing" below.
 - The files named in the manifest.
 
 The phone lists recent releases (`GET /repos/{owner}/{repo}/releases?per_page=20`). It takes:
 
 - the highest release whose manifest has a `dash` newer than the head unit's `dashRelease`;
-- the highest release whose manifest has an `apk` newer than the head unit's `apkRelease`.
+- the highest release whose manifest has an `apk` newer than the head unit's `apkRelease`;
+- likewise for `speedlimits` against `speedLimitsRelease`.
+
+The phone uploads in the order dash, speedlimits, apk. The APK goes last because installing it restarts the head unit app.
 
 For a private repo, every GitHub request carries `Authorization: Bearer <token>`. Assets are downloaded through the asset API URL (`assets[].url`) with `Accept: application/octet-stream`.
 
@@ -38,15 +41,16 @@ The head unit is the default gateway of the car Wi-Fi network (the hotspot).
 **`GET /update/status`** returns `200 application/json`:
 ```json
 {"service": "e60-update", "apkRelease": N, "apkVersionCode": 200000, "pendingApkRelease": 0,
- "dashRelease": N, "clusterDashRelease": M}
+ "dashRelease": N, "clusterDashRelease": M, "speedLimitsRelease": N}
 ```
 A value of 0 means none/unknown. `service` identifies this endpoint, so the phone knows it has found the car.
 
-**`POST /update/dash?release=N&sha256=<hex>`** and **`POST /update/apk?release=N&sha256=<hex>`**
+**`POST /update/{dash|apk|speedlimits}?release=N&sha256=<hex>`**
 
 - Headers: `X-Update-Signature: <sig from the manifest>` and `Content-Length: <bytes>`. The body is the raw file.
 - Replies: `200 ok`, `401` for a bad signature, `400` for a bad request or checksum mismatch, `409` if the release is not newer.
 - An APK upload is staged. The head unit asks for install confirmation when it is not projecting.
+- A speedlimits upload is unpacked and loaded straight away.
 
 **`GET /dash/manifest.txt?have=M`**
 
@@ -70,9 +74,18 @@ A value of 0 means none/unknown. `service` identifies this endpoint, so the phon
 
 Neither app contains a secret.
 
-- `release.py` signs `"<kind>\n<release>\n<sha256>\n"` (kind is `dash` or `apk`) with ECDSA P-256 / SHA-256, using `updater/signing_key.pem`. That file never leaves the release Mac and is not in git.
+- `release.py` signs `"<kind>\n<release>\n<sha256>\n"` (kind is `dash`, `apk` or `speedlimits`) with ECDSA P-256 / SHA-256, using `updater/signing_key.pem`. That file never leaves the release Mac and is not in git.
 - The head unit has the public half (`updater/signing_pub.pem`) built in.
 - The head unit checks the signature before it reads the body, then checks the body against that sha256.
 - An upload must also be a newer release than the head unit already has, so an old signed release cannot be replayed.
 
 **Keep a backup of `signing_key.pem`.** Without it, new releases are refused by the installed app until a new app is installed from USB.
+
+## Cluster messages (ClusterLink WebSocket, port 8765)
+
+Besides `nav`, `media` and `call`, two more message types go to the cluster:
+
+- `{"type":"settings", ...}`: display settings from the phone page at `http://<head unit>:8765/settings` (`GET`/`POST /settings.json`).
+- `{"type":"limit","kph":N}`: the speed limit of the current road, from GPS matched to the speed-limit data. `0` means unknown.
+
+The latest message of each type is replayed when the cluster connects.

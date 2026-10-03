@@ -51,12 +51,18 @@ Item {
 
     // display settings from the phone settings page (head unit CarSettings)
     signal settingsReceived(var settings)
+    // limit of the road the car is on, km/h (head unit SpeedLimits); 0 = unknown
+    property int speedLimitKph: 0
 
     function apply(msg) {
         var d
         try { d = JSON.parse(msg) } catch (e) { return }
         if (d.type === "settings") {
             settingsReceived(d)
+            return
+        }
+        if (d.type === "limit") {
+            speedLimitKph = d.kph || 0
             return
         }
         if (d.type === "media") {

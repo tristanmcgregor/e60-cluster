@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Build an over-the-air release and (optionally) publish it to GitHub.
 
-    python3 updater/release.py [--dash] [--apk] [--publish] [--notes "..."]
+    python3 updater/release.py [--dash] [--apk] [--speedlimits] [--publish] [--notes "..."]
 
-With neither --dash nor --apk, both are built. The release number is one more than the
+With none of --dash, --apk or --speedlimits, the dash and the APK are built. Speed-limit
+data (OpenStreetMap, south-east Queensland) changes rarely, so it is only built on request. The release number is one more than the
 highest seen so far (updater/last_release, and the repo's vN tags when --publish can
 ask GitHub). Output: updater/out/release-N/ with manifest.json and the files it names,
 in the format of updater/PROTOCOL.md. --publish uploads them as GitHub release vN
@@ -14,6 +15,7 @@ same release, so a USB install and the over-the-air copy agree on what is newest
 """
 import argparse
 import base64
+import gzip
 import hashlib
 import json
 import os
@@ -115,14 +117,27 @@ def build_apk(n, outdir):
     return path
 
 
+def build_speedlimits(n, outdir):
+    """speedlimits-N.bin.gz: updater/speedlimits.py output, gzipped (the head unit unpacks it)."""
+    raw = os.path.join(outdir, "speedlimits.bin")
+    subprocess.run([sys.executable, os.path.join(HERE, "speedlimits.py"), raw,
+                    "--cache", os.path.join(outdir, "osm_cache")], check=True)   # fresh data each release
+    path = os.path.join(outdir, f"speedlimits-{n}.bin.gz")
+    with open(raw, "rb") as src, gzip.open(path, "wb", compresslevel=9) as dst:
+        shutil.copyfileobj(src, dst)
+    os.remove(raw)
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dash", action="store_true", help="include a dash bundle")
     ap.add_argument("--apk", action="store_true", help="include the head unit APK")
+    ap.add_argument("--speedlimits", action="store_true", help="include fresh speed-limit data")
     ap.add_argument("--publish", action="store_true", help="upload as a GitHub release")
     ap.add_argument("--notes", default="", help="release notes")
     args = ap.parse_args()
-    if not args.dash and not args.apk:
+    if not args.dash and not args.apk and not args.speedlimits:
         args.dash = args.apk = True
 
     p = props()
@@ -157,6 +172,12 @@ def main():
         manifest["apk"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
                            "versionCode": 200000 + n, "sig": sign("apk", n, digest)}
         files.append(f)
+    if args.speedlimits:
+        f = build_speedlimits(n, outdir)
+        digest = sha256(f)
+        manifest["speedlimits"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
+                                   "sig": sign("speedlimits", n, digest)}
+        files.append(f)
     mpath = os.path.join(outdir, "manifest.json")
     with open(mpath, "w") as fh:
         json.dump(manifest, fh, indent=1)
@@ -164,7 +185,7 @@ def main():
 
     if args.publish:
         title = f"E60 v{n}"
-        notes = args.notes or ", ".join(k for k in ("dash", "apk") if k in manifest)
+        notes = args.notes or ", ".join(k for k in ("dash", "apk", "speedlimits") if k in manifest)
         subprocess.run([GH, "release", "create", f"v{n}", "--repo", repo, "--title", title,
                         "--notes", notes] + files, check=True)
         with open(COUNTER, "w") as fh:     # only published numbers count

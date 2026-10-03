@@ -8,7 +8,7 @@ import java.io.IOException
 
 /** One file named in a release manifest, with the asset API URL to fetch it from. */
 data class UpdateFile(
-    val kind: String, // "dash" or "apk", also the head unit upload path
+    val kind: String, // "dash", "speedlimits" or "apk", also the head unit upload path
     val release: Int,
     val name: String,
     val sha256: String,
@@ -28,10 +28,10 @@ class GitHub(private val network: Network, private val repo: String, private val
     }
 
     /**
-     * Picks, per PROTOCOL.md, the highest release whose manifest has a dash newer than [dashHave]
-     * and the highest whose manifest has an apk newer than [apkHave]. Either may be null.
+     * Picks, per PROTOCOL.md, for each kind in [have] the highest release whose manifest has that
+     * kind newer than the head unit's release of it. Kinds with nothing newer are left out.
      */
-    fun pick(dashHave: Int, apkHave: Int, log: (String) -> Unit): Pair<UpdateFile?, UpdateFile?> {
+    fun pick(have: Map<String, Int>, log: (String) -> Unit): Map<String, UpdateFile> {
         val releases = JSONArray(
             Http.getText(network, "https://api.github.com/repos/$repo/releases?per_page=20",
                 headers("application/vnd.github+json"))
@@ -41,14 +41,13 @@ class GitHub(private val network: Network, private val repo: String, private val
             .filter { !it.optBoolean("draft") }
             .sortedByDescending { tagNumber(it.optString("tag_name")) }
 
-        var dash: UpdateFile? = null
-        var apk: UpdateFile? = null
+        val picked = mutableMapOf<String, UpdateFile>()
         for (rel in candidates) {
-            if (dash != null && apk != null) break
+            val stillNeeded = have.filterKeys { it !in picked }
+            if (stillNeeded.isEmpty()) break
             val tagN = tagNumber(rel.optString("tag_name"))
             // Tags are sorted; once a tag is not newer than anything still needed, stop listing.
-            val stillNeeded = listOfNotNull(dashHave.takeIf { dash == null }, apkHave.takeIf { apk == null })
-            if (tagN >= 0 && stillNeeded.all { tagN <= it }) break
+            if (tagN >= 0 && stillNeeded.values.all { tagN <= it }) break
             val assets = rel.optJSONArray("assets") ?: continue
             val manifestUrl = assetUrl(assets, "manifest.json") ?: continue
             val manifest = try {
@@ -58,10 +57,11 @@ class GitHub(private val network: Network, private val repo: String, private val
                 continue
             }
             val n = manifest.optInt("release", 0)
-            if (dash == null && n > dashHave) dash = fileOf(manifest, "dash", n, assets)
-            if (apk == null && n > apkHave) apk = fileOf(manifest, "apk", n, assets)
+            for ((kind, current) in stillNeeded) {
+                if (n > current) fileOf(manifest, kind, n, assets)?.let { picked[kind] = it }
+            }
         }
-        return dash to apk
+        return picked
     }
 
     private fun fileOf(manifest: JSONObject, kind: String, release: Int, assets: JSONArray): UpdateFile? {

@@ -14,6 +14,7 @@ data class HeadUnitStatus(
     val apkVersionCode: Int,
     val pendingApkRelease: Int,
     val dashRelease: Int,
+    val speedLimitsRelease: Int,
     val clusterDashRelease: Int,
 )
 
@@ -28,6 +29,7 @@ class HeadUnit(val network: Network, private val host: String) {
             apkVersionCode = json.optInt("apkVersionCode", 0),
             pendingApkRelease = json.optInt("pendingApkRelease", 0),
             dashRelease = json.optInt("dashRelease", 0),
+            speedLimitsRelease = json.optInt("speedLimitsRelease", 0),
             clusterDashRelease = json.optInt("clusterDashRelease", 0),
         )
     }
