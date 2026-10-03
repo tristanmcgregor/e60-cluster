@@ -14,17 +14,22 @@ Item {
     property bool mapStreaming: false     // set by Dashboard when the live map has a picture
     property bool dimmed: false           // a check-control message is showing over the page
 
-    readonly property var titles: ["TRIP", "VEHICLE", "NAVIGATION", "INFO"]
+    readonly property var titles: ["TRIP", "VEHICLE", "NAVIGATION", "INFO", "DEVELOPER"]
+    readonly property int pageCount: 4    // DEVELOPER (index 4) is hidden: hold BC on INFO
     property int page: 0
     readonly property bool onNavPage: page === 2
 
     width: 520
     height: 480
 
-    function step(delta) { page = (page + delta + titles.length) % titles.length }
+    function step(delta) {
+        userMoved = true
+        var from = page === 4 ? 3 : page    // leaving DEVELOPER continues from INFO
+        page = (from + delta + pageCount) % pageCount
+    }
 
     // tell the MCU which page is up (stock EventHub.MenuId per page; see Car.menuId)
-    readonly property var menuIds: [257, 519, 769, 1030]
+    readonly property var menuIds: [257, 519, 769, 1030, 1032]
     onPageChanged: if (car) car.menuId = menuIds[page]
 
     Connections {
@@ -34,9 +39,16 @@ Item {
             switch (code) {
             case 21: menu.step(-1); break           // left
             case 22: case 26: menu.step(1); break   // right, BC single press
+            case 26 + 128: if (menu.page === 3) menu.page = 4; break   // hold BC on INFO
             }
         }
     }
+    // start on the page chosen in the phone settings (stored copy arrives at start-up)
+    Connections {
+        target: menu.car
+        onSettingsApplied: if (!menu.userMoved) menu.page = menu.car.defaultPage
+    }
+    property bool userMoved: false
     Connections {
         target: menu.nav
         onActiveChanged: if (menu.nav.active) menu.page = 2
@@ -61,7 +73,7 @@ Item {
             anchors.bottom: parent.bottom
             spacing: 10
             Repeater {
-                model: menu.titles.length
+                model: menu.pageCount
                 Rectangle {
                     width: index === menu.page ? 22 : 8
                     height: 4; radius: 2
@@ -120,6 +132,11 @@ Item {
             visible: menu.page === 3
             car: menu.car
             nav: menu.nav
+        }
+        DevPage {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: menu.page === 4
+            car: menu.car
         }
     }
 }

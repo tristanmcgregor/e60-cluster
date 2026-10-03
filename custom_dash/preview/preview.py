@@ -43,7 +43,7 @@ GROUPS = [
     ("tpmsChanged", {"flTire": str, "frTire": str, "rlTire": str, "rrTire": str,
                      "flTireState": int, "frTireState": int, "rlTireState": int, "rrTireState": int}),
     ("dashboardChanged", {"outsideTemp": str, "oilTemp": str, "oilTempInt": int, "batteryVoltage": int}),
-    ("gearChanged", {"gear": str, "gearShow": bool}),
+    ("gearChanged", {"gear": str, "gearShow": bool, "gearAuto": int, "gearManual": int}),
     ("turnChanged", {"turnLeft": bool, "turnRight": bool, "turnLeftState": bool, "turnRightState": bool}),
     ("warningChanged", {"warningId": int, "warningDuration": int}),
     ("doorChanged", {"lfDoor": int, "lrDoor": int, "rfDoor": int, "rrDoor": int, "trunk": int, "hood": int}),
@@ -75,11 +75,18 @@ SCENES = {
     "page_trip": {},
     "page_vehicle": {"keys": [(1.0, 26)]},
     "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26)]},
+    "page_dev": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (2.0, 26 + 128)]},
     "msg": {"warning": (58, 8)},
     "media": {"nav": True, "fh": "media"},
     "call": {"nav": True, "fh": "call"},
+    "settings": {"nav": True, "fh": "settings", "gear": "D3", "rpm": 5200, "oil": 65},
     "service": {"service": True},
     "startup": {},
+    # sport layout: gearbox in S / M; "cold" shows the warm-up redline
+    "sport": {"gear": "S3", "rpm": 5600},
+    "sport_shift": {"gear": "M4", "rpm": 6900},
+    "sport_cold": {"gear": "S2", "rpm": 3900, "oil": 45},
+    "cold": {"gear": "D2", "oil": 45},
 }
 SCENE = SCENES["normal"]
 WRITABLE = {"port": int, "packetDebug": int, "MPH": int, "verified": int, "menuId": int, "uiStyle": int}
@@ -149,6 +156,8 @@ def make_hub_class():
         kmh = int(60 + 55 * math.sin(t / 4))
         v["speed"], v["speedM"] = kmh, int(kmh / 1.609)
         v["rpm"] = int(1800 + 2600 * (0.5 + 0.5 * math.sin(t * 1.3)) + 900 * math.sin(t / 4))
+        if "rpm" in SCENE:                       # sport scenes: a fixed rpm, or a rising pull
+            v["rpm"] = SCENE["rpm"] if isinstance(SCENE["rpm"], int) else int(3000 + (t * 900) % 4400)
         self.speedChanged.emit()
         if int(t * 20) % 20 == 0:
             v["fuel"] = 62
@@ -157,8 +166,9 @@ def make_hub_class():
             v["waterTemperature"], v["waterTemperatureF"] = "90°C", "194°F"
             v["odo"], v["odoM"] = "187432km", "116464mi"
             v["tripA"], v["tripAmile"] = "312.4km", "194.1mi"
-            v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", "104°C", 104, 142
-            v["gear"], v["gearShow"] = "D3", True
+            oil = SCENE.get("oil", 104)
+            v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", f"{oil}°C", oil, 142
+            v["gear"], v["gearShow"] = SCENE.get("gear", "D3"), True
             v["instantFuel"], v["instantFuelUnit"] = "9.8", "L/100km"
             v["tripB"], v["tripBmile"] = "1204.6km", "748.5mi"
             v["resetAvgFuel"], v["resetAvgSpeed"] = "11.2 L/100km", "54 km/h"
@@ -230,6 +240,9 @@ def main():
     HUB_CLASS = make_hub_class()
     qmlRegisterType(HUB_CLASS, "plugins.EventHub", 1, 0, "EventHub")
     engine = QQmlEngine()
+    # fresh LocalStorage per run, so settings stored by one scene don't leak into the next
+    import tempfile
+    engine.setOfflineStoragePath(tempfile.mkdtemp(prefix="dashpreview-"))
     if args.font:
         engine.rootContext().setContextProperty("dashFont", args.font)
     if SCENE.get("map"):

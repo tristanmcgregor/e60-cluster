@@ -17,6 +17,7 @@ QtObject {
 
     // accents
     readonly property color speedAccent: "#bcd7ff"   // speedometer arc
+    readonly property color sportAccent: "#ff3b30"   // sport layout: tach ring and needle
     readonly property color tachAccent: "#f2a33a"    // tachometer arc
     readonly property color info: "#4aa3ff"
     readonly property color ok: "#35d07f"

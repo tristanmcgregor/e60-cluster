@@ -37,6 +37,18 @@ class MainActivity : Activity() {
             settings.save(repo.text.toString(), token.text.toString())
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         }
+        // The car's settings page is served by the head unit, the gateway of the car Wi-Fi.
+        // Its address changes when the head unit restarts its hotspot, so look it up now.
+        findViewById<Button>(R.id.openSettings).setOnClickListener {
+            val gw = HeadUnit.wifiGateway(getSystemService(android.net.ConnectivityManager::class.java))
+            if (gw == null) {
+                Toast.makeText(this, "Connect to the car's Wi-Fi first", Toast.LENGTH_LONG).show()
+            } else {
+                val host = if (gw.contains(':')) "[$gw]" else gw
+                startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("http://$host:${HeadUnit.PORT}/settings")))
+            }
+        }
         findViewById<Button>(R.id.checkNow).setOnClickListener {
             if (settings.repo.isEmpty()) {
                 settings.log("Set the GitHub repo")

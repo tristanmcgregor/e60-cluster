@@ -76,6 +76,10 @@ class FakeHeadUnit:
             if MODE in ("media", "call"):
                 self._send({"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
                             "album": "After Hours", "playing": True})
+            if MODE == "settings":      # as saved from the phone settings page
+                self._send({"type": "settings", "speedCorrection": 0, "sport": "always", "shiftLights": True,
+                            "shiftWindow": 1500, "shiftMargin": 300, "redline": [[0, 5000], [60, 6000], [90, 7000]],
+                            "speedLimit": True, "speedLimitMargin": 3, "defaultPage": 1})
             if MODE == "call":
                 self._send({"type": "call", "active": True, "state": 1, "name": "Mum",
                             "number": "0412 345 678", "seconds": 83})

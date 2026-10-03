@@ -49,9 +49,16 @@ Item {
         xhr.send()
     }
 
+    // display settings from the phone settings page (head unit CarSettings)
+    signal settingsReceived(var settings)
+
     function apply(msg) {
         var d
         try { d = JSON.parse(msg) } catch (e) { return }
+        if (d.type === "settings") {
+            settingsReceived(d)
+            return
+        }
         if (d.type === "media") {
             mediaTitle = d.title || ""
             mediaArtist = d.artist || ""

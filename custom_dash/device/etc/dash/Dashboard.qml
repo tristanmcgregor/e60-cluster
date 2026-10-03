@@ -16,7 +16,10 @@ Window {
 
     property alias car: car
     Car { id: car }
-    Nav { id: navData }
+    Nav {
+        id: navData
+        onSettingsReceived: car.applySettings(settings, true)
+    }
 
     // Fixed 1920x720 design surface; scale is 1 on the cluster, <1 in the desktop preview.
     Item {
@@ -132,7 +135,7 @@ Window {
         width: 800; height: stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
-        visible: status === Loader.Ready && item.streaming && centreMenu.onNavPage
+        visible: status === Loader.Ready && item.streaming && centreMenu.onNavPage && !car.sportMode
         onLoaded: item.host = Qt.binding(function() { return navData.gateway })
         onStatusChanged: if (status === Loader.Error) console.warn("[dash] cluster map unavailable; using the directions card")
     }
@@ -202,7 +205,9 @@ Window {
         minorPerMajor: 2
         labelDivisor: 1000
         alternateDim: false
-        redFrom: 7000
+        redFrom: car.redlineRpm                       // follows oil temperature while warming up
+        ringColor: car.sportMode ? Theme.sportAccent : "#d9dde2"
+        needleColor: car.sportMode ? Theme.sportAccent : "#ffffff"
         scaleLabel: "rpm x 1000"
         value: stage.sweeping ? stage.sweep * maxValue : stage.rpmShown
         gapFrac: car.coolantPercent / 100
@@ -258,8 +263,30 @@ Window {
     }
 
     // ── centre band: menu pages (live map behind on the Navigation page); popup and doors on top
+    // sport layout (gearbox in S or M): shift lights on the top hairline, sport card in the centre
+    ShiftLights {
+        x: 600; y: stage.lineTop + 8
+        width: 720
+        visible: opacity > 0.01
+        opacity: car.sportMode && car.shiftLightsOn && !stage.sweeping ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+        rpm: car.rpm
+        shiftRpm: car.shiftRpm
+        window: car.shiftWindow
+    }
+    SportCard {
+        x: 700; y: stage.lineTop + 2
+        car: car
+        visible: opacity > 0.01
+        opacity: car.sportMode ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+    }
+
     CentreMenu {
         id: centreMenu
+        visible: opacity > 0.01
+        opacity: car.sportMode ? 0 : 1
+        Behavior on opacity { NumberAnimation { duration: 300 } }
         x: 700; y: stage.lineTop + 2
         width: 520; height: stage.lineBottom - stage.lineTop - 4
         car: car

@@ -14,7 +14,9 @@ Item {
     property int minorPerMajor: 2
     property real labelDivisor: 1
     property bool alternateDim: true   // every other numeral small and grey (speedo)
-    property real redFrom: -1          // tach red zone
+    property real redFrom: -1          // tach red zone (moves with the warm-up redline)
+    property color ringColor: "#d9dde2"
+    property color needleColor: "#ffffff"
     property string scaleLabel: ""     // e.g. "km/h" or "rpm x 1000" under the top numeral
     property real size: 600
 
@@ -53,6 +55,8 @@ Item {
         target: Theme
         onFontChanged: face.requestPaint()
     }
+    onRedFromChanged: face.requestPaint()
+    onRingColorChanged: face.requestPaint()
 
     Canvas {
         id: face
@@ -129,7 +133,7 @@ Item {
             }
 
             // thin inner ring
-            ctx.strokeStyle = "#d9dde2"
+            ctx.strokeStyle = dial.ringColor
             ctx.lineWidth = R * 0.007
             ctx.beginPath(); ctx.arc(cx, cy, R * 0.555, 0, 2 * Math.PI); ctx.stroke()
         }
@@ -201,8 +205,8 @@ Item {
             y: dial.r - dial.r * 0.915
             antialiasing: true
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#ffffff" }
-                GradientStop { position: 1.0; color: "#c9ced4" }
+                GradientStop { position: 0.0; color: dial.needleColor }
+                GradientStop { position: 1.0; color: Qt.darker(dial.needleColor, 1.25) }
             }
         }
     }

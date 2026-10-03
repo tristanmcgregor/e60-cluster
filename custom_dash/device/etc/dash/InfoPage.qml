@@ -22,5 +22,10 @@ Column {
         value: page.nav.gateway === "" ? "Not on the hotspot"
              : (page.nav.connected ? "Connected to " + page.nav.gateway : "Hotspot " + page.nav.gateway + ", app not answering")
     }
+    Stat {
+        width: 440
+        label: "SETTINGS (PHONE BROWSER ON THE CAR WI-FI)"
+        value: page.nav.gateway === "" ? "--" : "http://" + page.nav.gateway + ":8765/settings"
+    }
     Stat { width: 440; label: "LAST BUTTON CODE"; value: page.car.lastButton > 0 ? String(page.car.lastButton) : "--" }
 }

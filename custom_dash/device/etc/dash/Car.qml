@@ -5,6 +5,7 @@
 // EventHub only emits one NOTIFY signal per group (speedChanged covers speed,
 // speedM and rpm, etc.), so each handler copies the whole group out.
 import QtQuick 2.14
+import QtQuick.LocalStorage 2.0
 import plugins.EventHub 1.0
 
 Item {
@@ -94,6 +95,78 @@ Item {
     // 26 single (BC); a hold arrives as code + 128.
     signal button(int code)
 
+    // ---- warm-up redline, shift lights, sport layout ----
+    // Defaults; the phone settings page (CarSettings on the head unit) can replace them.
+    // Redline steps on engine oil temperature like BMW's warm-up display: [°C, rpm] rows,
+    // the highest row at or below the current temperature wins. 7000 is the N52 cut-off.
+    property var redlineTable: [[30, 4500], [50, 5000], [70, 5500], [80, 6000], [90, 6500], [100, 7000]]
+    property bool shiftLightsOn: true
+    property int shiftWindow: 2000      // lights start this far below the shift point
+    property int shiftMargin: 200       // flash this far below the redline
+    property string sportSetting: "auto"   // auto (gearbox in S or M) | always | never
+
+    // Oil temperature when the MCU reports it, otherwise coolant; 0 = unknown.
+    readonly property int engineTemp: oilTempInt > 0 ? oilTempInt : (parseInt(coolantTemp) || 0)
+    readonly property int redlineRpm: {
+        var table = redlineTable, rpm = table.length ? table[0][1] : 7000
+        if (engineTemp <= 0) return table.length ? table[table.length - 1][1] : 7000   // unknown: full range
+        for (var i = 0; i < table.length; i++)
+            if (engineTemp >= table[i][0]) rpm = table[i][1]
+        return rpm
+    }
+    readonly property int shiftRpm: redlineRpm - shiftMargin
+    // S or M on the selector. TODO(after the Phase 0 drive): confirm this car's gear strings.
+    readonly property bool gearboxSport: /^(DS|S|M)\d*$/i.test(gear.trim())
+    readonly property bool sportMode: sportSetting === "always" || (sportSetting === "auto" && gearboxSport)
+
+    property int speedLimitMargin: 3
+    property bool speedLimitOn: true
+    property int defaultPage: 0
+    signal settingsApplied()
+
+    // Settings from the phone settings page (head unit CarSettings). Applied live, and kept
+    // with LocalStorage so the next start-up uses them before the head unit is reachable.
+    function applySettings(s, store) {
+        if (s.speedCorrection !== undefined) speedFactor = 1 + Number(s.speedCorrection) / 100
+        if (s.sport !== undefined) sportSetting = s.sport
+        if (s.shiftLights !== undefined) shiftLightsOn = s.shiftLights === true
+        if (s.shiftWindow !== undefined) shiftWindow = s.shiftWindow
+        if (s.shiftMargin !== undefined) shiftMargin = s.shiftMargin
+        if (s.redline !== undefined && s.redline.length) redlineTable = s.redline
+        if (s.speedLimit !== undefined) speedLimitOn = s.speedLimit === true
+        if (s.speedLimitMargin !== undefined) speedLimitMargin = s.speedLimitMargin
+        if (s.defaultPage !== undefined) defaultPage = s.defaultPage
+        settingsApplied()
+        if (store) {
+            try {
+                settingsDb().transaction(function(tx) {
+                    tx.executeSql("INSERT OR REPLACE INTO kv VALUES ('settings', ?)", [JSON.stringify(s)])
+                })
+            } catch (e) {
+                console.warn("[dash] settings not stored: " + e)
+            }
+        }
+        console.log("[dash] settings applied" + (store ? " and stored" : " (stored copy)"))
+    }
+    function settingsDb() {
+        var db = LocalStorage.openDatabaseSync("e60dash", "1.0", "E60 dash settings", 64 * 1024)
+        db.transaction(function(tx) { tx.executeSql("CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT)") })
+        return db
+    }
+    Component.onCompleted: {
+        try {
+            settingsDb().readTransaction(function(tx) {
+                var r = tx.executeSql("SELECT v FROM kv WHERE k = 'settings'")
+                if (r.rows.length) car.applySettings(JSON.parse(r.rows.item(0).v), false)
+            })
+        } catch (e) {
+            console.warn("[dash] no stored settings: " + e)
+        }
+    }
+
+    // The EventHub object itself, for the developer page (read-only use).
+    readonly property QtObject eventHub: hub
+
     // Menu page currently shown, as the stock Launcher's EventHub.MenuId values. Writing
     // hub.menuId makes EventHub send the MCU its "interface" packet (UI style, menu, window);
     // the stock UI does this at start-up and on every page change, and the MCU relies on it
@@ -109,6 +182,18 @@ Item {
     Timer { interval: 2000; running: true; onTriggered: car.reportMenu() }
     property string hubVersion: ""
     property string mcuVersion: ""
+    // What the MCU reports for the gearbox and oil, logged on change: the sport layout and
+    // the warm-up redline depend on values only a drive in D, S and M can show.
+    property string lastDrivetrainLog: ""
+    function logDrivetrain() {
+        var line = "gear \"" + hub.gear + "\" auto=" + hub.gearAuto + " manual=" + hub.gearManual +
+                   " oil=" + hub.oilTempInt + " coolant=" + hub.waterTemperature
+        if (line !== lastDrivetrainLog) {
+            lastDrivetrainLog = line
+            console.log("[dash] " + line)
+        }
+    }
+
     property int lastButton: 0
     property bool buttonDown: false
 
@@ -167,10 +252,12 @@ Item {
             car.oilTemp = hub.oilTemp
             car.oilTempInt = hub.oilTempInt
             car.batteryVoltage = hub.batteryVoltage
+            car.logDrivetrain()
         }
         onGearChanged: {
             car.gear = hub.gear
             car.gearShow = hub.gearShow
+            car.logDrivetrain()
         }
         onTurnChanged: {
             car.turnLeftOn = hub.turnLeft

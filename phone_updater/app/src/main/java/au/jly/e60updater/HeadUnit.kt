@@ -80,6 +80,12 @@ class HeadUnit(val network: Network, private val host: String) {
             return null
         }
 
+        /** Default gateway of the first Wi-Fi network: the head unit when on the car hotspot. */
+        @Suppress("DEPRECATION")
+        fun wifiGateway(cm: ConnectivityManager): String? = cm.allNetworks
+            .filter { cm.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true }
+            .firstNotNullOfOrNull { gatewayOf(cm, it)?.hostAddress }
+
         private fun gatewayOf(cm: ConnectivityManager, network: Network): InetAddress? {
             val routes = cm.getLinkProperties(network)?.routes ?: return null
             val gateways = routes.filter { it.isDefaultRoute && it.hasGateway() }.mapNotNull { it.gateway }
