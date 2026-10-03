@@ -47,18 +47,6 @@
             android:inputType="textPassword"
             android:importantForAutofill="no" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update key" />
-
-        <EditText
-            android:id="@+id/key"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:importantForAutofill="no" />
-
         <Button
             android:id="@+id/save"
             android:layout_width="match_parent"

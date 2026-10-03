@@ -30,13 +30,11 @@ class MainActivity : Activity() {
 
         val repo = findViewById<EditText>(R.id.repo)
         val token = findViewById<EditText>(R.id.token)
-        val key = findViewById<EditText>(R.id.key)
         repo.setText(settings.repo)
         token.setText(settings.token)
-        key.setText(settings.updateKey)
 
         findViewById<Button>(R.id.save).setOnClickListener {
-            settings.save(repo.text.toString(), token.text.toString(), key.text.toString())
+            settings.save(repo.text.toString(), token.text.toString())
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         }
         findViewById<Button>(R.id.checkNow).setOnClickListener {

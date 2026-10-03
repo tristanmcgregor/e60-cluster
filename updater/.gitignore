@@ -2,3 +2,4 @@
 updater.properties
 out/
 test/
+signing_key.pem

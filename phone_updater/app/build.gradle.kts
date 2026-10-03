@@ -28,8 +28,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
-        buildConfigField("String", "UPDATE_KEY", quoted("update.key"))
         buildConfigField("String", "GITHUB_REPO", quoted("github.repo"))
         buildConfigField("String", "GITHUB_TOKEN", quoted("github.token"))
     }

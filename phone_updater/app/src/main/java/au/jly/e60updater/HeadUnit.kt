@@ -35,20 +35,20 @@ class HeadUnit(val network: Network, private val host: String) {
     enum class UploadResult { OK, NOT_NEWER }
 
     /** POST /update/{kind}?release=N&sha256=hex with the raw file as a fixed-length body. */
-    fun upload(kind: String, release: Int, sha256: String, file: File, key: String): UploadResult {
+    fun upload(kind: String, release: Int, sha256: String, file: File, signature: String): UploadResult {
         val conn = Http.open(network, "$base/update/$kind?release=$release&sha256=$sha256", 5_000, 120_000)
         try {
             conn.requestMethod = "POST"
             conn.doOutput = true
             // Fixed-length streaming sends Content-Length and avoids buffering the whole file in memory.
             conn.setFixedLengthStreamingMode(file.length())
-            conn.setRequestProperty("X-Update-Key", key)
+            conn.setRequestProperty("X-Update-Signature", signature)
             conn.setRequestProperty("Content-Type", "application/octet-stream")
             conn.outputStream.use { out -> file.inputStream().use { it.copyTo(out, 64 * 1024) } }
             return when (val code = conn.responseCode) {
                 200 -> UploadResult.OK
                 409 -> UploadResult.NOT_NEWER
-                401 -> throw Http.HttpException(code, "Head unit rejected the update key (401)")
+                401 -> throw Http.HttpException(code, "Head unit rejected the release signature (401)")
                 else -> throw Http.HttpException(code, "Head unit replied $code: ${Http.errorBody(conn)}")
             }
         } finally {

@@ -29,4 +29,4 @@ python3 updater/release.py --dash --publish     # dash only
 
 The phone updater picks a new release up the next time the phone joins the car's Wi-Fi. The head unit installs the app update once confirmed on its home screen. The cluster switches to the new dash at its next start-up.
 
-`updater/updater.properties` is not in git. It holds the upload key shared by the two apps and the JLY USB package password.
+Releases are signed with `updater/signing_key.pem`, which stays on the release machine and out of git (keep a backup). The head unit app only accepts uploads that verify against the public key `updater/signing_pub.pem`, so neither app contains a secret. `updater/updater.properties` (not in git) holds local settings such as the JLY USB package password.

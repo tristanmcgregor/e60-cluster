@@ -60,7 +60,7 @@ class Updater(private val context: Context, private val isCancelled: () -> Boole
         for (file in listOfNotNull(dash, apk)) {
             if (isCancelled()) throw IOException("Stopped by the system")
             settings.log("Uploading ${file.name} to the car")
-            when (car.upload(file.kind, file.release, file.sha256, cached(file), settings.updateKey)) {
+            when (car.upload(file.kind, file.release, file.sha256, cached(file), file.signature)) {
                 HeadUnit.UploadResult.OK -> pushed += "${file.kind} v${file.release}"
                 HeadUnit.UploadResult.NOT_NEWER -> settings.log("Car already has ${file.kind} v${file.release}")
             }

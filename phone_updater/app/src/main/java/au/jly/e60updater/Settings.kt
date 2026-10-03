@@ -14,16 +14,14 @@ class Settings(context: Context) {
     // A blank override falls back to the build-time default.
     val repo: String get() = pick(KEY_REPO, BuildConfig.GITHUB_REPO)
     val token: String get() = pick(KEY_TOKEN, BuildConfig.GITHUB_TOKEN)
-    val updateKey: String get() = pick(KEY_UPDATE_KEY, BuildConfig.UPDATE_KEY)
 
     private fun pick(key: String, default: String): String =
         prefs.getString(key, null)?.trim()?.takeIf { it.isNotEmpty() } ?: default.trim()
 
-    fun save(repo: String, token: String, updateKey: String) {
+    fun save(repo: String, token: String) {
         prefs.edit()
             .putString(KEY_REPO, repo.trim())
             .putString(KEY_TOKEN, token.trim())
-            .putString(KEY_UPDATE_KEY, updateKey.trim())
             .apply()
     }
 
@@ -62,7 +60,6 @@ class Settings(context: Context) {
         const val PREFS = "e60_updater"
         const val KEY_REPO = "github.repo"
         const val KEY_TOKEN = "github.token"
-        const val KEY_UPDATE_KEY = "update.key"
         const val KEY_LOG = "log"
         const val KEY_APK = "hu.apkRelease"
         const val KEY_PENDING_APK = "hu.pendingApkRelease"

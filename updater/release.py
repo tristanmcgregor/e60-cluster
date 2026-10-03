@@ -13,6 +13,7 @@ Also rebuilds the USB package (custom_dash/out/install/dashboard.zip) stamped wi
 same release, so a USB install and the over-the-air copy agree on what is newest.
 """
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -46,6 +47,20 @@ def sha256(path):
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def sign(kind, n, digest):
+    """Signs "<kind>\\n<release>\\n<sha256>\\n" with the release key (ECDSA P-256, SHA-256).
+
+    The head unit checks this against the public key built into it (signing_pub.pem), so an
+    upload is accepted only if it came from this tool. signing_key.pem never leaves this Mac.
+    """
+    key = os.path.join(HERE, "signing_key.pem")
+    if not os.path.isfile(key):
+        sys.exit("updater/signing_key.pem is missing; releases cannot be signed")
+    sig = subprocess.run(["openssl", "dgst", "-sha256", "-sign", key],
+                         input=f"{kind}\n{n}\n{digest}\n".encode(), capture_output=True, check=True).stdout
+    return base64.b64encode(sig).decode()
 
 
 def github_highest(repo):
@@ -126,7 +141,9 @@ def main():
     files = []
     if args.dash:
         f = build_dash(n, outdir)
-        manifest["dash"] = {"name": os.path.basename(f), "sha256": sha256(f), "size": os.path.getsize(f)}
+        digest = sha256(f)
+        manifest["dash"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
+                            "sig": sign("dash", n, digest)}
         files.append(f)
         # USB package stamped with the same release
         subprocess.run([sys.executable, os.path.join(JLY, "custom_dash", "tools", "build_dash_package.py"),
@@ -136,8 +153,9 @@ def main():
                        check=True, stdout=subprocess.DEVNULL)
     if args.apk:
         f = build_apk(n, outdir)
-        manifest["apk"] = {"name": os.path.basename(f), "sha256": sha256(f), "size": os.path.getsize(f),
-                           "versionCode": 200000 + n}
+        digest = sha256(f)
+        manifest["apk"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
+                           "versionCode": 200000 + n, "sig": sign("apk", n, digest)}
         files.append(f)
     mpath = os.path.join(outdir, "manifest.json")
     with open(mpath, "w") as fh:

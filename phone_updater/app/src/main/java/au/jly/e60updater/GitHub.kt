@@ -14,6 +14,7 @@ data class UpdateFile(
     val sha256: String,
     val size: Long,
     val assetUrl: String,
+    val signature: String, // release-tool signature, checked by the head unit
 )
 
 /** Reads releases and their manifest.json assets from GitHub, over the given internet network. */
@@ -68,7 +69,7 @@ class GitHub(private val network: Network, private val repo: String, private val
         val name = entry.optString("name")
         val url = assetUrl(assets, name) ?: return null
         return UpdateFile(kind, release, name, entry.optString("sha256").lowercase(),
-            entry.optLong("size", -1), url)
+            entry.optLong("size", -1), url, entry.optString("sig"))
     }
 
     fun download(file: UpdateFile, dest: File): String =

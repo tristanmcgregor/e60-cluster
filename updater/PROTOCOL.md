@@ -16,10 +16,12 @@ Assets:
 - `manifest.json`:
   ```json
   {"release": N,
-   "dash": {"name": "dash-N.tar.gz", "sha256": "<hex>", "size": 123},
-   "apk":  {"name": "OpenHeadunit-e60-N.apk", "sha256": "<hex>", "size": 123, "versionCode": 200000}}
+   "dash": {"name": "dash-N.tar.gz", "sha256": "<hex>", "size": 123, "sig": "<base64>"},
+   "apk":  {"name": "OpenHeadunit-e60-N.apk", "sha256": "<hex>", "size": 123, "versionCode": 200000,
+            "sig": "<base64>"}}
   ```
   `dash` and `apk` are each optional: a release may carry only one of them.
+  `sig` is the release signature; see "Signing" below.
 - The files named in the manifest.
 
 The phone lists recent releases (`GET /repos/{owner}/{repo}/releases?per_page=20`). It takes:
@@ -42,8 +44,8 @@ A value of 0 means none/unknown. `service` identifies this endpoint, so the phon
 
 **`POST /update/dash?release=N&sha256=<hex>`** and **`POST /update/apk?release=N&sha256=<hex>`**
 
-- Headers: `X-Update-Key: <update.key>` and `Content-Length: <bytes>`. The body is the raw file.
-- Replies: `200 ok`, `401` for a bad key, `400` for a bad request or checksum mismatch, `409` if the release is not newer.
+- Headers: `X-Update-Signature: <sig from the manifest>` and `Content-Length: <bytes>`. The body is the raw file.
+- Replies: `200 ok`, `401` for a bad signature, `400` for a bad request or checksum mismatch, `409` if the release is not newer.
 - An APK upload is staged. The head unit asks for install confirmation when it is not projecting.
 
 **`GET /dash/manifest.txt?have=M`**
@@ -64,6 +66,13 @@ A value of 0 means none/unknown. `service` identifies this endpoint, so the phon
 - `/etc/dash/`: the base version installed by USB; the last fallback.
 - `/etc/d.qml` loads `dashv/<active>/Dashboard.qml`. If that fails it tries the previous release, then `/etc/dash`, then the stock UI.
 
-## Shared secret
+## Signing
 
-`updater/updater.properties` holds `update.key`, which is compiled into both apps. That file stays out of git.
+Neither app contains a secret.
+
+- `release.py` signs `"<kind>\n<release>\n<sha256>\n"` (kind is `dash` or `apk`) with ECDSA P-256 / SHA-256, using `updater/signing_key.pem`. That file never leaves the release Mac and is not in git.
+- The head unit has the public half (`updater/signing_pub.pem`) built in.
+- The head unit checks the signature before it reads the body, then checks the body against that sha256.
+- An upload must also be a newer release than the head unit already has, so an old signed release cannot be replayed.
+
+**Keep a backup of `signing_key.pem`.** Without it, new releases are refused by the installed app until a new app is installed from USB.
