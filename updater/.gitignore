@@ -1,0 +1,4 @@
+# secrets and build output
+updater.properties
+out/
+test/

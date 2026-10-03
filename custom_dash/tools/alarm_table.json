@@ -1,0 +1,1394 @@
+[
+{
+"id": 0,
+"icon": "images/alarm/ico_jinggao.png",
+"en": "NONE",
+"zh": "無"
+},
+{
+"id": 1,
+"icon": "images/alarm/ico_jinggao.png",
+"en": "warning",
+"zh": "警告"
+},
+{
+"id": 2,
+"icon": "images/alarm/tsico_fdjgz.png",
+"en": "Engine failure",
+"zh": "发动机故障"
+},
+{
+"id": 3,
+"icon": "images/alarm/tsico_aqqngz.png",
+"en": "airbag fault",
+"zh": "安全气囊故障"
+},
+{
+"id": 4,
+"icon": "images/alarm/tsico_abs.png",
+"en": "ABS failure",
+"zh": "防抱死故障"
+},
+{
+"id": 5,
+"icon": "images/alarm/tsico_zdgz.png",
+"en": "Brake failure",
+"zh": "制动故障"
+},
+{
+"id": 6,
+"icon": "images/alarm/tsico_zxxtgz.png",
+"en": "Steering failure",
+"zh": "转向故障"
+},
+{
+"id": 7,
+"icon": "images/alarm/tsico_qxybz.png",
+"en": "Low cleaning fluid",
+"zh": "清洗液低"
+},
+{
+"id": 8,
+"icon": "images/alarm/ico_atooltemp.png",
+"en": "High transmission temperature",
+"zh": "变速箱温度高"
+},
+{
+"id": 9,
+"icon": "images/alarm/tsico_yg.png",
+"en": "high beam",
+"zh": "远光灯"
+},
+{
+"id": 10,
+"icon": "images/alarm/tsico_hwd.png",
+"en": "Rear fog lamp",
+"zh": "后雾灯"
+},
+{
+"id": 11,
+"icon": "images/alarm/tsico_qwd.png",
+"en": "Front fog lamp",
+"zh": "前雾灯"
+},
+{
+"id": 12,
+"icon": "images/alarm/tsico_qzd.png",
+"en": "Side lamp (headlamp)",
+"zh": "示宽灯(大灯)"
+},
+{
+"id": 13,
+"icon": "images/alarm/tsico_dpsh.png",
+"en": "Headlamp failure",
+"zh": "大灯故障"
+},
+{
+"id": 14,
+"icon": "images/alarm/tsico_zsyqzdgz.png",
+"en": "Lamp height fault",
+"zh": "车灯高度故障"
+},
+{
+"id": 15,
+"icon": "images/alarm/tsico_light.png",
+"en": "dipped headlight",
+"zh": "近光灯"
+},
+{
+"id": 16,
+"icon": "images/alarm/ico_dengauto.png",
+"en": "Automatic headlight",
+"zh": "自动大灯"
+},
+{
+"id": 17,
+"icon": "images/alarm/tsico_aqd.png",
+"en": "Main seat belt not fastened",
+"zh": "主安全带未系"
+},
+{
+"id": 18,
+"icon": "images/alarm/tsico_aqd.png",
+"en": "The auxiliary safety belt is not fastened",
+"zh": "副安全带未系"
+},
+{
+"id": 19,
+"icon": "images/alarm/tsico_cswdon.png",
+"en": "Body stability failure",
+"zh": "车身稳定故障"
+},
+{
+"id": 20,
+"icon": "images/alarm/tsico_cswdxtoff.png",
+"en": "Body steady close",
+"zh": "车身稳定关闭"
+},
+{
+"id": 21,
+"icon": "images/alarm/tsico_dhjgd.png",
+"en": "Battery failure",
+"zh": "电池故障"
+},
+{
+"id": 22,
+"icon": "images/alarm/tsico_chemen.png",
+"en": "Door not closed",
+"zh": "车门未关闭"
+},
+{
+"id": 23,
+"icon": "images/alarm/tsico_shousha.png",
+"en": "Handbrake up",
+"zh": "手刹拉起"
+},
+{
+"id": 24,
+"icon": "images/alarm/tsico_tydgz.png",
+"en": "Tire pressure failure",
+"zh": "胎压故障"
+},
+{
+"id": 25,
+"icon": "images/alarm/tsico_jyyl.png",
+"en": "low oil pressure",
+"zh": "机油压力低"
+},
+{
+"id": 26,
+"icon": "images/alarm/tsico_fdjon.png",
+"en": "Smart idle is working",
+"zh": "智能怠速正在工作"
+},
+{
+"id": 27,
+"icon": "images/alarm/tsico_fdjoff.png",
+"en": "Intelligent idle off",
+"zh": "智能怠速关闭"
+},
+{
+"id": 28,
+"icon": "images/alarm/baojing_09.png",
+"en": "Intelligent idle not available",
+"zh": "智能怠速不可用"
+},
+{
+"id": 29,
+"icon": "images/alarm/tsico_sd.png",
+"en": "frost",
+"zh": "霜冻"
+},
+{
+"id": 30,
+"icon": "images/alarm/tsico_xpfz.png",
+"en": "Downhill assist",
+"zh": "下坡辅助"
+},
+{
+"id": 31,
+"icon": "images/alarm/baojing_21.png",
+"en": "Cruise on",
+"zh": "定速巡航打开"
+},
+{
+"id": 32,
+"icon": "images/alarm/baojing_05.png",
+"en": "Cruise control fault",
+"zh": "定速巡航故障"
+},
+{
+"id": 33,
+"icon": "images/alarm/tsico_qdqy.png",
+"en": "Four wheel drive on",
+"zh": "四驱打开"
+},
+{
+"id": 34,
+"icon": "images/alarm/ico_chasu_auto.png",
+"en": "Automatic 4WD mode",
+"zh": "自动四驱模式"
+},
+{
+"id": 35,
+"icon": "images/alarm/ico_chasu1.png",
+"en": "Rear differential lock open",
+"zh": "后差速锁打开"
+},
+{
+"id": 36,
+"icon": "images/alarm/ico_chasu2.png",
+"en": "Medium differential lock open",
+"zh": "中差速锁打开"
+},
+{
+"id": 37,
+"icon": "images/alarm/tsico_wdfz.png",
+"en": "Tank turning fault",
+"zh": "坦克调头故障"
+},
+{
+"id": 38,
+"icon": "images/alarm/ico_waidanfuzhu.png",
+"en": "The tank turned around and started",
+"zh": "坦克调头启动"
+},
+{
+"id": 39,
+"icon": "images/alarm/chasusuo_4h.png",
+"en": "High speed 4WD",
+"zh": "高速四驱"
+},
+{
+"id": 40,
+"icon": "images/alarm/chasusuo_4l.png",
+"en": "Low speed 4WD",
+"zh": "低速四驱"
+},
+{
+"id": 41,
+"icon": "images/alarm/tsico_4lo.png",
+"en": "Low speed 4WD 4LO",
+"zh": "低速四驱 4LO"
+},
+{
+"id": 42,
+"icon": "images/alarm/chasusuo_auto.png",
+"en": "Automatic mode",
+"zh": "自动模式"
+},
+{
+"id": 43,
+"icon": "images/alarm/ico_awd.png",
+"en": "Four wheel drive failure",
+"zh": "四驱故障"
+},
+{
+"id": 44,
+"icon": "images/alarm/ico_atp.png",
+"en": "ATP",
+"zh": "ATP"
+},
+{
+"id": 45,
+"icon": "images/alarm/fuizi_bai.png",
+"en": "ICS intelligent gap sonar system",
+"zh": "ICS 智能间隙声纳系统"
+},
+{
+"id": 46,
+"icon": "images/alarm/hold_green.png",
+"en": "ABH (auto brake hold) on",
+"zh": "ABH(Auto Brake Hold)自动驻车系统打开"
+},
+{
+"id": 47,
+"icon": "images/alarm/hold_huang.png",
+"en": "ABH (auto brake hold) automatic parking system fault",
+"zh": "ABH(Auto Brake Hold)自动驻车系统故障"
+},
+{
+"id": 48,
+"icon": "images/alarm/ico_bsm.png",
+"en": "Parallel auxiliary system on",
+"zh": "并线辅助系统打开"
+},
+{
+"id": 49,
+"icon": "images/alarm/ico_pianyi3.png",
+"en": "Lane Departure Warning",
+"zh": "车道偏离警告"
+},
+{
+"id": 50,
+"icon": "images/alarm/ico_pianyi2.png",
+"en": "Lane departure preparation",
+"zh": "车道偏离准备"
+},
+{
+"id": 51,
+"icon": "images/alarm/ico_pianyi1.png",
+"en": "Lane departure work",
+"zh": "车道偏离工作"
+},
+{
+"id": 52,
+"icon": "images/alarm/ico_pianyi4.png",
+"en": "Lane departure fault",
+"zh": "车道偏离故障"
+},
+{
+"id": 53,
+"icon": "images/alarm/tsico_ect2nd.png",
+"en": "Ect 2nd gear start",
+"zh": "ECT 2 挡起步"
+},
+{
+"id": 54,
+"icon": "images/alarm/tsico_ectpwr.png",
+"en": "Power mode",
+"zh": "动力模式"
+},
+{
+"id": 55,
+"icon": "images/alarm/ico_snow.png",
+"en": "Start in the snow",
+"zh": "雪地起步"
+},
+{
+"id": 56,
+"icon": "images/alarm/anquandai_r1.png",
+"en": "Rear left seat belt not fastened",
+"zh": "后排左 1 安全带未系"
+},
+{
+"id": 57,
+"icon": "images/alarm/anquandai_r2.png",
+"en": "Rear left second seat belt not fastened",
+"zh": "后排左 2 安全带未系"
+},
+{
+"id": 58,
+"icon": "images/alarm/anquandai_r3.png",
+"en": "Rear left three seat belts not fastened",
+"zh": "后排左 3 安全带未系"
+},
+{
+"id": 59,
+"icon": "images/alarm/ico_zhangai.png",
+"en": "Radar on",
+"zh": "雷达开启"
+},
+{
+"id": 60,
+"icon": "images/alarm/jiyouyaliguogao.png",
+"en": "High oil temperature",
+"zh": "机油温度高"
+},
+{
+"id": 61,
+"icon": "images/alarm/taiya_tc.png",
+"en": "Tire pressure TC disable",
+"zh": "胎压TC禁用"
+},
+{
+"id": 62,
+"icon": "images/alarm/ico_vdc.png",
+"en": "VDC",
+"zh": "VDC"
+},
+{
+"id": 63,
+"icon": "images/alarm/ico_afsoff.png",
+"en": "AFS OFF",
+"zh": "AFS OFF"
+},
+{
+"id": 64,
+"icon": "images/alarm/ico_atcheck.png",
+"en": "AT CHECK",
+"zh": "AT CHECK"
+},
+{
+"id": 65,
+"icon": "images/alarm/tsico_bsxywg.png",
+"en": "Transmission failure",
+"zh": "变速箱故障"
+},
+{
+"id": 66,
+"icon": "images/alarm/tsico_rscaoff.png",
+"en": "Roll over airbag off",
+"zh": "翻滚气囊关闭"
+},
+{
+"id": 67,
+"icon": "images/alarm/rcta_off.png",
+"en": "Parking Aid brake system off",
+"zh": "倒车辅助刹车系统关闭"
+},
+{
+"id": 68,
+"icon": "images/alarm/ico_kdss.png",
+"en": "Failure of power regulating suspension system",
+"zh": "动力调节悬挂系统故障"
+},
+{
+"id": 69,
+"icon": "images/alarm/ico_key.png",
+"en": "Key lock failure",
+"zh": "钥匙锁故障"
+},
+{
+"id": 70,
+"icon": "images/alarm/ico_key2.png",
+"en": "There is a key in the car",
+"zh": "车内有钥匙"
+},
+{
+"id": 71,
+"icon": "images/alarm/ico_ldcoff.png",
+"en": "Vehicle dynamic control system off",
+"zh": "车辆动态控制系统关闭"
+},
+{
+"id": 72,
+"icon": "images/alarm/ico_ldpon.png",
+"en": "Lane departure prevention system",
+"zh": "预防车道偏离系统"
+},
+{
+"id": 73,
+"icon": "images/alarm/ico_ibaoff.png",
+"en": "Intelligent brake assist system off",
+"zh": "智能刹车辅助系统关闭"
+},
+{
+"id": 74,
+"icon": "images/alarm/tsico_rcta.png",
+"en": "Park assist brake on",
+"zh": "倒车辅助刹车系统打开"
+},
+{
+"id": 75,
+"icon": "images/alarm/ico_cksusp.png",
+"en": "CK SUSP",
+"zh": "CK SUSP"
+},
+{
+"id": 76,
+"icon": "images/alarm/ico_difflock.png",
+"en": "Differential lock does not work",
+"zh": "差速锁不工作"
+},
+{
+"id": 77,
+"icon": "images/alarm/tsico_trcoff.png",
+"en": "TRC OFF",
+"zh": "TRC OFF"
+},
+{
+"id": 78,
+"icon": "images/alarm/baojing_07.png",
+"en": "Timing belt warning lamp",
+"zh": "正时皮带报警灯"
+},
+{
+"id": 79,
+"icon": "images/alarm/baojing_03.png",
+"en": "Parallel auxiliary warning",
+"zh": "并线辅助警告"
+},
+{
+"id": 80,
+"icon": "images/alarm/baojing_03_green.png",
+"en": "Parallel auxiliary opening",
+"zh": "并线辅助打开"
+},
+{
+"id": 81,
+"icon": "images/alarm/baojing_03_yellow.png",
+"en": "Parallel auxiliary fault",
+"zh": "并线辅助故障"
+},
+{
+"id": 82,
+"icon": "images/alarm/baojing_18.png",
+"en": "Car following assist on",
+"zh": "跟车辅助开启"
+},
+{
+"id": 83,
+"icon": "images/alarm/baojing_18_orange.png",
+"en": "Car following aid failure",
+"zh": "跟车辅助故障"
+},
+{
+"id": 84,
+"icon": "images/alarm/baojing_10.png",
+"en": "Lane keeping failure",
+"zh": "车道保持故障"
+},
+{
+"id": 85,
+"icon": "images/alarm/baojing_10_green.png",
+"en": "Lane hold open",
+"zh": "车道保持开启"
+},
+{
+"id": 86,
+"icon": "images/alarm/baojing_10_orange.png",
+"en": "Lane keeping reminder",
+"zh": "车道保持提醒"
+},
+{
+"id": 87,
+"icon": "images/alarm/baojing_12.png",
+"en": "Distance keeping fault",
+"zh": "车距保持故障"
+},
+{
+"id": 88,
+"icon": "images/alarm/baojing_12_green.png",
+"en": "Gap hold open",
+"zh": "车距保持开启"
+},
+{
+"id": 89,
+"icon": "images/alarm/baojing_12_green_2.png",
+"en": "Distance keeping operation",
+"zh": "车距保持工作"
+},
+{
+"id": 90,
+"icon": "images/alarm/baojing_02.png",
+"en": "Trailer mode on",
+"zh": "拖车模式打开"
+},
+{
+"id": 91,
+"icon": "images/alarm/baojing_04.png",
+"en": "The automatic handbrake remains on",
+"zh": "自动手刹保持开启"
+},
+{
+"id": 92,
+"icon": "images/alarm/baojing_06.png",
+"en": "2nd gear starts",
+"zh": "2nd 挡起步开启"
+},
+{
+"id": 93,
+"icon": "images/alarm/baojing_08.png",
+"en": "Maintenance reminder sign",
+"zh": "保养提醒标志"
+},
+{
+"id": 94,
+"icon": "images/alarm/baojing_01.png",
+"en": "Downhill assist control",
+"zh": "下坡辅助控制"
+},
+{
+"id": 95,
+"icon": "images/alarm/baojing_14.png",
+"en": "Cruise on",
+"zh": "定速巡航打开"
+},
+{
+"id": 96,
+"icon": "images/alarm/baojing_14_orange.png",
+"en": "自动手刹保持开启",
+"zh": "定速巡航故障"
+},
+{
+"id": 97,
+"icon": "images/alarm/baojing_17.png",
+"en": "Constant speed cruise acceleration one",
+"zh": "定速巡航加速一"
+},
+{
+"id": 98,
+"icon": "images/alarm/baojing_14_blue.png",
+"en": "Cruise acceleration two",
+"zh": "定速巡航加速二"
+},
+{
+"id": 99,
+"icon": "images/alarm/ico_qianchejiance.png",
+"en": "ACC adaptive cruise on",
+"zh": "ACC 自适应巡航打开"
+},
+{
+"id": 100,
+"icon": "images/alarm/baojing_20.png",
+"en": "Distance control assistant",
+"zh": "车距控制辅助"
+},
+{
+"id": 101,
+"icon": "images/alarm/tsico_yswsb.png",
+"en": "No key detected",
+"zh": "未检测到钥匙"
+},
+{
+"id": 102,
+"icon": "images/alarm/ico_sudu1.png",
+"en": "No key detected",
+"zh": "蠕动模式 CRAWL"
+},
+{
+"id": 103,
+"icon": "images/alarm/ico_sudu2.png",
+"en": "No key detected",
+"zh": "检测到地形"
+},
+{
+"id": 104,
+"icon": "images/alarm/tsico_pcs.png",
+"en": "No key detected",
+"zh": "PCS故障"
+},
+{
+"id": 105,
+"icon": "images/alarm/tsico_a_tp.png",
+"en": "No key detected",
+"zh": "变速箱从N档移出"
+},
+{
+"id": 106,
+"icon": "images/alarm/tsico_easy_enter.png",
+"en": "No key detected",
+"zh": "方便进入模式"
+},
+{
+"id": 107,
+"icon": "images/alarm/ico_pengzhaung.png",
+"en": "No key detected",
+"zh": "防碰撞系统被关闭"
+},
+{
+"id": 108,
+"icon": "images/alarm/baojing_19.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 109,
+"icon": "images/alarm/slider_door.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 110,
+"icon": "images/alarm/search_parking_lot.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 111,
+"icon": "images/alarm/left_parking_lot.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 112,
+"icon": "images/alarm/right_parking_lot.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 113,
+"icon": "images/alarm/attention_assist.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 114,
+"icon": "images/alarm/rear_wiper.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 115,
+"icon": "images/alarm/tco.png",
+"en": "No key detected",
+"zh": "防碰撞报警指示灯"
+},
+{
+"id": 116,
+"icon": "images/alarm/a07.png",
+"en": "No key detected",
+"zh": "电子前悬平衡杆"
+},
+{
+"id": 117,
+"icon": "images/alarm/baojingdeng_1.png",
+"en": "",
+"zh": "前差速锁"
+},
+{
+"id": 118,
+"icon": "images/alarm/baojingdeng_2.png",
+"en": "",
+"zh": "后差速锁"
+},
+{
+"id": 119,
+"icon": "images/alarm/baojingdeng_4.png",
+"en": "",
+"zh": "节气门"
+},
+{
+"id": 120,
+"icon": "images/alarm/baojingdeng_5.png",
+"en": "",
+"zh": "防盗系统警告"
+},
+{
+"id": 121,
+"icon": "images/alarm/a07.png",
+"en": "No key detected",
+"zh": "电子前悬平衡杆"
+},
+{
+"id": 122,
+"icon": "images/alarm/a07.png",
+"en": "No key detected",
+"zh": "电子前悬平衡杆"
+},
+{
+"id": 123,
+"icon": "images/alarm/alarm123_auto_lsd.png",
+"en": "",
+"zh": "AUTO LSD 自动限滑差速器系统"
+},
+{
+"id": 124,
+"icon": "images/alarm/alarm124_stop.png",
+"en": "",
+"zh": "STOP 立即停车"
+},
+{
+"id": 125,
+"icon": "images/alarm/alarm125_iMT.png",
+"en": "",
+"zh": "iMT智能机械式变速器 开启"
+},
+{
+"id": 126,
+"icon": "images/alarm/alarm126_iMT.png",
+"en": "",
+"zh": "iMT故障"
+},
+{
+"id": 127,
+"icon": "images/alarm/a07.png",
+"en": "",
+"zh": "维修提醒"
+},
+{
+"id": 128,
+"icon": "images/alarm/tsico_zdyxxtgz.png",
+"en": "",
+"zh": "制动器取消系统警示灯"
+},
+{
+"id": 129,
+"icon": "images/alarm/a07.png",
+"en": "",
+"zh": "雷达提醒被关闭"
+},
+{
+"id": 130,
+"icon": "images/alarm/alarm-23.png",
+"en": "",
+"zh": "动力故障指示灯"
+},
+{
+"id": 131,
+"icon": "images/alarm/alarm-24.png",
+"en": "",
+"zh": "整车故障灯"
+},
+{
+"id": 132,
+"icon": "images/alarm/alarm-22.png",
+"en": "",
+"zh": "制动气压表"
+},
+{
+"id": 133,
+"icon": "images/alarm/alarm-13.png",
+"en": "",
+"zh": "动力蓄电池故障指示灯"
+},
+{
+"id": 134,
+"icon": "images/alarm/alarm-21.png",
+"en": "",
+"zh": "动力电池电压低报警指示灯"
+},
+{
+"id": 135,
+"icon": "images/alarm/alarm-8.png",
+"en": "",
+"zh": "铅酸蓄电池电压低报警指示灯"
+},
+{
+"id": 136,
+"icon": "images/alarm/alarm-17.png",
+"en": "",
+"zh": "动力电池高温报警信号装置"
+},
+{
+"id": 137,
+"icon": "images/alarm/alarm-9.png",
+"en": "",
+"zh": "驱动电机过热指示灯"
+},
+{
+"id": 138,
+"icon": "images/alarm/alarm-15.png",
+"en": "",
+"zh": "过载报警灯"
+},
+{
+"id": 139,
+"icon": "images/alarm/a07.png",
+"en": "",
+"zh": "Ready-正常状态"
+},
+{
+"id": 140,
+"icon": "images/alarm/a07.png",
+"en": "",
+"zh": "Ready-异常状态"
+},
+{
+"id": 141,
+"icon": "images/alarm/alarm-10.png",
+"en": "",
+"zh": "回油滤清报警灯(回油压力指示灯)"
+},
+{
+"id": 142,
+"icon": "images/alarm/alarm-16.png",
+"en": "",
+"zh": "充电连接指示灯"
+},
+{
+"id": 143,
+"icon": "images/alarm/alarm-11.png",
+"en": "",
+"zh": "变矩器油压指示灯"
+},
+{
+"id": 144,
+"icon": "images/alarm/alarm-20.png",
+"en": "",
+"zh": "变矩器油温报警灯"
+},
+{
+"id": 145,
+"icon": "images/alarm/alarm-19.png",
+"en": "",
+"zh": "双变油滤报警灯"
+},
+{
+"id": 146,
+"icon": "images/alarm/alarm-7.png",
+"en": "",
+"zh": "驾驶员报警灯"
+},
+{
+"id": 147,
+"icon": "images/alarm/alarm-18.png",
+"en": "",
+"zh": "绝缘报警灯"
+},
+{
+"id": 148,
+"icon": "images/alarm/alarm-25.png",
+"en": "",
+"zh": "辅驱控制器报警灯"
+},
+{
+"id": 149,
+"icon": "images/alarm/alarm-14.png",
+"en": "",
+"zh": "远程锁车指示灯"
+},
+{
+"id": 150,
+"icon": "images/alarm/alarm-1.png",
+"en": "",
+"zh": "举升负荷超载报警"
+},
+{
+"id": 151,
+"icon": "images/alarm/alarm-26.png",
+"en": "",
+"zh": "充电状态"
+},
+{
+"id": 152,
+"icon": "images/alarm/alarm-27.png",
+"en": "",
+"zh": "充电故障"
+},
+{
+"id": 153,
+"icon": "images/alarm/153.png",
+"en": "",
+"zh": "下坡辅助故障"
+},
+{
+"id": 154,
+"icon": "images/alarm/alarm154_snow.png",
+"en": "",
+"zh": "雪地模式打开"
+},
+{
+"id": 155,
+"icon": "images/alarm/a25.png",
+"en": "",
+"zh": "拖车模式"
+},
+{
+"id": 156,
+"icon": "images/alarm/alarm-27.png",
+"en": "",
+"zh": "低速4驱故障"
+},
+{
+"id": 157,
+"icon": "images/alarm/sonaroff.png",
+"en": "",
+"zh": "sonar"
+},
+{
+"id": 158,
+"icon": "images/alarm/158.png",
+"en": "",
+"zh": "驻车灯"
+},
+{
+"id": 159,
+"icon": "images/alarm/159.png",
+"en": "",
+"zh": "自动变速器故障"
+},
+{
+"id": 160,
+"icon": "images/alarm/160.png",
+"en": "",
+"zh": "乘客安全气囊关闭警告灯"
+},
+{
+"id": 161,
+"icon": "images/alarm/161.png",
+"en": "",
+"zh": "车辆钥匙故障"
+},
+{
+"id": 162,
+"icon": "images/alarm/162.png",
+"en": "",
+"zh": "制动片磨损"
+},
+{
+"id": 163,
+"icon": "images/alarm/163.png",
+"en": "",
+"zh": "燃油切断惯性开关启动"
+},
+{
+"id": 164,
+"icon": "images/alarm/164.png",
+"en": "",
+"zh": "停车灯故障"
+},
+{
+"id": 165,
+"icon": "images/alarm/165.png",
+"en": "",
+"zh": "微光传感器故障"
+},
+{
+"id": 166,
+"icon": "images/alarm/166.png",
+"en": "",
+"zh": "催化转化器温度过高警告灯"
+},
+{
+"id": 167,
+"icon": "images/alarm/167.png",
+"en": "",
+"zh": "软顶故障"
+},
+{
+"id": 168,
+"icon": "images/alarm/168.png",
+"en": "",
+"zh": "发动机油位低"
+},
+{
+"id": 169,
+"icon": "images/alarm/169.png",
+"en": "",
+"zh": "ASR系统故障"
+},
+{
+"id": 170,
+"icon": "images/alarm/170.png",
+"en": "",
+"zh": "自动变速器油位低"
+},
+{
+"id": 171,
+"icon": "images/alarm/171.png",
+"en": "",
+"zh": "减振器故障"
+},
+{
+"id": 172,
+"icon": "images/alarm/172.png",
+"en": "",
+"zh": "雨量传感器故障"
+},
+{
+"id": 173,
+"icon": "images/alarm/173.png",
+"en": "",
+"zh": "雷达故障"
+},
+{
+"id": 174,
+"icon": "images/alarm/174.png",
+"en": "",
+"zh": "运动模式"
+},
+{
+"id": 175,
+"icon": "images/alarm/175.png",
+"en": "",
+"zh": "低附着力功能开启"
+},
+{
+"id": 176,
+"icon": "images/alarm/176.png",
+"en": "",
+"zh": "EPB 自动运行功能关闭"
+},
+{
+"id": 177,
+"icon": "images/alarm/177.png",
+"en": "",
+"zh": "自动变速器(与MANUAL放同一个位置)"
+},
+{
+"id": 178,
+"icon": "images/alarm/178.png",
+"en": "",
+"zh": "手动挡模变速器式(与AUTO放同一个位置)"
+},
+{
+"id": 179,
+"icon": "images/alarm/179.png",
+"en": "",
+"zh": "座椅加热"
+},
+{
+"id": 180,
+"icon": "images/alarm/180.png",
+"en": "",
+"zh": "钥匙故障(非法闯入、钥匙匹配失败)"
+},
+{
+"id": 181,
+"icon": "images/alarm/181.png",
+"en": "",
+"zh": "自适应前照灯控制系统(ALC)故障"
+},
+{
+"id": 182,
+"icon": "images/alarm/AUTO-H.png",
+"en": "",
+"zh": "自动手刹开启"
+},
+{
+"id": 183,
+"icon": "images/alarm/alarm-2-1.png",
+"en": "",
+"zh": "手刹（绿色）"
+},
+{
+"id": 184,
+"icon": "images/alarm/DTC.png",
+"en": "",
+"zh": "DTC"
+},
+{
+"id": 185,
+"icon": "images/alarm/ABS.png",
+"en": "",
+"zh": "ABS（黄色图标）"
+},
+{
+"id": 186,
+"icon": "images/alarm/adbule.png",
+"en": "",
+"zh": "adbule低报警"
+},
+{
+"id": 187,
+"icon": "images/alarm/diandongshenjiang.png",
+"en": "",
+"zh": "电动车窗安全装置"
+},
+{
+"id": 188,
+"icon": "images/alarm/2-28.png",
+"en": "",
+"zh": "弹起式发动机罩警告灯"
+},
+{
+"id": 189,
+"icon": "images/alarm/2-28-2.png",
+"en": "",
+"zh": "4WAS故障"
+},
+{
+"id": 190,
+"icon": "images/alarm/190.png",
+"en": "",
+"zh": "节能模式"
+},
+{
+"id": 191,
+"icon": "images/alarm/191.png",
+"en": "",
+"zh": "节能模式故障故障"
+},
+{
+"id": 192,
+"icon": "images/alarm/max_edrive.png",
+"en": "",
+"zh": "MAX eDRIVE 蓝色字体 混动车型"
+},
+{
+"id": 193,
+"icon": "images/alarm/eboost.png",
+"en": "",
+"zh": "eBOOST 蓝色字体 混动车型"
+},
+{
+"id": 194,
+"icon": "images/alarm/chashangdianyuanchongdian.png",
+"en": "",
+"zh": "插上电源插座充电"
+},
+{
+"id": 195,
+"icon": "images/alarm/donglixudianchiguzhangzhishideng.png",
+"en": "",
+"zh": "动力蓄电池故障"
+},
+{
+"id": 196,
+"icon": "images/alarm/donglidianchigaowenbaojingxinhaozhuangzhi.png",
+"en": "",
+"zh": "动力蓄电池高温报警信号装置"
+},
+{
+"id": 197,
+"icon": "images/alarm/chongdianlianjiezhishideng.png",
+"en": "",
+"zh": "充电连接指示灯"
+},
+{
+"id": 198,
+"icon": "images/alarm/chongdianzhuangtai.png",
+"en": "",
+"zh": "充电状态"
+},
+{
+"id": 199,
+"icon": "images/alarm/saidao_2.png",
+"en": "",
+"zh": "RACE"
+},
+{
+"id": 200,
+"icon": "images/alarm/mc_r.png",
+"en": "",
+"zh": "MC-R"
+},
+{
+"id": 201,
+"icon": "images/alarm/m_quan.png",
+"en": "",
+"zh": "M"
+},
+{
+"id": 202,
+"icon": "images/alarm/mdm.png",
+"en": "",
+"zh": "MDM"
+},
+{
+"id": 203,
+"icon": "images/alarm/yellw-.png",
+"en": "",
+"zh": "制动故障（黄色）"
+},
+{
+"id": 204,
+"icon": "images/alarm/yellw.png",
+"en": "",
+"zh": "手刹故障（黄色）"
+},
+{
+"id": 205,
+"icon": "images/alarm/gree.png",
+"en": "",
+"zh": "方向盘（绿色）"
+},
+{
+"id": 206,
+"icon": "images/alarm/white.png",
+"en": "",
+"zh": "方向盘（灰白色）"
+},
+{
+"id": 207,
+"icon": "images/alarm/gree+.png",
+"en": "",
+"zh": "车+方向盘（绿色）"
+},
+{
+"id": 208,
+"icon": "images/alarm/PARK.png",
+"en": "",
+"zh": "PARK(红色)"
+},
+{
+"id": 209,
+"icon": "images/alarm/zidongtabanguzang.png",
+"en": "",
+"zh": "自动踏板故障"
+},
+{
+"id": 210,
+"icon": "",
+"en": "",
+"zh": "定速巡航reday"
+},
+{
+"id": 211,
+"icon": "images/alarm/a_trac.png",
+"en": "",
+"zh": "主动牵引力控制系统开启"
+},
+{
+"id": 212,
+"icon": "images/alarm/lqywd.png",
+"en": "",
+"zh": "冷却液位低"
+},
+{
+"id": 213,
+"icon": "images/alarm/CNG.png",
+"en": "",
+"zh": "CNG"
+},
+{
+"id": 214,
+"icon": "images/alarm/214.png",
+"en": "",
+"zh": "手刹故障（黄色）"
+},
+{
+"id": 215,
+"icon": "images/alarm/215.png",
+"en": "",
+"zh": "方向盘（绿色）"
+},
+{
+"id": 216,
+"icon": "images/alarm/216.png",
+"en": "",
+"zh": "方向盘（灰白色）"
+},
+{
+"id": 217,
+"icon": "images/alarm/217.png",
+"en": "",
+"zh": "车+方向盘（绿色）"
+},
+{
+"id": 218,
+"icon": "images/alarm/218.png",
+"en": "",
+"zh": "PARK(红色)"
+},
+{
+"id": 219,
+"icon": "images/alarm/219.png",
+"en": "",
+"zh": "自动踏板故障"
+},
+{
+"id": 220,
+"icon": "images/alarm/220.png",
+"en": "",
+"zh": "定速巡航reday"
+},
+{
+"id": 221,
+"icon": "images/alarm/221.png",
+"en": "",
+"zh": "主动牵引力控制系统开启"
+},
+{
+"id": 222,
+"icon": "images/alarm/222.png",
+"en": "",
+"zh": "冷却液位低"
+},
+{
+"id": 223,
+"icon": "images/alarm/223.png",
+"en": "",
+"zh": "CNG"
+},
+{
+"id": 224,
+"icon": "images/alarm/224.png",
+"en": "",
+"zh": "手刹故障（黄色）"
+},
+{
+"id": 225,
+"icon": "images/alarm/225.png",
+"en": "",
+"zh": "方向盘（绿色）"
+},
+{
+"id": 226,
+"icon": "images/alarm/226.png",
+"en": "",
+"zh": "方向盘（灰白色）"
+},
+{
+"id": 227,
+"icon": "images/alarm/227.png",
+"en": "",
+"zh": "车+方向盘（绿色）"
+},
+{
+"id": 228,
+"icon": "images/alarm/228.png",
+"en": "",
+"zh": "PARK(红色)"
+},
+{
+"id": 229,
+"icon": "images/alarm/229.png",
+"en": "",
+"zh": "自动踏板故障"
+},
+{
+"id": 230,
+"icon": "images/alarm/230.png",
+"en": "",
+"zh": "定速巡航reday"
+},
+{
+"id": 231,
+"icon": "images/alarm/231.png",
+"en": "",
+"zh": "主动牵引力控制系统开启"
+}
+]

@@ -1,0 +1,122 @@
+#!/bin/sh
+# Over-the-air dash updates (see updater/PROTOCOL.md). Started by /etc/init.d/rcS at
+# boot; everything runs in the background.
+#
+# While the head unit is reachable (S60wifi writes its address to /tmp/nav_gateway),
+# this asks it once a minute for a newer dash bundle. A newer one is downloaded,
+# checked against its sha256 and unpacked into /etc/dashv/<release>; then
+# /etc/dash_active is pointed at it. /etc/d.qml reads that pointer when the
+# Launcher starts, so the new dash appears at the next start-up and never mid-drive.
+# Log: /tmp/dashupdate.log
+
+ETC=${DASH_ETC:-/etc}                       # overridable for testing on a desktop
+GATEWAY_FILE=${DASH_GATEWAY_FILE:-/tmp/nav_gateway}
+TMP=${DASH_TMP:-/tmp}
+PORT=8765
+INTERVAL=60
+LOG=$TMP/dashupdate.log
+PIDFILE=$TMP/dashupdate.pid
+
+log() { echo "$(date '+%H:%M:%S') $*" >> $LOG; }
+
+# digits only, 0 when empty
+num() { n=$(echo "$1" | tr -cd 0-9); echo ${n:-0}; }
+
+# The release d.qml loads: the over-the-air pointer when it is newer than the USB install.
+loaded_release() {
+	a=$(num "$(cat $ETC/dash_active 2> /dev/null)")
+	b=$(num "$(cat $ETC/dash/RELEASE 2> /dev/null)")
+	if [ "$a" -gt "$b" ]; then echo $a; else echo $b; fi
+}
+
+check_once() {
+	gw=$(cat $GATEWAY_FILE 2> /dev/null)
+	[ -n "$gw" ] || return 0
+	have=$(loaded_release)
+	rm -f $TMP/dashupd.txt
+	wget -q -T 10 -O $TMP/dashupd.txt "http://$gw:$PORT/dash/manifest.txt?have=$have" 2> /dev/null || return 0
+	rel=$(num "$(sed -n 's/^release=//p' $TMP/dashupd.txt)")
+	sha=$(sed -n 's/^sha256=//p' $TMP/dashupd.txt | tr -cd 0-9a-f)
+	if [ "$rel" -eq 0 ] || [ ${#sha} -ne 64 ]; then
+		log "unreadable manifest from $gw"
+		return 0
+	fi
+	[ "$rel" -gt "$have" ] || return 0
+
+	log "release $rel available (loaded $have), downloading"
+	if ! wget -q -T 30 -O $TMP/dash.tgz "http://$gw:$PORT/dash/bundle.tar.gz" 2> /dev/null; then
+		log "download failed"
+		rm -f $TMP/dash.tgz
+		return 0
+	fi
+	got=$(sha256sum $TMP/dash.tgz | cut -d' ' -f1)
+	if [ "$got" != "$sha" ]; then
+		log "checksum mismatch, discarded"
+		rm -f $TMP/dash.tgz
+		return 0
+	fi
+
+	new=$ETC/dashv/.new
+	rm -rf $new
+	mkdir -p $new
+	if ! gunzip -c $TMP/dash.tgz | tar -x -C $new; then
+		log "unpack failed"
+		rm -rf $new $TMP/dash.tgz
+		return 0
+	fi
+	rm -f $TMP/dash.tgz
+	if [ ! -f $new/Dashboard.qml ] || [ "$(num "$(cat $new/RELEASE 2> /dev/null)")" != "$rel" ]; then
+		log "bundle incomplete, discarded"
+		rm -rf $new
+		return 0
+	fi
+
+	# Switch with renames, so a power cut leaves either the old or the new pointer.
+	rm -rf $ETC/dashv/$rel
+	mv $new $ETC/dashv/$rel
+	old=$(num "$(cat $ETC/dash_active 2> /dev/null)")
+	if [ "$old" -ne 0 ] && [ "$old" -ne "$rel" ]; then
+		echo $old > $ETC/dash_prev.tmp && mv $ETC/dash_prev.tmp $ETC/dash_prev
+	fi
+	echo $rel > $ETC/dash_active.tmp && mv $ETC/dash_active.tmp $ETC/dash_active
+	sync
+
+	# keep only the active and previous releases
+	prev=$(num "$(cat $ETC/dash_prev 2> /dev/null)")
+	for d in $ETC/dashv/*; do
+		r=$(basename $d)
+		[ "$r" = "$rel" ] || [ "$r" = "$prev" ] || rm -rf $d
+	done
+	sync
+	log "release $rel installed; it loads at the next start-up"
+}
+
+watch() {
+	for tool in wget sha256sum gunzip tar; do
+		command -v $tool > /dev/null || log "missing tool: $tool (updates disabled)"
+	done
+	sleep 20
+	while true; do
+		check_once
+		[ "$(wc -c < $LOG 2> /dev/null || echo 0)" -gt 32768 ] && tail -c 16384 $LOG > $LOG.tmp && mv $LOG.tmp $LOG
+		sleep $INTERVAL
+	done
+}
+
+case "$1" in
+	start|"")
+		[ -f $PIDFILE ] && kill -0 $(cat $PIDFILE) 2> /dev/null && exit 0
+		log "start (loaded release $(loaded_release))"
+		watch > /dev/null 2>&1 &
+		echo $! > $PIDFILE
+		;;
+	stop)
+		[ -f $PIDFILE ] && kill $(cat $PIDFILE) 2> /dev/null
+		rm -f $PIDFILE
+		log "stop"
+		;;
+	once)
+		check_once
+		;;
+esac
+exit 0

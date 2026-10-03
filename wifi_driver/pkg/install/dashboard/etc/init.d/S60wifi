@@ -1,0 +1,86 @@
+#!/bin/sh
+# Wi-Fi client for the head unit's hotspot (RTL8821CS, driver 8821cs.ko).
+# Started by /etc/init.d/rcS at boot; all work runs in the background so the
+# dash is never delayed. Network settings: /etc/wifi/wpa_supplicant.conf
+# Log: /tmp/wifi.log   Head unit address for the dash: /tmp/nav_gateway
+
+MOD=/lib/modules/4.9.170/8821cs.ko
+CONF=/etc/wifi/wpa_supplicant.conf
+LOG=/tmp/wifi.log
+PIDFILE=/tmp/wifi_watchdog.pid
+
+log() { echo "$(date '+%H:%M:%S') $*" >> $LOG; }
+
+bring_up() {
+	grep -q '^8821cs ' /proc/modules || insmod $MOD >> $LOG 2>&1
+	i=0
+	while [ ! -e /sys/class/net/wlan0 ] && [ $i -lt 20 ]; do sleep 1; i=$((i+1)); done
+	if [ ! -e /sys/class/net/wlan0 ]; then
+		log "wlan0 did not appear"
+		return 1
+	fi
+	ifconfig wlan0 up
+	if ! pidof wpa_supplicant > /dev/null; then
+		mkdir -p /var/run/wpa_supplicant
+		wpa_supplicant -B -i wlan0 -c $CONF -D nl80211 >> $LOG 2>&1 && log "wpa_supplicant started"
+	fi
+	# udhcpc -b keeps running and renews the lease; -t 0 retries forever
+	pidof udhcpc > /dev/null || udhcpc -i wlan0 -b -t 0 -T 3 -A 5 >> $LOG 2>&1
+}
+
+# The hotspot gateway is the head unit; the dash's Nav.qml reads it from here.
+record_gateway() {
+	gw=$(route -n | awk '$1 == "0.0.0.0" && $8 == "wlan0" { print $2; exit }')
+	if [ -n "$gw" ]; then
+		[ "$(cat /tmp/nav_gateway 2> /dev/null)" = "$gw" ] || { echo "$gw" > /tmp/nav_gateway; log "head unit at $gw"; }
+	else
+		rm -f /tmp/nav_gateway
+	fi
+}
+
+watchdog() {
+	bring_up
+	n=0
+	while true; do
+		sleep 5
+		record_gateway
+		n=$((n + 1))
+		# every 30 s: connection state; every 60 s: visible networks (band + security), log kept small
+		if [ $((n % 6)) -eq 0 ]; then
+			[ "$(wc -c < $LOG)" -gt 65536 ] && tail -c 32768 $LOG > $LOG.tmp && mv $LOG.tmp $LOG
+			log "status: $(wpa_cli -i wlan0 status 2> /dev/null | grep -E '^(wpa_state|ssid|freq|key_mgmt|ip_address)=' | tr '\n' ' ')"
+		fi
+		if [ $((n % 12)) -eq 0 ]; then
+			wpa_cli -i wlan0 scan > /dev/null 2>&1
+			sleep 4
+			log "scan: $(wpa_cli -i wlan0 scan_results 2> /dev/null | tail -n +2 | head -8 | awk '{print $5"("$2"MHz "$3"dBm "$4")"}' | tr '\n' ' ')"
+		fi
+		[ $((n % 3)) -eq 0 ] || continue
+		if ! pidof wpa_supplicant > /dev/null || ! pidof udhcpc > /dev/null; then
+			log "restarting wifi"
+			bring_up
+		fi
+	done
+}
+
+case "$1" in
+	start|"")
+		[ -f $PIDFILE ] && kill -0 $(cat $PIDFILE) 2> /dev/null && exit 0
+		log "start"
+		watchdog > /dev/null 2>&1 &
+		echo $! > $PIDFILE
+		;;
+	stop)
+		[ -f $PIDFILE ] && kill $(cat $PIDFILE) 2> /dev/null
+		rm -f $PIDFILE
+		killall udhcpc wpa_supplicant 2> /dev/null
+		ifconfig wlan0 down 2> /dev/null
+		log "stop"
+		;;
+	restart)
+		"$0" stop
+		sleep 1
+		"$0" start
+		;;
+esac
+exit 0

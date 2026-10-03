@@ -1,0 +1,2017 @@
+[
+{
+"id": 0,
+"en": "",
+"zh": ""
+},
+{
+"id": 1,
+"en": "Cruise Control.Keep your distance",
+"zh": "主动巡航控制系统  注意保持车距"
+},
+{
+"id": 3,
+"en": "Trailer parking light failure",
+"zh": "挂车灯 失效"
+},
+{
+"id": 4,
+"en": "Trailer turn signal failure",
+"zh": "挂车 转向灯失效"
+},
+{
+"id": 5,
+"en": "Trailer brake lights failure",
+"zh": "挂车 制动灯失效"
+},
+{
+"id": 6,
+"en": "Trailer fog light failure",
+"zh": "挂车 后雾灯失效"
+},
+{
+"id": 7,
+"en": "Chassis,Possible to continue journey",
+"zh": "底盘 请小心驾驶"
+},
+{
+"id": 8,
+"en": "Chassis,Stop carefully",
+"zh": "底盘 请小心停车"
+},
+{
+"id": 9,
+"en": "Door open",
+"zh": "车门未关闭"
+},
+{
+"id": 13,
+"en": "Bonnet open",
+"zh": "发动机盖未关闭"
+},
+{
+"id": 14,
+"en": "Boot open",
+"zh": "行李箱未关闭"
+},
+{
+"id": 15,
+"en": "Starter/ignition",
+"zh": "起动/点火装置"
+},
+{
+"id": 16,
+"en": "Starter.Do not stop engine",
+"zh": "起动 切勿将发动机熄火"
+},
+{
+"id": 17,
+"en": "Brake system,Drive moderately",
+"zh": "制动系统 请小心驾驶"
+},
+{
+"id": 18,
+"en": "Preheating,Please wait",
+"zh": "预热中 请等待"
+},
+{
+"id": 19,
+"en": "Refill engine oil",
+"zh": "请添加机油"
+},
+{
+"id": 20,
+"en": "Engine oil level,Refill engine oil",
+"zh": "发动机机油油位！请添加机油"
+},
+{
+"id": 21,
+"en": "Drivetrain,Drive moderately",
+"zh": "传动系统 请小心驾驶"
+},
+{
+"id": 22,
+"en": "Filler cap open",
+"zh": "油箱盖未关闭"
+},
+{
+"id": 23,
+"en": "Driving stabilisation,Drive moderately",
+"zh": "DSC 失效！ 谨慎行驶"
+},
+{
+"id": 24,
+"en": "DSC deactivated",
+"zh": "动态稳定控制系统 DSC已退出工作"
+},
+{
+"id": 25,
+"en": "Trigger...",
+"zh": "触发器..."
+},
+{
+"id": 26,
+"en": "Engine overheated,Stop carefully",
+"zh": "发动机过热 请小心停车"
+},
+{
+"id": 27,
+"en": "To start engine,press brake pedal",
+"zh": "起动发动机 需踩下制动踏板"
+},
+{
+"id": 28,
+"en": "Service due",
+"zh": "保养期限已到"
+},
+{
+"id": 29,
+"en": "Brake system,Drive moderately",
+"zh": "制动系统 请小心驾驶"
+},
+{
+"id": 30,
+"en": "Flat Tyre Monitor (RPA)failure",
+"zh": "RPA失效"
+},
+{
+"id": 31,
+"en": "Protect against rolling away",
+"zh": "请防止车辆滑动"
+},
+{
+"id": 32,
+"en": "Automatic Hold.Apply the brakes",
+"zh": "自动驻车功能 请自己制动"
+},
+{
+"id": 33,
+"en": "Parking brake only partially available",
+"zh": "驻车制动器的使用受到限制"
+},
+{
+"id": 34,
+"en": "Release parking brake",
+"zh": "松开驻车制动器"
+},
+{
+"id": 35,
+"en": "Instrument cluster",
+"zh": "组合仪表"
+},
+{
+"id": 36,
+"en": "Speed warning",
+"zh": "限速警告"
+},
+{
+"id": 37,
+"en": "Tyre pressure low,Stop carefully",
+"zh": "轮胎失压 请小心停车"
+},
+{
+"id": 38,
+"en": "Remote control. No engine start",
+"zh": "遥控器 发动机无法启动"
+},
+{
+"id": 39,
+"en": "Remote control.Replace battery",
+"zh": "请更换遥控器电池"
+},
+{
+"id": 40,
+"en": "Remote control for car parked functions",
+"zh": "多功能遥控器"
+},
+{
+"id": 41,
+"en": "Steering.Drive moderately",
+"zh": "转向系统 请小心驾驶"
+},
+{
+"id": 42,
+"en": "Brake system.Drive moderately",
+"zh": "制动摩擦片 请小心驾驶"
+},
+{
+"id": 43,
+"en": "Brake system.Stop carefully",
+"zh": "制动系统 请小心停车"
+},
+{
+"id": 44,
+"en": "Trailer tow bar electrics",
+"zh": "挂车 拖车钩电气装置"
+},
+{
+"id": 45,
+"en": "Speed warning",
+"zh": "速度警告"
+},
+{
+"id": 46,
+"en": "Outside temperature...",
+"zh": "车外温度..."
+},
+{
+"id": 47,
+"en": "Rear light right failure",
+"zh": "右尾灯失效"
+},
+{
+"id": 48,
+"en": "Dipped beam left failure",
+"zh": "左侧近光灯失效"
+},
+{
+"id": 49,
+"en": "Dipped beam right failure",
+"zh": "右近光灯失效"
+},
+{
+"id": 50,
+"en": "Trailer reversing light failure",
+"zh": "挂车倒车灯失效"
+},
+{
+"id": 51,
+"en": "Fasten seat belt",
+"zh": "请系上安全带"
+},
+{
+"id": 52,
+"en": "Restraint system rear",
+"zh": "后座区乘员 保护系统异常"
+},
+{
+"id": 53,
+"en": "Restraint system",
+"zh": "乘员保护系统有异常"
+},
+{
+"id": 54,
+"en": "Transmission too hot",
+"zh": "变速箱过热"
+},
+{
+"id": 55,
+"en": "Transmission TEMP.Stop carefully",
+"zh": "变速箱温度 请小心停车"
+},
+{
+"id": 56,
+"en": "Driver restraint system",
+"zh": "驾驶员保护系统"
+},
+{
+"id": 57,
+"en": "Passenger restraint system",
+"zh": "前乘客座乘员保护系统"
+},
+{
+"id": 58,
+"en": "Parking lights on",
+"zh": "停车灯亮起"
+},
+{
+"id": 59,
+"en": "Rear fog light failure",
+"zh": "后雾灯失效"
+},
+{
+"id": 60,
+"en": "Reversing light failure",
+"zh": "倒车灯失效"
+},
+{
+"id": 61,
+"en": "Turn indicator rear left failure",
+"zh": "左后转向信号灯失效"
+},
+{
+"id": 62,
+"en": "Turn indicator front right failure",
+"zh": "右前转向信号灯失效"
+},
+{
+"id": 63,
+"en": "Turn indicator front left failure",
+"zh": "左前转向信号灯失效"
+},
+{
+"id": 64,
+"en": "Rear light left failure",
+"zh": "左尾灯失效"
+},
+{
+"id": 65,
+"en": "Turn indicator rear right failure",
+"zh": "右后转向信号灯失效"
+},
+{
+"id": 66,
+"en": "Fog light failure",
+"zh": "前雾灯失效"
+},
+{
+"id": 67,
+"en": "High beam head-light left failure",
+"zh": "左远光灯失效"
+},
+{
+"id": 68,
+"en": "High beam head-light right failure",
+"zh": "右远光灯失效"
+},
+{
+"id": 69,
+"en": "Brake light left failure",
+"zh": "右制动灯失效"
+},
+{
+"id": 70,
+"en": "Left brake lamp failure",
+"zh": "左制动灯失效"
+},
+{
+"id": 71,
+"en": "Tyre pressure low.Stop carefully",
+"zh": "轮胎压力过低 请小心停车"
+},
+{
+"id": 75,
+"en": "Check tyre pressure.Initialise RDC",
+"zh": "检查轮胎压力。进行(RDC)初始化"
+},
+{
+"id": 76,
+"en": "Tyre Press.Monitor(RDC)deactivated",
+"zh": "轮胎压力检测系统（RDC）故障"
+},
+{
+"id": 77,
+"en": "Armoured luggage-compt door open",
+"zh": "行李箱盖防护门未关闭"
+},
+{
+"id": 78,
+"en": "Gas alarm.Air system on",
+"zh": "危险气体警告！供气装置已打开"
+},
+{
+"id": 79,
+"en": "Disconnect charging cable",
+"zh": "请拆除充电线"
+},
+{
+"id": 80,
+"en": "Gun mount fault",
+"zh": "枪架功能异常"
+},
+{
+"id": 81,
+"en": "Irritant gas sensor fault",
+"zh": "刺激性气体传感器异常"
+},
+{
+"id": 82,
+"en": "Air system not functioning",
+"zh": "供气装置功能异常"
+},
+{
+"id": 83,
+"en": "Air system active",
+"zh": "供气装置启动"
+},
+{
+"id": 84,
+"en": "Doors not locked!",
+"zh": "中控锁未锁止"
+},
+{
+"id": 85,
+"en": "Use window lifter emergency system",
+"zh": "使用车窗玻璃升降器的应急功能"
+},
+{
+"id": 86,
+"en": "Second battery defect",
+"zh": "第二块蓄电池损坏"
+},
+{
+"id": 87,
+"en": "Strobe light.check bulb",
+"zh": "请检查警示闪光灯的灯泡"
+},
+{
+"id": 88,
+"en": "消火装置が作動した",
+"zh": "灭火装置已启动Fire extinguisher active"
+},
+{
+"id": 89,
+"en": "Washer fluid level low",
+"zh": "清洗液水位过低"
+},
+{
+"id": 90,
+"en": "Top up the coolant",
+"zh": "发动机冷却液液位太低"
+},
+{
+"id": 91,
+"en": "Transmission.Drive moderately",
+"zh": "变速箱 请小心驾驶"
+},
+{
+"id": 92,
+"en": "Gearbox in position P only at standstill",
+"zh": "只有在车辆静止时才能挂入P档"
+},
+{
+"id": 93,
+"en": "Protect against rolling away",
+"zh": "请防止车辆滑动"
+},
+{
+"id": 94,
+"en": "Dynamic traction control activated",
+"zh": "动态牵引力控制已启动"
+},
+{
+"id": 95,
+"en": "Gear selector-lever indicator",
+"zh": "档位显示"
+},
+{
+"id": 96,
+"en": "Steering wheel lock defective",
+"zh": "方向盘锁止装置！暂不要关闭发动机"
+},
+{
+"id": 97,
+"en": "Resetting Tire Press. Monitor (RDC)...",
+"zh": "正在进行 RDC重置..."
+},
+{
+"id": 98,
+"en": "Emergency exit fault",
+"zh": "紧急出口异常"
+},
+{
+"id": 99,
+"en": "Parking assistance.Please park unaided",
+"zh": "泊车距离报警装置请自己泊车"
+},
+{
+"id": 100,
+"en": "Automatic Hold.Apply the brakes",
+"zh": "自动驻车 请自己制动"
+},
+{
+"id": 101,
+"en": "Protect against rolling away",
+"zh": "请防止车辆滑动"
+},
+{
+"id": 102,
+"en": "Next press of button starts engine",
+"zh": "再次按下按钮即可起动发动机"
+},
+{
+"id": 103,
+"en": "Remote key inside car",
+"zh": "遥控器在车内"
+},
+{
+"id": 104,
+"en": "Parking brake failure",
+"zh": "驻车制动器失效"
+},
+{
+"id": 105,
+"en": "Engine oil pressure.Stop carefully",
+"zh": "机油压力请小心停车"
+},
+{
+"id": 106,
+"en": "Charging fault",
+"zh": "充电系统有异常"
+},
+{
+"id": 107,
+"en": "Fuel supply.Drive moderately",
+"zh": "供油系统 请小心驾驶"
+},
+{
+"id": 108,
+"en": "Hold remote control up to steer.column",
+"zh": "将遥控器靠近转向柱"
+},
+{
+"id": 109,
+"en": "Gas alarm.Leave the area",
+"zh": "危险气体警告！请离开此地"
+},
+{
+"id": 110,
+"en": "Electrical fault.Drive moderately",
+"zh": "电气系统有异常！小心驾驶"
+},
+{
+"id": 111,
+"en": "Insulation fault",
+"zh": "绝缘异常"
+},
+{
+"id": 112,
+"en": "Windscreen unlocked",
+"zh": "挡风玻璃未锁止"
+},
+{
+"id": 113,
+"en": "Fire extinguisher fault",
+"zh": "灭火装置异常！"
+},
+{
+"id": 114,
+"en": "Battery discharged.Start engine",
+"zh": "蓄电池需进行充电"
+},
+{
+"id": 115,
+"en": "Lighting system.Stop carefully",
+"zh": "照明装置 应小心停车"
+},
+{
+"id": 116,
+"en": "Protection systems fault",
+"zh": "保护系统异常"
+},
+{
+"id": 117,
+"en": "Communication fault",
+"zh": "通信功能有异常"
+},
+{
+"id": 118,
+"en": "Assault alarm fault",
+"zh": "遇袭报警功能有异常"
+},
+{
+"id": 119,
+"en": "Driving stabilisation,Drive moderately",
+"zh": "行驶稳定控制系统 请小心驾驶"
+},
+{
+"id": 120,
+"en": "To engage gear,press brake",
+"zh": "踩下制动踏板以挂入档位"
+},
+{
+"id": 121,
+"en": "Press brake to engage gear",
+"zh": "换档须踩制动踏板"
+},
+{
+"id": 122,
+"en": "Rain closure not possible.",
+"zh": "活动天窗 防夹保护！"
+},
+{
+"id": 123,
+"en": "Tyre pressure.Check",
+"zh": "胎压 请检查"
+},
+{
+"id": 124,
+"en": "Roll-over protection fault",
+"zh": "翻车保护装置异常"
+},
+{
+"id": 125,
+"en": "Convertible roof.Reduce speed further",
+"zh": "硬顶！减速行驶"
+},
+{
+"id": 126,
+"en": "Transmission.Drive moderately",
+"zh": "燃油已到备用油位"
+},
+{
+"id": 127,
+"en": "Select lower gear",
+"zh": "请换低档"
+},
+{
+"id": 128,
+"en": "Driver's seat back not engaged",
+"zh": "驾驶员座椅靠背未锁住"
+},
+{
+"id": 129,
+"en": "Front passenge seat back not engaged",
+"zh": "前乘客座椅靠背未锁住"
+},
+{
+"id": 130,
+"en": "Service due in ---",
+"zh": "保养期限还剩"
+},
+{
+"id": 131,
+"en": "Service due since___",
+"zh": "保养期限已到"
+},
+{
+"id": 133,
+"en": "Range---",
+"zh": "可达里程"
+},
+{
+"id": 134,
+"en": "Clutch temperature.Drive moderately",
+"zh": "离合器温度。请小心驾驶"
+},
+{
+"id": 135,
+"en": "Adaptive Headlights failure",
+"zh": "自适应前大灯失效"
+},
+{
+"id": 136,
+"en": "SOS call system restricted",
+"zh": "紧急呼叫系统异常"
+},
+{
+"id": 137,
+"en": "Seat back monitoring",
+"zh": "座椅靠背监控装置异常！"
+},
+{
+"id": 138,
+"en": "To start engine,depress clutch",
+"zh": "踩下离合器，以启动发动机"
+},
+{
+"id": 139,
+"en": "Electrical power supply limited.",
+"zh": "电力供应系统"
+},
+{
+"id": 140,
+"en": "Convertible roof movement complete",
+"zh": "折叠式软顶移动已完成"
+},
+{
+"id": 141,
+"en": "Brake pad wear indicator",
+"zh": "制动摩擦片磨损指示"
+},
+{
+"id": 142,
+"en": "Hill Descent Control currently inactive",
+"zh": "下坡车速控制系统无作用"
+},
+{
+"id": 143,
+"en": "Hill Descent Control active",
+"zh": "下坡车速控制系统已启动"
+},
+{
+"id": 144,
+"en": "Hill Descent Control deactivated",
+"zh": "下坡车速控制系统已退出工作"
+},
+{
+"id": 145,
+"en": "Ignition switched on",
+"zh": "点火开关接通"
+},
+{
+"id": 146,
+"en": "Cruise Control deactivated",
+"zh": "巡航控制系统已退出工作"
+},
+{
+"id": 147,
+"en": "Left brake/rear light failure",
+"zh": "左侧刹车灯/尾灯失效"
+},
+{
+"id": 148,
+"en": "Unable to change transmission position",
+"zh": "选档杆无法换挡"
+},
+{
+"id": 149,
+"en": "Drivetrain,Drive moderately",
+"zh": "传动系统 请小心驾驶"
+},
+{
+"id": 150,
+"en": "Number plate light failure",
+"zh": "牌照灯失效"
+},
+{
+"id": 151,
+"en": "Two-stage brake light right failure",
+"zh": "右侧二级制动信号灯失效"
+},
+{
+"id": 152,
+"en": "Camera-based support systems failure",
+"zh": "基于摄像头的辅助系统失效"
+},
+{
+"id": 153,
+"en": "Sensitivity maladjusted",
+"zh": "灵敏度调节开始"
+},
+{
+"id": 154,
+"en": "Side/daytime lights fault",
+"zh": "左侧停车灯和日间行车灯失效"
+},
+{
+"id": 155,
+"en": "Left cornering light failure",
+"zh": "左侧转弯照明灯失效"
+},
+{
+"id": 156,
+"en": "Right cornering light failure",
+"zh": "右侧转弯照明灯失效"
+},
+{
+"id": 157,
+"en": "Move selection lever back into autogate",
+"zh": "将选档杆移回自动档槽"
+},
+{
+"id": 158,
+"en": "Auto Start/Stop.Function failure",
+"zh": "发动机节能启停功能失效"
+},
+{
+"id": 159,
+"en": "Engine oil level too high",
+"zh": "发动机机油油位过高"
+},
+{
+"id": 160,
+"en": "In addition press brake pedal",
+"zh": "同时还要踩下制动踏板"
+},
+{
+"id": 161,
+"en": "Trailer turn indicator/brake light left",
+"zh": "挂车左侧转向信号灯/制动灯"
+},
+{
+"id": 162,
+"en": "Trailer electric brake.Check",
+"zh": "检查挂车电动制动器"
+},
+{
+"id": 163,
+"en": "Rear seat not locked in position",
+"zh": "后排座椅未锁定"
+},
+{
+"id": 164,
+"en": "Roof storage tray",
+"zh": "行李箱分隔装置"
+},
+{
+"id": 165,
+"en": "Tow hitch.Stop carefully",
+"zh": "挂车钩 请小心停车"
+},
+{
+"id": 166,
+"en": "Rear view camera Check camera lens",
+"zh": "倒车摄像机请检查摄像机镜头"
+},
+{
+"id": 167,
+"en": "Rear view camera failure",
+"zh": "倒车摄像机损坏"
+},
+{
+"id": 168,
+"en": "Side View camera failure",
+"zh": "侧面摄像头失效"
+},
+{
+"id": 169,
+"en": "Caution-transport mode",
+"zh": "运输模式"
+},
+{
+"id": 170,
+"en": "High braking load",
+"zh": "制动负荷高"
+},
+{
+"id": 171,
+"en": "Lane departure warning failure",
+"zh": "偏离行车道警告功能失效"
+},
+{
+"id": 172,
+"en": "Seat position identification fault",
+"zh": "座椅位置识别有异常"
+},
+{
+"id": 173,
+"en": "Parking lights on",
+"zh": "驻车灯亮"
+},
+{
+"id": 174,
+"en": "Cruise Control.Apply brakes yourself",
+"zh": "定速巡航控制系统 请自己制动"
+},
+{
+"id": 175,
+"en": "Fasten rear seat belt",
+"zh": "请系上后座的安全带"
+},
+{
+"id": 176,
+"en": "Auto Start/Stop.Function deactivated",
+"zh": "发动机节能启停功能已退出工作"
+},
+{
+"id": 177,
+"en": "P will be engaged shortly",
+"zh": "点火开关关闭，必要时挂入档位P"
+},
+{
+"id": 178,
+"en": "Pedestrian warning system",
+"zh": "行人保护系统！"
+},
+{
+"id": 179,
+"en": "Replace battery",
+"zh": "请更换电池"
+},
+{
+"id": 180,
+"en": "Test-SW: Airbag-ECU cannot deploy",
+"zh": "Test-SW: Airbag-ECU cannot deploy"
+},
+{
+"id": 181,
+"en": "Night Vision restricted",
+"zh": "请清洁夜视摄像头"
+},
+{
+"id": 182,
+"en": "Lane departure warning deactivated",
+"zh": "偏离行车道警告功能已退出工作"
+},
+{
+"id": 183,
+"en": "Clean Top View camera",
+"zh": "请清洁俯视摄像头"
+},
+{
+"id": 184,
+"en": "Clean Side View camera",
+"zh": "请清洁侧视摄像头"
+},
+{
+"id": 185,
+"en": "Battery OK___",
+"zh": "蓄电池电量正常"
+},
+{
+"id": 186,
+"en": "Park Assist.Please park vehicle yourself",
+"zh": "驻车辅助系统请自行完成驻车"
+},
+{
+"id": 188,
+"en": "Strobes light switched on!",
+"zh": "警示闪光灯已打开"
+},
+{
+"id": 189,
+"en": "Attention!Protect systems inactive!",
+"zh": "注意！保护系统退出工作"
+},
+{
+"id": 190,
+"en": "Convertible roof.Only when stationary",
+"zh": "硬顶！仅当车辆静止时才可以使用"
+},
+{
+"id": 191,
+"en": "Service indicator not available",
+"zh": "没有保养提示"
+},
+{
+"id": 192,
+"en": "Speed limit info not available now",
+"zh": "目前无限速信息"
+},
+{
+"id": 193,
+"en": "Distance control deactivated",
+"zh": "车距控制功能已退出工作"
+},
+{
+"id": 194,
+"en": "Distance control activated",
+"zh": "车距控制功能已启动"
+},
+{
+"id": 195,
+"en": "When the speed exceeds... This system can only be used when",
+"zh": "当车速超过...时才可以使用此系统"
+},
+{
+"id": 196,
+"en": "Cruise Control cannot be activated",
+"zh": "巡航控制系统无法启动"
+},
+{
+"id": 197,
+"en": "Dangerous traffic situation!",
+"zh": "危险！交通状况"
+},
+{
+"id": 198,
+"en": "Lane change warning",
+"zh": "变换行车道警告功能"
+},
+{
+"id": 199,
+"en": "Passenger airbag deactivated",
+"zh": "前乘客安全气囊退出工作"
+},
+{
+"id": 200,
+"en": "Objects on the road!",
+"zh": "行车道上有物品"
+},
+{
+"id": 201,
+"en": "Wrong-way driver!",
+"zh": "有逆向行驶者"
+},
+{
+"id": 202,
+"en": "Congestion!",
+"zh": "堵车"
+},
+{
+"id": 203,
+"en": "Road closed!",
+"zh": "道路被完全封锁"
+},
+{
+"id": 204,
+"en": "Accident!",
+"zh": "交通事故"
+},
+{
+"id": 205,
+"en": "People in the road!",
+"zh": "车道上有行人"
+},
+{
+"id": 206,
+"en": "Convertible roof.Check secure!",
+"zh": "检查硬顶是否锁止"
+},
+{
+"id": 207,
+"en": "Convertible roof not latched!",
+"zh": "硬顶未锁止"
+},
+{
+"id": 208,
+"en": "Ventilation",
+"zh": "通风扇异常"
+},
+{
+"id": 209,
+"en": "Update of service data",
+"zh": "更新保养数据"
+},
+{
+"id": 210,
+"en": "Drivetrain.Stop carefully",
+"zh": "驱动系统 请小心停车"
+},
+{
+"id": 211,
+"en": "Update of service data",
+"zh": "传动系统！行驶距离严重受限"
+},
+{
+"id": 212,
+"en": "Regenerative braking not available",
+"zh": "无法回收制动能量"
+},
+{
+"id": 213,
+"en": "Ready to refuel at ___%",
+"zh": "加油准备已完成...%"
+},
+{
+"id": 214,
+"en": "Заправку можно производить только тогда, когда транспортное средство находится в неподвижном состоянии",
+"zh": "只有当车辆处亍静止状态时才能加油"
+},
+{
+"id": 215,
+"en": "Refuelling possible",
+"zh": "可以开始加油"
+},
+{
+"id": 216,
+"en": "Fuel tank system",
+"zh": "油箱系统"
+},
+{
+"id": 217,
+"en": "Lane change warning failure",
+"zh": "变换行车道警告功能失效"
+},
+{
+"id": 218,
+"en": "Hill Descent Control cannot be activated",
+"zh": "下坡车速控制系统无法启动"
+},
+{
+"id": 219,
+"en": "Drivetrain. No restart",
+"zh": "传动系统 切勿重新启动发动机"
+},
+{
+"id": 220,
+"en": "Vehicle not ready for driving",
+"zh": "车辆无法继续行驶"
+},
+{
+"id": 221,
+"en": "To charge,switch on the ignition",
+"zh": "如要充电：打开点火开关"
+},
+{
+"id": 222,
+"en": "High-voltage battery now charging",
+"zh": "高压蓄电池正在充电"
+},
+{
+"id": 223,
+"en": "Battery charging complete",
+"zh": "蓄电池充电已结束"
+},
+{
+"id": 224,
+"en": "Battery charging cancelle",
+"zh": "充电过程中断"
+},
+{
+"id": 225,
+"en": "Front-end collision warning deactivated",
+"zh": "追尾碰撞警告功能已关闭"
+},
+{
+"id": 226,
+"en": "Front-end collision warning failure",
+"zh": "追尾碰撞警告功能失效"
+},
+{
+"id": 227,
+"en": "Lane change warning deactivated",
+"zh": "变换行车道警告功能退出工作"
+},
+{
+"id": 228,
+"en": "Front-end collision warning deactivated",
+"zh": "追尾碰撞警告功能退出工作"
+},
+{
+"id": 229,
+"en": "Active Cruise Control ready",
+"zh": "巡航控制系统准备就绪"
+},
+{
+"id": 230,
+"en": "High-voltage system deactivated",
+"zh": "高压电力系统已关闭"
+},
+{
+"id": 231,
+"en": "Radio diagnosis active",
+"zh": "无线诊断已启动"
+},
+{
+"id": 232,
+"en": "AdBlue reserve",
+"zh": "AdBlue储备"
+},
+{
+"id": 233,
+"en": "Refill AbBlue.Range:…",
+"zh": "请添加AdBlue可行驶距离：..."
+},
+{
+"id": 234,
+"en": "Incorrect fluid. Range:…",
+"zh": "添加了非AdBlue溶液可行驶距离：..."
+},
+{
+"id": 235,
+"en": "System fault. Range:…",
+"zh": "AdBlue系统失效可行驶距离：..."
+},
+{
+"id": 236,
+"en": "AdBlue-Incorrect fluid",
+"zh": "AdBlue添加错误"
+},
+{
+"id": 237,
+"en": "Exhaust Fluid System NO Start in ... miles",
+"zh": "Exhaust Fluid System NO Start in ... miles"
+},
+{
+"id": 238,
+"en": "AdBlue-system",
+"zh": "AdBlue系统"
+},
+{
+"id": 239,
+"en": "Remote detected.Eng.can be started",
+"zh": "发现了遥控器可以起动发动机"
+},
+{
+"id": 240,
+"en": "Fasten seat belt and close door",
+"zh": "系上安全带并关闭车门"
+},
+{
+"id": 241,
+"en": "System available as of ---",
+"zh": "系统将在车速高...才可以使用"
+},
+{
+"id": 242,
+"en": "AbBlue Reserve.Rang:…",
+"zh": "已达备用油位可行驶距离：..."
+},
+{
+"id": 243,
+"en": "Snow chains fitted",
+"zh": "雪地防滑链运行模式"
+},
+{
+"id": 244,
+"en": "High-voltage battery.Charge status…",
+"zh": "混合动力电池充电状态..."
+},
+{
+"id": 245,
+"en": "High-voltage battery OK…",
+"zh": "混合动力电池充电正常"
+},
+{
+"id": 246,
+"en": "Replace high-voltage battery",
+"zh": "请更换混合动力电池"
+},
+{
+"id": 247,
+"en": "Transmission position P faulty!",
+"zh": "变速箱档位P有异常"
+},
+{
+"id": 248,
+"en": "Please move off!",
+"zh": "请起步！"
+},
+{
+"id": 249,
+"en": "Parking brake.Select P",
+"zh": "驻车制动请挂入档位P"
+},
+{
+"id": 250,
+"en": "Depress brake or clutch pedal",
+"zh": "踩下制动器或离合器"
+},
+{
+"id": 251,
+"en": "Press unlock button to select a gear",
+"zh": "如要挂挡请按下解锁按钮"
+},
+{
+"id": 252,
+"en": "Engine restart not possible",
+"zh": "无法启动发动机"
+},
+{
+"id": 253,
+"en": "Engine start fault.Press start",
+"zh": "启动发动机按下Start/Stop按钮"
+},
+{
+"id": 254,
+"en": "Gearbox position P not engaged!",
+"zh": "变速箱在挡位N。车辆无法锁止"
+},
+{
+"id": 255,
+"en": "Engine compartment hot!Open carefully",
+"zh": "发动机室过热！打开时要小心"
+},
+{
+"id": 256,
+"en": "Distance information failure",
+"zh": "车距信息功能失效"
+},
+{
+"id": 257,
+"en": "Door-close assistant deactivated!",
+"zh": "车门自动关闭功能已退出工作"
+},
+{
+"id": 258,
+"en": "Safety function of doors malfunctioning",
+"zh": "安全功能车门异常"
+},
+{
+"id": 259,
+"en": "Journey time restricted to ---min",
+"zh": "驾驶受到限制还可以行驶...分钟"
+},
+{
+"id": 260,
+"en": "Test model!End:switch off ignition",
+"zh": "测试模式起步后将退出"
+},
+{
+"id": 261,
+"en": "Front-end collision warning restricted",
+"zh": "追尾警告功能受限"
+},
+{
+"id": 262,
+"en": "Speed limit ready!",
+"zh": "限速器就绪"
+},
+{
+"id": 263,
+"en": "Speed limit failure",
+"zh": "限速功能失效"
+},
+{
+"id": 264,
+"en": "Speed limit exceeded!",
+"zh": "已超出限速范围"
+},
+{
+"id": 265,
+"en": "Speed limit cannot be activated",
+"zh": "限速功能尚未启动"
+},
+{
+"id": 266,
+"en": "Ignition on",
+"zh": "点火开关接通"
+},
+{
+"id": 267,
+"en": "Parking heating/parking air conditioning switched off",
+"zh": "驻车加热/驻车空调已关闭"
+},
+{
+"id": 268,
+"en": "Engine only possible to start in neutral",
+"zh": "发动机只能在空挡启动"
+},
+{
+"id": 269,
+"en": "Allow the clutch to cool down",
+"zh": "让离合器冷却"
+},
+{
+"id": 270,
+"en": "Rear axle differential lock",
+"zh": "后桥锁止机构"
+},
+{
+"id": 271,
+"en": "Front-end collision warning restricted",
+"zh": "追尾警告功能检查视线范围"
+},
+{
+"id": 272,
+"en": "Front camera.Check field of view",
+"zh": "前部摄像头检查视线范围"
+},
+{
+"id": 273,
+"en": "Front camera",
+"zh": "前部摄像头"
+},
+{
+"id": 274,
+"en": "Initialisation of driving stabilisation",
+"zh": "正在安装行驶稳定控制系统..."
+},
+{
+"id": 275,
+"en": "Emergency release.For manoeuvring only",
+"zh": "紧急解锁。仅可使汽车入位"
+},
+{
+"id": 276,
+"en": "Drivetrain.Drive moderately",
+"zh": "传动系统请中速驾驶"
+},
+{
+"id": 277,
+"en": "Check charging cable",
+"zh": "请检查充电线"
+},
+{
+"id": 278,
+"en": "Mains power too low",
+"zh": "电源电力过低"
+},
+{
+"id": 279,
+"en": "Unable to charge",
+"zh": "无法充电"
+},
+{
+"id": 280,
+"en": "Total driving range---",
+"zh": "可达里程..."
+},
+{
+"id": 282,
+"en": "Please remove the charging cable",
+"zh": "请拆除充电线"
+},
+{
+"id": 284,
+"en": "Engage P to charge",
+"zh": "如要充电，请挂入挡位P"
+},
+{
+"id": 285,
+"en": "Dynamic Light Spot failure",
+"zh": "动态聚光照明功能异常"
+},
+{
+"id": 286,
+"en": "Lighting system front left failure",
+"zh": "照明系统左前故障"
+},
+{
+"id": 287,
+"en": "Lighting system front right failure",
+"zh": "照明系统右前故障"
+},
+{
+"id": 288,
+"en": "Rear spoiler",
+"zh": "扰流板"
+},
+{
+"id": 289,
+"en": "To start engine,select P",
+"zh": "启动发动机请挂入挡位P"
+},
+{
+"id": 290,
+"en": "Vehicle ready for driving",
+"zh": "车辆准备就绪"
+},
+{
+"id": 291,
+"en": "Only poss.with light switch in position A",
+"zh": "仅当车灯开关位于 A 时，才可以"
+},
+{
+"id": 293,
+"en": "Check battery charge status",
+"zh": "请检查蓄电池充电状态"
+},
+{
+"id": 294,
+"en": "Parking assistance.Please park unaided",
+"zh": "泊车距离报警装置请自己泊车"
+},
+{
+"id": 295,
+"en": "...",
+"zh": "..."
+},
+{
+"id": 296,
+"en": "Traffic Jam Assist failure",
+"zh": "堵车辅助功能失效"
+},
+{
+"id": 297,
+"en": "Traffic Jam Assist deactivated",
+"zh": "堵车辅助功能已关闭"
+},
+{
+"id": 298,
+"en": "Traffic Jam Assist available up to---",
+"zh": "堵车辅助功能可在...之内使用"
+},
+{
+"id": 299,
+"en": "Traffic Jam Assist cannot be activated",
+"zh": "无法启动堵车辅助功能"
+},
+{
+"id": 300,
+"en": "Keep hands on steering wheel",
+"zh": "请手扶方向盘"
+},
+{
+"id": 301,
+"en": "Lane too narrow or not detected",
+"zh": "行车道过亍狭窄或无法辨认"
+},
+{
+"id": 302,
+"en": "Pedestrian alert failure",
+"zh": "行人警告功能失效"
+},
+{
+"id": 303,
+"en": "Pedestrian alert restricted",
+"zh": "行人警告功能受到限制"
+},
+{
+"id": 304,
+"en": "Pedestrian warning. Check the line of sight",
+"zh": "行人警告。检查视线范围"
+},
+{
+"id": 305,
+"en": "Loading aid Stop carefully",
+"zh": "直通装载系统。请小心停车"
+},
+{
+"id": 306,
+"en": "Total driving range---",
+"zh": "可达里程..."
+},
+{
+"id": 308,
+"en": "Remote control missing.Unable to close",
+"zh": "遥控器缺失。无法关闭"
+},
+{
+"id": 309,
+"en": "Trailer detected.Open manually",
+"zh": "已识别拖车。请手动打开"
+},
+{
+"id": 310,
+"en": "Charging station fault",
+"zh": "充电站有故障"
+},
+{
+"id": 311,
+"en": "Charge status low",
+"zh": "充电状态：电量低"
+},
+{
+"id": 312,
+"en": "Parking assistance.Brake vehicle yourself",
+"zh": "泊车距离报警装置。请自行制动"
+},
+{
+"id": 314,
+"en": "Roof.Incorrect loading of boot",
+"zh": "车顶。行李箱装载错误"
+},
+{
+"id": 315,
+"en": "Exhaust emission test mode activated",
+"zh": "尾气检测模式已启动"
+},
+{
+"id": 316,
+"en": "Exhaust emission test mode not possible",
+"zh": "无法启动尾气检测模式"
+},
+{
+"id": 317,
+"en": "Vehicle cannot be lowered",
+"zh": "无法降低车身"
+},
+{
+"id": 318,
+"en": "AC charging not possible",
+"zh": "无法进行标准充电"
+},
+{
+"id": 319,
+"en": "Quick charging not possible",
+"zh": "无法进行快速充电"
+},
+{
+"id": 320,
+"en": "Charging socket flap open",
+"zh": "充电插座掀盖未关"
+},
+{
+"id": 321,
+"en": "Driver assistance Keep your distance",
+"zh": "驾驶者辅助系统请注意车距"
+},
+{
+"id": 322,
+"en": "Acoustic pedestrian warning failure",
+"zh": "行人保护警示音失效"
+},
+{
+"id": 323,
+"en": "Panorama View Check camera lens",
+"zh": "全景请检查摄像机镜头"
+},
+{
+"id": 324,
+"en": "Engine can be started in---minutes",
+"zh": "...分钟后可以启动发动机"
+},
+{
+"id": 325,
+"en": "Quick charging active",
+"zh": "快速充电已启动"
+},
+{
+"id": 326,
+"en": "Charging with reduced power",
+"zh": "降低充电功率"
+},
+{
+"id": 327,
+"en": "Not fully charged at departure time",
+"zh": "高压蓄电池未充满电"
+},
+{
+"id": 328,
+"en": "AutoPDC failure",
+"zh": "AutoPDC失效"
+},
+{
+"id": 329,
+"en": "Traffic Jam Assist only on motorways",
+"zh": "堵车辅助功能仅可在高速公路上使用"
+},
+{
+"id": 330,
+"en": "Activate Cruise Control first",
+"zh": "事先启动巡航控制系统"
+},
+{
+"id": 331,
+"en": "Oil dilution critical.Drive moderately",
+"zh": "机油变稀严重。请小心驾驶"
+},
+{
+"id": 333,
+"en": "Lower tailgate section",
+"zh": "尾门下段"
+},
+{
+"id": 334,
+"en": "Drivetrain.Stop carefully",
+"zh": "传动系统 请小心停车"
+},
+{
+"id": 335,
+"en": "Drivetrain.Note remain.driving range",
+"zh": "传动系统 请注意可行驶里程"
+},
+{
+"id": 336,
+"en": "Start assistance inactive",
+"zh": "起步辅助装置退出工作"
+},
+{
+"id": 337,
+"en": "Night Vision failure",
+"zh": "夜视系统失效"
+},
+{
+"id": 338,
+"en": "Resetting Flat Tyre Monitor(RPA)...",
+"zh": "正在进行RPA重置..."
+},
+{
+"id": 339,
+"en": "Two-stage brake light left failure",
+"zh": "左侧二级制动信号灯失效"
+},
+{
+"id": 340,
+"en": "Trailer rear light/number plate light",
+"zh": "挂车尾灯/牌照灯"
+},
+{
+"id": 341,
+"en": "Trailer turn indicator/brake light right",
+"zh": "挂车右侧转向信号灯/制动灯"
+},
+{
+"id": 342,
+"en": "Battery.Discharging when stationary",
+"zh": "蓄电池 停车时放电增加"
+},
+{
+"id": 343,
+"en": "Launch Control active",
+"zh": "起跑控制已激活"
+},
+{
+"id": 344,
+"en": "Tow hitch.Stop carefully",
+"zh": "拖车挂钩 请小心停车"
+},
+{
+"id": 345,
+"en": "Close-range sensors deactivated!",
+"zh": "近距离传感器退出工作"
+},
+{
+"id": 346,
+"en": "Gearbox position N,Ignition switched on",
+"zh": "变速箱位于档位N,点火开关接通"
+},
+{
+"id": 347,
+"en": "Battery.Charge state---",
+"zh": "蓄电池充电状态"
+},
+{
+"id": 348,
+"en": "Gear selector-lever indicator",
+"zh": "选档杆"
+},
+{
+"id": 349,
+"en": "Camera system",
+"zh": "摄像机系统"
+},
+{
+"id": 350,
+"en": "Side View failure",
+"zh": "侧视系统损坏"
+},
+{
+"id": 351,
+"en": "Escape speed used!",
+"zh": "已启用逃逸速度"
+},
+{
+"id": 352,
+"en": "Tire chains!Reduce speed",
+"zh": "雪地防滑链，请减速！"
+},
+{
+"id": 353,
+"en": "Danger!High CO2 level in the car!",
+"zh": "危险！车内二氧化碳浓度过高！"
+},
+{
+"id": 354,
+"en": "Tone sequence ready!",
+"zh": "声响序列准备就绪"
+},
+{
+"id": 355,
+"en": "Automatic climate control",
+"zh": "自动空调"
+},
+{
+"id": 356,
+"en": "Set time and date",
+"zh": "调整时间和日期"
+},
+{
+"id": 357,
+"en": "Engine overheated.Drive moderately",
+"zh": "发动机过热！谨慎行驶"
+},
+{
+"id": 358,
+"en": "Windscreen wiper",
+"zh": "雨刮器异常"
+},
+{
+"id": 359,
+"en": "lgnition off only possible in position P",
+"zh": "仅可在档位P关闭点火开关"
+},
+{
+"id": 360,
+"en": "Motor cannot currently be started",
+"zh": "发动机当前无法起动"
+},
+{
+"id": 361,
+"en": "Motor can be started",
+"zh": "发动机可以起动"
+},
+{
+"id": 362,
+"en": "Range externder maintenance cycle",
+"zh": "增程器 维护程序"
+},
+{
+"id": 363,
+"en": "Maintenance cycle active remain time --- min",
+"zh": "维护周期活动保持时间---分钟"
+},
+{
+"id": 364,
+"en": "Range externder，maintenance not poss",
+"zh": "增程器,无法进行维护"
+},
+{
+"id": 365,
+"en": "Engaging gearbox position P",
+"zh": "已挂入P档"
+},
+{
+"id": 367,
+"en": "Engine switched off automatically",
+"zh": "发动机自动关闭"
+},
+{
+"id": 368,
+"en": "Brake pad wear indicator",
+"zh": "制动摩擦片磨损标示"
+},
+{
+"id": 369,
+"en": "Tank empty,reduced performance",
+"zh": "油箱已空,性能下降"
+},
+{
+"id": 370,
+"en": "Finish test section",
+"zh": "完成测试部分"
+},
+{
+"id": 371,
+"en": "Showroom mode",
+"zh": "展厅模式"
+},
+{
+"id": 372,
+"en": "n.t.a.(US)",
+"zh": "n.t.a.(US)"
+},
+{
+"id": 373,
+"en": "Steering wheel heating activated",
+"zh": "方向盘加热功能已开启"
+},
+{
+"id": 374,
+"en": "Steering wheel heating deactivated",
+"zh": "方向盘加热功能已关闭"
+},
+{
+"id": 375,
+"en": "Charge battery",
+"zh": "给电池充电"
+},
+{
+"id": 376,
+"en": "Cruise Control failure",
+"zh": "巡航控制系统失效"
+},
+{
+"id": 377,
+"en": "Engine!Stop carefully",
+"zh": "发动机！请小心停车"
+},
+{
+"id": 378,
+"en": "Increased emission",
+"zh": "排放量升高"
+},
+{
+"id": 379,
+"en": "Cornering ability restricted",
+"zh": "转弯性能受到影响"
+},
+{
+"id": 380,
+"en": "Gearbox in N only with engine on",
+"zh": "只在发动机起动时才能挂入N档"
+},
+{
+"id": 381,
+"en": "Increased battery discharge",
+"zh": "蓄电池过度放电"
+},
+{
+"id": 382,
+"en": "Battery monitoring failure",
+"zh": "蓄电池监控失效"
+},
+{
+"id": 383,
+"en": "Battery charge very low",
+"zh": "电量低，高压蓄电池"
+},
+{
+"id": 384,
+"en": "Power window anti-trap function",
+"zh": "车窗升降机防夹保护"
+},
+{
+"id": 385,
+"en": "Engine speed!Select higher gear",
+"zh": "发动机转速！请选择较高档位"
+},
+{
+"id": 386,
+"en": "Gearbox position P not engaged",
+"zh": "未挂入变速箱档位P"
+},
+{
+"id": 387,
+"en": "Battery charge very low",
+"zh": "蓄电池电量极低"
+},
+{
+"id": 388,
+"en": "End of line！Initialise RPA",
+"zh": "请对RPA进行标准化设置"
+},
+{
+"id": 389,
+"en": "Drivetrain！Only forward crawl modee",
+"zh": "传动系统！仅可缓慢向前行驶"
+},
+{
+"id": 390,
+"en": "Battery terminals check!",
+"zh": "蓄电池触点！请检查"
+},
+{
+"id": 391,
+"en": "Power supply!Drive moderately",
+"zh": "供电系统！请谨慎驾驶"
+},
+{
+"id": 392,
+"en": "Break recommended",
+"zh": "建议停车休息"
+},
+{
+"id": 393,
+"en": "Tyre pressure notification",
+"zh": "轮胎充气提示"
+},
+{
+"id": 394,
+"en": "Possible to continue journey.Inflate tyres",
+"zh": "您可以继续行驶。请给轮胎充气"
+},
+{
+"id": 395,
+"en": "Battery not charging",
+"zh": "蓄电池不充电"
+},
+{
+"id": 396,
+"en": "Check engine oil level",
+"zh": "请检查发动机机油油位"
+},
+{
+"id": 397,
+"en": "Water injection.Water tank reserve level",
+"zh": "喷水功能。水箱储水量"
+},
+{
+"id": 398,
+"en": "Stop carefully.Fire risk",
+"zh": "请小心停车。火灾危险"
+},
+{
+"id": 399,
+"en": "Brake light control failure",
+"zh": "刹车灯控制故障"
+},
+{
+"id": 400,
+"en": "Cruise control activated",
+"zh": "巡航控制已激活"
+},
+{
+"id": 401,
+"en": "Engine fault!Drive moderately",
+"zh": "发动机异常！谨慎驾驶。"
+},
+{
+"id": 402,
+"en": "Power window anti-trap function",
+"zh": "微粒过滤器失效"
+},
+{
+"id": 403,
+"en": "Engine speed!Select higher gear",
+"zh": "启动器已启动！"
+},
+{
+"id": 404,
+"en": "Gearbox position P not engaged",
+"zh": "引擎熄火！"
+},
+{
+"id": 405,
+"en": "Battery charge very low",
+"zh": "儿童安全保护锁故障！"
+},
+{
+"id": 406,
+"en": "End of line！Initialise RPA",
+"zh": "Pre-Crash 感应器有污垢！"
+},
+{
+"id": 407,
+"en": "Drivetrain！Only forward crawl modee",
+"zh": "儿童座椅识别装置故障"
+},
+{
+"id": 408,
+"en": "Battery terminals check!",
+"zh": "便捷上车功能 退出工作"
+},
+{
+"id": 409,
+"en": "Power supply!Drive moderately",
+"zh": "电瓶开关位于OFF位置(关闭)"
+},
+{
+"id": 410,
+"en": "Break recommended",
+"zh": "动力模组故障！请小心驾驶"
+},
+{
+"id": 411,
+"en": "Tyre pressure notification",
+"zh": "空调系统功能受限制！"
+},
+{
+"id": 412,
+"en": "Possible to continue journey.Inflate tyres",
+"zh": "关闭车门和车窗"
+},
+{
+"id": 413,
+"en": "Battery not charging",
+"zh": "无法进行汽油驱动"
+},
+{
+"id": 414,
+"en": "Check engine oil level",
+"zh": "氢气系统有故障"
+},
+{
+"id": 415,
+"en": "Water injection.Water tank reserve level",
+"zh": "氢气！立即离开汽车"
+},
+{
+"id": 416,
+"en": "Stop carefully.Fire risk",
+"zh": "目前无法用氢运行"
+},
+{
+"id": 417,
+"en": "Brake light control failure",
+"zh": "目前无法添加氢"
+},
+{
+"id": 418,
+"en": "Cruise control activated",
+"zh": "不要驶入封闭的空间"
+}
+]

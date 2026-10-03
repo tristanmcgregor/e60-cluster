@@ -1,0 +1,268 @@
+#!/usr/bin/env python3
+"""
+Desktop preview of the custom dashboard with a fake EventHub.
+
+    python3 preview.py                 # live window, simulated drive
+    python3 preview.py --shot out.png  # render one frame to PNG and exit
+
+Registers a mock `plugins.EventHub 1.0` type exposing the same property
+names / NOTIFY groups the real libEventHub.so has, then loads the exact
+device files from ../device/etc/dash/Dashboard.qml.
+"""
+import argparse
+import math
+import os
+import sys
+
+from PyQt5.QtCore import QObject, QTimer, QUrl, pyqtProperty, pyqtSignal
+from PyQt5.QtGui import QFontDatabase, QGuiApplication
+from PyQt5.QtQml import QQmlComponent, QQmlEngine, qmlRegisterType
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DASH = os.path.join(HERE, "..", "device", "etc", "dash", "Dashboard.qml")
+FONT_DIRS = [
+    os.path.join(HERE, "fonts"),
+    os.path.join(HERE, "..", "fonts_candidates"),
+    "/private/tmp/claude-501/-Users-tritty-Documents-code-JLY/22db9255-63f4-42f4-b887-91fa283eb1b1/scratchpad/pkg/dashboard/usr/share/fonts",
+]
+
+
+def group(signal_name, props):
+    """Build read-only pyqtProperties sharing one NOTIFY signal, like EventHub."""
+    return signal_name, props
+
+
+GROUPS = [
+    ("speedChanged", {"speed": int, "speedM": int, "rpm": int}),
+    ("fuelChanged", {"fuel": int, "remindingRange": str, "remindingRangeM": str,
+                     "instantFuel": str, "instantFuelUnit": str}),
+    ("waterChanged", {"waterPercetage": int, "waterTemperature": str, "waterTemperatureF": str}),
+    ("tripChanged", {"odo": str, "odoM": str, "tripA": str, "tripAmile": str, "tripB": str, "tripBmile": str}),
+    ("cruiseChanged", {"cruiseShowSetSpeed": int, "cruiseShowCtrlIndicator": int, "cruiseSetSpeed": str}),
+    ("resetChanged", {"resetAvgFuel": str, "resetAvgSpeed": str, "resetDistance": str, "resetDuration": str}),
+    ("tpmsChanged", {"flTire": str, "frTire": str, "rlTire": str, "rrTire": str,
+                     "flTireState": int, "frTireState": int, "rlTireState": int, "rrTireState": int}),
+    ("dashboardChanged", {"outsideTemp": str, "oilTemp": str, "oilTempInt": int, "batteryVoltage": int}),
+    ("gearChanged", {"gear": str, "gearShow": bool}),
+    ("turnChanged", {"turnLeft": bool, "turnRight": bool, "turnLeftState": bool, "turnRightState": bool}),
+    ("warningChanged", {"warningId": int, "warningDuration": int}),
+    ("doorChanged", {"lfDoor": int, "lrDoor": int, "rfDoor": int, "rrDoor": int, "trunk": int, "hood": int}),
+    ("overspeedChanged", {"overspeedOn": int, "overspeedFlicker": int}),
+    ("alarmtableChanged", {"alarmTableMax": int}),
+    ("swcChanged", {"swcKey": int, "swcKeyPress": bool}),
+    ("maintainChanged", {"maintainItemId": int, "maintainState": int, "maintainMileage": str,
+                         "maintainReminder": str, "maintainYear": str, "maintainMonth": str,
+                         "maintainDay": str, "maintainDuration": int}),
+    ("accChanged", {"acc": int}),
+    ("versionNotify", {"version": str, "canVersion": str}),
+]
+ICON_BASE = os.path.join(HERE, "..", "..", "launcher_ui_assets", "bundle_1")
+
+# --scene: which warning features the fake car exercises
+SCENES = {
+    "normal": {},
+    # engine (on), ABS (fast flash), handbrake (on), low oil pressure (slow flash), high beam, cruise on
+    "alarms": {"alarms": {2: 1, 4: 2, 23: 1, 25: 3, 9: 1, 31: 1}},
+    "door": {"doors": {"lfDoor": 1, "trunk": 1}},
+    "warning": {"warning": (150, 8)},
+    "overspeed": {"overspeed": True},
+    # fake head unit streams a route over ws://127.0.0.1:8765 (fake_headunit.py)
+    "nav": {"nav": True},
+    "cruise": {"cruise": True},
+    # nav + a stand-in for the native map plugin (preview/qml/ClusterVideo)
+    "map": {"nav": True, "map": True},
+    # centre menu pages: BC (26) presses step TRIP -> VEHICLE -> NAVIGATION -> INFO
+    "page_trip": {},
+    "page_vehicle": {"keys": [(1.0, 26)]},
+    "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26)]},
+    "msg": {"warning": (58, 8)},
+    "media": {"nav": True, "fh": "media"},
+    "call": {"nav": True, "fh": "call"},
+    "service": {"service": True},
+    "startup": {},
+}
+SCENE = SCENES["normal"]
+WRITABLE = {"port": int, "packetDebug": int, "MPH": int, "verified": int, "menuId": int, "uiStyle": int}
+
+
+def make_hub_class():
+    ns = {}
+    for sig, _ in GROUPS:
+        ns[sig] = pyqtSignal()
+    ns["unitChanged"] = pyqtSignal()
+    ns["portChanged"] = pyqtSignal()
+
+    def ro(name, typ, sig):
+        return pyqtProperty(typ, lambda self: self._v[name], notify=ns[sig])
+
+    for sig, props in GROUPS:
+        for name, typ in props.items():
+            ns[name] = ro(name, typ, sig)
+
+    def rw(name, typ, sig=None):
+        def get(self):
+            return self._v[name]
+
+        def set_(self, v):
+            self._v[name] = v
+            if sig:
+                getattr(self, sig).emit()
+
+        kw = {"notify": ns[sig]} if sig else {}
+        return pyqtProperty(typ, get, set_, **kw)
+
+    ns["port"] = rw("port", int, "portChanged")
+    ns["packetDebug"] = rw("packetDebug", int)
+    ns["MPH"] = rw("MPH", int, "unitChanged")
+    ns["verified"] = rw("verified", int)
+    ns["menuId"] = rw("menuId", int)      # on the device, writing this sends the MCU the interface packet
+    ns["uiStyle"] = rw("uiStyle", int)
+
+    # alarmTable: write an index, read back that alarm's state (no NOTIFY on write, like the device)
+    def at_get(self):
+        return SCENE.get("alarms", {}).get(self._at, 0)
+
+    def at_set(self, i):
+        self._at = i
+
+    ns["alarmTable"] = pyqtProperty(int, at_get, at_set, notify=ns["alarmtableChanged"])
+
+    def __init__(self, parent=None):
+        QObject.__init__(self, parent)
+        self._v = {}
+        for _, props in GROUPS:
+            for n, t in props.items():
+                self._v[n] = t()
+        for n, t in WRITABLE.items():
+            self._v[n] = t()
+        self._t = 0.0
+        self._at = 0
+        self._v["alarmTableMax"] = 232
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._tick)
+        self._timer.start(50)
+        self._tick()
+
+    def _tick(self):
+        t = self._t = self._t + 0.05
+        v = self._v
+        kmh = int(60 + 55 * math.sin(t / 4))
+        v["speed"], v["speedM"] = kmh, int(kmh / 1.609)
+        v["rpm"] = int(1800 + 2600 * (0.5 + 0.5 * math.sin(t * 1.3)) + 900 * math.sin(t / 4))
+        self.speedChanged.emit()
+        if int(t * 20) % 20 == 0:
+            v["fuel"] = 62
+            v["remindingRange"], v["remindingRangeM"] = "438", "272"
+            v["waterPercetage"] = 52
+            v["waterTemperature"], v["waterTemperatureF"] = "90°C", "194°F"
+            v["odo"], v["odoM"] = "187432km", "116464mi"
+            v["tripA"], v["tripAmile"] = "312.4km", "194.1mi"
+            v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", "104°C", 104, 142
+            v["gear"], v["gearShow"] = "D3", True
+            v["instantFuel"], v["instantFuelUnit"] = "9.8", "L/100km"
+            v["tripB"], v["tripBmile"] = "1204.6km", "748.5mi"
+            v["resetAvgFuel"], v["resetAvgSpeed"] = "11.2 L/100km", "54 km/h"
+            v["resetDistance"], v["resetDuration"] = "312.4 km", "5:47"
+            v["flTire"], v["frTire"], v["rlTire"], v["rrTire"] = "2.3 bar", "2.3 bar", "2.5 bar", "2.4 bar"
+            v["cruiseShowSetSpeed"], v["cruiseSetSpeed"] = (1, "100") if SCENE.get("cruise") else (0, "")
+            v["version"], v["canVersion"] = "EventHub@20230416 r19154", "129A.V01 2024/6/4"
+            for sig in ("fuelChanged", "waterChanged", "tripChanged", "dashboardChanged", "gearChanged",
+                        "cruiseChanged", "resetChanged", "tpmsChanged", "versionNotify"):
+                getattr(self, sig).emit()
+        # scripted button presses: SCENE["keys"] = [(seconds, code), ...], sent as press + release
+        for at, code in SCENE.get("keys", []):
+            if abs(t - at) < 0.026:
+                v["swcKey"], v["swcKeyPress"] = code, True
+                self.swcChanged.emit()
+                v["swcKeyPress"] = False
+                self.swcChanged.emit()
+        if abs(t - 0.5) < 0.026:
+            self.alarmtableChanged.emit()
+            for k, val in SCENE.get("doors", {}).items():
+                v[k] = val
+            self.doorChanged.emit()
+            if "warning" in SCENE:
+                v["warningId"], v["warningDuration"] = SCENE["warning"]
+                self.warningChanged.emit()
+            if SCENE.get("service"):
+                v["maintainItemId"], v["maintainState"] = 0, 1
+                v["maintainMileage"], v["maintainReminder"] = "1500km", "1500 km"
+                v["maintainYear"], v["maintainMonth"], v["maintainDay"] = "2026", "11", "20"
+                v["maintainDuration"] = 8
+                self.maintainChanged.emit()
+            if SCENE.get("overspeed"):
+                v["overspeedOn"], v["overspeedFlicker"] = 1, 1
+                self.overspeedChanged.emit()
+        blink = int(t * 2.5) % 2 == 0 and (t % 12) < 4
+        if blink != v["turnLeftState"]:
+            v["turnLeftState"] = blink
+            self.turnChanged.emit()
+
+    ns["__init__"] = __init__
+    ns["_tick"] = _tick
+    return type("EventHub", (QObject,), ns)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--shot", help="write a single frame to this PNG and exit")
+    ap.add_argument("--time", type=float, default=2.5, help="sim seconds before --shot")
+    ap.add_argument("--scene", choices=sorted(SCENES), default="normal")
+    ap.add_argument("--font", help="override the dash typeface (family name)")
+    args = ap.parse_args()
+    global SCENE
+    SCENE = SCENES[args.scene]
+    if not SCENE.get("nav") and os.path.exists("/tmp/nav_gateway"):
+        os.remove("/tmp/nav_gateway")
+
+    if args.shot:
+        os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+        os.environ.setdefault("QT_QUICK_BACKEND", "software")
+    app = QGuiApplication(sys.argv)
+    for d in FONT_DIRS:
+        if os.path.isdir(d):
+            for f in os.listdir(d):
+                if f.lower().endswith((".ttf", ".otf")):
+                    QFontDatabase.addApplicationFont(os.path.join(d, f))
+
+    # Keep a reference: qmlRegisterType does not, and a collected class crashes QML later.
+    global HUB_CLASS
+    HUB_CLASS = make_hub_class()
+    qmlRegisterType(HUB_CLASS, "plugins.EventHub", 1, 0, "EventHub")
+    engine = QQmlEngine()
+    if args.font:
+        engine.rootContext().setContextProperty("dashFont", args.font)
+    if SCENE.get("map"):
+        engine.addImportPath(os.path.join(HERE, "qml"))
+    engine.rootContext().setContextProperty("dashIconBase", QUrl.fromLocalFile(os.path.abspath(ICON_BASE) + "/").toString())
+    comp = QQmlComponent(engine, QUrl.fromLocalFile(os.path.abspath(DASH)))
+    win = comp.create()
+    if win is None:
+        for e in comp.errors():
+            print("QML ERROR:", e.toString())
+        sys.exit(1)
+
+    if SCENE.get("nav"):
+        # Started only after the QML exists: with it running during comp.create(),
+        # PyQt crashes constructing the mock EventHub (sip createPyObject).
+        import atexit, subprocess
+        fake = subprocess.Popen([sys.executable, os.path.join(HERE, "fake_headunit.py"), SCENE.get("fh", "nav")],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        atexit.register(fake.terminate)
+
+    win.setProperty("width", 1600)
+    win.setProperty("height", 600)
+    if args.shot:
+        def snap():
+            from PyQt5 import sip
+            from PyQt5.QtQuick import QQuickWindow
+            img = sip.cast(win, QQuickWindow).grabWindow()
+            print("grab", img.width(), img.height(), img.isNull(), "saved", img.save(os.path.abspath(args.shot)))
+            print("wrote", args.shot)
+            app.quit()
+        QTimer.singleShot(int(args.time * 1000), snap)
+    sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()
