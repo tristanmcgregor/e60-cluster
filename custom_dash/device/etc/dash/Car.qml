@@ -42,19 +42,29 @@ Item {
 
     property string gear: ""
     property bool gearShow: true
-    // Indicator lamps as shown. The stock UI lights its arrows from turn*State (the blink phase);
-    // as a fallback, when only the "indicator on" flags (turnLeft/turnRight) arrive, we blink them
-    // ourselves at the normal flasher rate.
-    property bool turnLeft: (turnLeftPhase || (turnLeftOn && blinkPhase))
-    property bool turnRight: (turnRightPhase || (turnRightOn && blinkPhase))
+    // Indicator lamps as shown. The MCU reports two things per side: turn* ("indicator on")
+    // and turn*State (the flasher's lamp phase). While the phase is actually flashing it drives
+    // the arrow. Only when the indicator is on and the phase has not changed for 1.5 s (no phase
+    // reported, or stuck lit) do we blink the arrow ourselves at the normal flasher rate.
+    // (The old fallback restarted its own blink, lit, on every dark phase, which held normal
+    // indicators steadily on; hazards, which report the phase without "on", blinked fine.)
+    property bool turnLeft: leftFlashing ? turnLeftPhase : ((turnLeftOn || turnLeftPhase) && blinkPhase)
+    property bool turnRight: rightFlashing ? turnRightPhase : ((turnRightOn || turnRightPhase) && blinkPhase)
     property bool turnLeftOn: false
     property bool turnRightOn: false
     property bool turnLeftPhase: false
     property bool turnRightPhase: false
+    property bool leftFlashing: false      // phase changed within the last 1.5 s
+    property bool rightFlashing: false
     property bool blinkPhase: true
+    onTurnLeftPhaseChanged: { leftFlashing = true; leftFlashWatch.restart() }
+    onTurnRightPhaseChanged: { rightFlashing = true; rightFlashWatch.restart() }
+    Timer { id: leftFlashWatch; interval: 1500; onTriggered: car.leftFlashing = false }
+    Timer { id: rightFlashWatch; interval: 1500; onTriggered: car.rightFlashing = false }
     Timer {
         interval: 380; repeat: true
-        running: (car.turnLeftOn && !car.turnLeftPhase) || (car.turnRightOn && !car.turnRightPhase)
+        running: (!car.leftFlashing && (car.turnLeftOn || car.turnLeftPhase)) ||
+                 (!car.rightFlashing && (car.turnRightOn || car.turnRightPhase))
         onTriggered: car.blinkPhase = !car.blinkPhase
         onRunningChanged: car.blinkPhase = true
     }
