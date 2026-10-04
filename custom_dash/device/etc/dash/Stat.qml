@@ -6,6 +6,7 @@ Column {
     property string label: ""
     property string value: ""
     property bool fit: false
+    property int valueSize: Theme.tMedium
     spacing: 0
     width: 200
     Text {
@@ -21,7 +22,7 @@ Column {
         elide: parent.fit ? Text.ElideRight : Text.ElideNone
         text: parent.value
         color: Theme.text
-        font.pixelSize: Theme.tMedium
+        font.pixelSize: parent.valueSize
         font.family: Theme.font
     }
 }

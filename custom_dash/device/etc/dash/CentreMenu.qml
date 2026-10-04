@@ -13,24 +13,31 @@ Item {
     property bool mph: false
     property bool mapStreaming: false     // set by Dashboard when the live map has a picture
     property bool dimmed: false           // a check-control message is showing over the page
+    property var fuel                     // FuelTracker, for the FUEL page
 
-    readonly property var titles: ["TRIP", "VEHICLE", "NAVIGATION", "INFO", "DEVELOPER"]
-    readonly property int pageCount: 4    // DEVELOPER (index 4) is hidden: hold BC on INFO
+    // Pages are referred to by name; the last one, DEVELOPER, is hidden (hold BC on INFO).
+    readonly property var titles: ["TRIP", "FUEL", "VEHICLE", "NAVIGATION", "INFO", "DEVELOPER"]
+    readonly property int pageCount: titles.length - 1
     property int page: 0
-    readonly property bool onNavPage: page === 2
+    readonly property string current: titles[page]
+    readonly property bool onNavPage: current === "NAVIGATION"
+    function show(name) { page = titles.indexOf(name) }
+
+    // the phone settings' default-page numbers (kept stable as pages are added)
+    readonly property var settingsPages: ["TRIP", "VEHICLE", "NAVIGATION", "INFO", "FUEL"]
 
     width: 520
     height: 480
 
     function step(delta) {
         userMoved = true
-        var from = page === 4 ? 3 : page    // leaving DEVELOPER continues from INFO
+        var from = current === "DEVELOPER" ? titles.indexOf("INFO") : page
         page = (from + delta + pageCount) % pageCount
     }
 
     // tell the MCU which page is up (stock EventHub.MenuId per page; see Car.menuId)
-    readonly property var menuIds: [257, 519, 769, 1030, 1032]
-    onPageChanged: if (car) car.menuId = menuIds[page]
+    readonly property var menuIds: ({ TRIP: 257, FUEL: 258, VEHICLE: 519, NAVIGATION: 769, INFO: 1030, DEVELOPER: 1032 })
+    onPageChanged: if (car) car.menuId = menuIds[current]
 
     Connections {
         target: menu.car
@@ -39,19 +46,19 @@ Item {
             switch (code) {
             case 21: menu.step(-1); break           // left
             case 22: case 26: menu.step(1); break   // right, BC single press
-            case 26 + 128: if (menu.page === 3) menu.page = 4; break   // hold BC on INFO
+            case 26 + 128: if (menu.current === "INFO") menu.show("DEVELOPER"); break
             }
         }
     }
     // start on the page chosen in the phone settings (stored copy arrives at start-up)
     Connections {
         target: menu.car
-        onSettingsApplied: if (!menu.userMoved) menu.page = menu.car.defaultPage
+        onSettingsApplied: if (!menu.userMoved) menu.show(menu.settingsPages[menu.car.defaultPage] || "TRIP")
     }
     property bool userMoved: false
     Connections {
         target: menu.nav
-        onActiveChanged: if (menu.nav.active) menu.page = 2
+        onActiveChanged: if (menu.nav.active) menu.show("NAVIGATION")
     }
 
     // title strip
@@ -96,17 +103,23 @@ Item {
 
         TripCard {
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: menu.page === 0
+            visible: menu.current === "TRIP"
             car: menu.car
+        }
+        FuelPage {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: menu.current === "FUEL"
+            car: menu.car
+            fuel: menu.fuel
         }
         VehiclePage {
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: menu.page === 1
+            visible: menu.current === "VEHICLE"
             car: menu.car
         }
         Item {
             anchors.fill: parent
-            visible: menu.page === 2
+            visible: menu.onNavPage
             NavCard {
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: menu.nav.active && !menu.mapStreaming
@@ -129,13 +142,13 @@ Item {
         }
         InfoPage {
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: menu.page === 3
+            visible: menu.current === "INFO"
             car: menu.car
             nav: menu.nav
         }
         DevPage {
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: menu.page === 4
+            visible: menu.current === "DEVELOPER"
             car: menu.car
         }
     }

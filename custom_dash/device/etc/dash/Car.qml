@@ -136,6 +136,10 @@ Item {
     readonly property bool gearboxSport: /^(DS|S|M)\d*$/i.test(gear.trim())
     readonly property bool sportMode: sportSetting === "always" || (sportSetting === "auto" && gearboxSport)
 
+    // fuel page and fuel-to-destination (FuelTracker)
+    property real tankLitres: 70         // E60 525i
+    property real fuelPrice: 2.0         // per litre, for cost per tank
+    property int fuelReserveKm: 30       // warn when arriving with less range than this
     property int speedLimitMargin: 3
     property bool speedLimitOn: true
     property int defaultPage: 0
@@ -154,6 +158,9 @@ Item {
         if (s.speedLimitMargin !== undefined) speedLimitMargin = s.speedLimitMargin
         if (s.defaultPage !== undefined) defaultPage = s.defaultPage
         if (s.perfPopups !== undefined) perfPopups = s.perfPopups
+        if (s.tankLitres !== undefined) tankLitres = s.tankLitres
+        if (s.fuelPrice !== undefined) fuelPrice = s.fuelPrice
+        if (s.fuelReserveKm !== undefined) fuelReserveKm = s.fuelReserveKm
         settingsApplied()
         if (store) {
             try {

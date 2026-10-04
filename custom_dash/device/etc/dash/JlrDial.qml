@@ -15,8 +15,8 @@ Item {
     property real labelDivisor: 1
     property bool alternateDim: true   // every other numeral small and grey (speedo)
     property real redFrom: -1          // tach red zone (moves with the warm-up redline)
-    property color ringColor: "#d9dde2"
-    property color needleColor: "#ffffff"
+    property color ringColor: Theme.ring
+    property color needleColor: Theme.needle
     property string scaleLabel: ""     // e.g. "km/h" or "rpm x 1000" under the top numeral
     property real size: 600
 
@@ -56,6 +56,10 @@ Item {
         onFontChanged: face.requestPaint()
     }
     onRedFromChanged: face.requestPaint()
+    Connections {
+        target: Theme
+        onNightChanged: face.requestPaint()
+    }
     onRingColorChanged: face.requestPaint()
 
     Canvas {
@@ -68,7 +72,7 @@ Item {
             var cx = dial.r, cy = dial.r, R = dial.r
 
             // beaded bezel: two staggered rows of small bright beads between thin rings
-            ctx.strokeStyle = "#8d949c"
+            ctx.strokeStyle = Theme.bezelLine
             ctx.lineWidth = 1.2
             ctx.beginPath(); ctx.arc(cx, cy, R * 0.997, 0, 2 * Math.PI); ctx.stroke()
             ctx.beginPath(); ctx.arc(cx, cy, R * 0.928, 0, 2 * Math.PI); ctx.stroke()
@@ -79,9 +83,9 @@ Item {
                     var ba = (b + row * 0.5) * 2 * Math.PI / beads
                     var bx = cx + br * Math.cos(ba), by = cy + br * Math.sin(ba)
                     var g = ctx.createRadialGradient(bx - 1.5, by - 1.5, 0, bx, by, R * (row === 0 ? 0.021 : 0.014))
-                    g.addColorStop(0, "#ffffff")
-                    g.addColorStop(0.6, "#c8cdd3")
-                    g.addColorStop(1, "#4d535a")
+                    g.addColorStop(0, Theme.beadHi)
+                    g.addColorStop(0.6, Theme.beadMid)
+                    g.addColorStop(1, Theme.beadLo)
                     ctx.fillStyle = g
                     ctx.globalAlpha = row === 0 ? 1.0 : 0.55
                     ctx.beginPath(); ctx.arc(bx, by, R * (row === 0 ? 0.019 : 0.012), 0, 2 * Math.PI); ctx.fill()
@@ -100,7 +104,7 @@ Item {
                 var red = dial.redFrom >= 0 && v >= dial.redFrom
                 var rOut = R * 0.915
                 var rIn = R * (major ? 0.835 : 0.88)
-                ctx.strokeStyle = red ? "#ff3b30" : "#e9edf2"
+                ctx.strokeStyle = red ? "#ff3b30" : Theme.inkTick
                 ctx.lineWidth = major ? R * 0.016 : R * 0.008
                 ctx.beginPath()
                 ctx.moveTo(cx + rIn * Math.cos(a), cy + rIn * Math.sin(a))
@@ -111,7 +115,7 @@ Item {
                     var dim = dial.alternateDim && (n % 2 === 0)
                     var rl = R * 0.745
                     ctx.font = Math.round(R * (dim ? 0.075 : 0.105)) + "px '" + Theme.font + "'"
-                    ctx.fillStyle = red ? "#ff4a3d" : (dim ? "#8f979f" : "#f4f6f8")
+                    ctx.fillStyle = red ? "#ff4a3d" : (dim ? Theme.inkDim : Theme.ink)
                     ctx.fillText(Math.round(v / dial.labelDivisor), cx + rl * Math.cos(a), cy + rl * Math.sin(a))
                 }
             }
@@ -163,7 +167,7 @@ Item {
                 var c
                 if (i === 0) c = dial.gapLowColor
                 else if (i === n - 1 && dial.gapHighColor !== dial.gapLowColor) c = dial.gapHighColor
-                else c = "#e9edf2"
+                else c = Theme.inkTick
                 if (dial.w && lit) c = "#ff3b30"
                 ctx.strokeStyle = lit || i === 0 || (i === n - 1 && dial.gapHighColor !== dial.gapLowColor) ? c : "#2a2e33"
                 ctx.globalAlpha = lit ? 1.0 : 0.45
@@ -188,7 +192,7 @@ Item {
         y: dial.size * 0.165
         visible: dial.scaleLabel !== ""
         text: dial.scaleLabel
-        color: "#aeb5bd"
+        color: Theme.inkSoft
         font.pixelSize: dial.size * 0.028
         font.family: Theme.font
     }

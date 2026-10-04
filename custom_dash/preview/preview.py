@@ -73,12 +73,14 @@ SCENES = {
     "map": {"nav": True, "map": True},
     # centre menu pages: BC (26) presses step TRIP -> VEHICLE -> NAVIGATION -> INFO
     "page_trip": {},
-    "page_vehicle": {"keys": [(1.0, 26)]},
-    "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26)]},
-    "page_dev": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (2.0, 26 + 128)]},
+    "page_fuel": {"keys": [(13.0, 21), (13.3, 21)], "fastfuel": True, "fueljump": (20, 75, 6.0), "range": "25", "nav": True},
+    "page_vehicle": {"keys": [(1.0, 26), (1.3, 26)]},
+    "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26)]},
+    "page_dev": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26), (2.3, 26 + 128)]},
     "msg": {"warning": (58, 8)},
     "media": {"nav": True, "fh": "media"},
     "call": {"nav": True, "fh": "call"},
+    "media_art": {"nav": True, "fh": "media_art"},
     "settings": {"nav": True, "fh": "settings", "gear": "D3", "rpm": 5200, "oil": 65},
     "limit": {"nav": True, "fh": "limit130"},
     "limit_over": {"nav": True, "fh": "limit60"},
@@ -175,7 +177,12 @@ def make_hub_class():
             oil = SCENE.get("oil", 104)
             v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", f"{oil}°C", oil, SCENE.get("volts", 142)
             v["gear"], v["gearShow"] = SCENE.get("gear", "D3"), True
-            v["instantFuel"], v["instantFuelUnit"] = "9.8", "L/100km"
+            v["instantFuel"], v["instantFuelUnit"] = "%.1f" % (9.5 + 4 * abs(math.sin(t * 1.7))), "L/100km"
+            if "fueljump" in SCENE:              # (before %, after %, at seconds): a refuel
+                lo, hi, at = SCENE["fueljump"]
+                v["fuel"] = lo if t < at else hi
+            if "range" in SCENE:
+                v["remindingRange"] = SCENE["range"]
             v["tripB"], v["tripBmile"] = "1204.6km", "748.5mi"
             v["resetAvgFuel"], v["resetAvgSpeed"] = "11.2 L/100km", "54 km/h"
             v["resetDistance"], v["resetDuration"] = "312.4 km", "5:47"
@@ -222,6 +229,7 @@ def make_hub_class():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shot", help="write a single frame to this PNG and exit")
+    ap.add_argument("--night", action="store_true", help="night theme (Theme.night)")
     ap.add_argument("--time", type=float, default=2.5, help="sim seconds before --shot")
     ap.add_argument("--scene", choices=sorted(SCENES), default="normal")
     ap.add_argument("--font", help="override the dash typeface (family name)")
@@ -251,6 +259,10 @@ def main():
     engine.setOfflineStoragePath(tempfile.mkdtemp(prefix="dashpreview-"))
     if args.font:
         engine.rootContext().setContextProperty("dashFont", args.font)
+    if SCENE.get("fastfuel"):                    # FuelTracker: one graph bar per 0.25 s
+        engine.rootContext().setContextProperty("dashFastFuel", True)
+    if args.night:
+        engine.rootContext().setContextProperty("dashNight", True)
     if SCENE.get("map"):
         engine.addImportPath(os.path.join(HERE, "qml"))
     engine.rootContext().setContextProperty("dashIconBase", QUrl.fromLocalFile(os.path.abspath(ICON_BASE) + "/").toString())

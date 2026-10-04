@@ -17,6 +17,7 @@ Window {
     property alias car: car
     Car { id: car }
     PerfTimer { id: perfTimer; car: car }
+    FuelTracker { id: fuelTracker; car: car; nav: navData }
     CarWarnings { id: carWarnings; car: car }
     Nav {
         id: navData
@@ -184,7 +185,7 @@ Window {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: stage.speedShown
-                color: stage.overLimit ? Theme.critical : "#f4f6f8"
+                color: stage.overLimit ? Theme.critical : Theme.ink
                 font.pixelSize: 100
                 font.family: stage.fontName
             }
@@ -192,7 +193,7 @@ Window {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: car.useMph ? "mph" : "km/h"
                 opacity: stage.limitShown > 0 ? 0 : 1        // the limit sign sits here instead
-                color: "#aeb5bd"
+                color: Theme.inkSoft
                 font.pixelSize: 22
                 font.family: stage.fontName
             }
@@ -222,8 +223,8 @@ Window {
         labelDivisor: 1000
         alternateDim: false
         redFrom: car.redlineRpm                       // follows oil temperature while warming up
-        ringColor: car.sportMode ? Theme.sportAccent : "#d9dde2"
-        needleColor: car.sportMode ? Theme.sportAccent : "#ffffff"
+        ringColor: car.sportMode ? Theme.sportAccent : Theme.ring
+        needleColor: car.sportMode ? Theme.sportAccent : Theme.needle
         scaleLabel: "rpm x 1000"
         value: stage.sweeping ? stage.sweep * maxValue : stage.rpmShown
         gapFrac: car.coolantPercent / 100
@@ -237,7 +238,7 @@ Window {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: stage.gearOffset
             text: car.gearShow && car.gear !== "" ? car.gear : "P"
-            color: car.gear === "R" ? Theme.critical : "#f4f6f8"
+            color: car.gear === "R" ? Theme.critical : Theme.ink
             font.pixelSize: 100
             font.family: stage.fontName
         }
@@ -262,7 +263,7 @@ Window {
     Text {
         id: clock
         x: 640 - width; y: 104
-        color: "#e9edf2"; font.pixelSize: 30; font.family: stage.fontName
+        color: Theme.ink; font.pixelSize: 30; font.family: stage.fontName
         text: Qt.formatTime(new Date(), "hh:mm")
         Timer { interval: 10000; running: true; repeat: true; onTriggered: clock.text = Qt.formatTime(new Date(), "hh:mm") }
     }
@@ -277,7 +278,7 @@ Window {
     Text {
         x: 1280; y: 104
         text: car.outsideTemp
-        color: "#e9edf2"; font.pixelSize: 30; font.family: stage.fontName
+        color: Theme.ink; font.pixelSize: 30; font.family: stage.fontName
     }
     Image {
         x: 650; y: 100; width: 42; height: 42; smooth: true
@@ -322,7 +323,8 @@ Window {
         nav: navData
         mph: car.useMph
         mapStreaming: mapLoader.status === Loader.Ready && mapLoader.item.streaming
-        dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown
+        fuel: fuelTracker
+        dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
     }
     WarningPopup {
         id: popup
@@ -362,6 +364,17 @@ Window {
         durationMs: 10000
         seq: carWarnings.seq
     }
+    WarningPopup {       // fuel to destination
+        id: fuelPopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown
+        forceCritical: fuelTracker.warnCritical
+        customText: fuelTracker.warnText
+        customIcon: "icons/fuel_warn.png"
+        durationMs: 10000
+        seq: fuelTracker.warnSeq
+    }
     WarningPopup {       // performance timer result
         id: perfPopup
         anchors.horizontalCenter: parent.horizontalCenter
@@ -397,7 +410,7 @@ Window {
             var unit = car.useMph ? "mi" : "km"
             return num === "" ? "" : ("000000" + num).slice(-6) + " " + unit
         }
-        color: "#e9edf2"; font.pixelSize: 28; font.family: stage.fontName
+        color: Theme.ink; font.pixelSize: 28; font.family: stage.fontName
     }
     Row {
         x: 1180; y: 652
@@ -405,11 +418,14 @@ Window {
         Image {
             anchors.verticalCenter: parent.verticalCenter
             width: 30; height: 30; smooth: true
-            source: car.fuelPercent <= 12 ? "icons/fuel_warn.png" : "icons/fuel.png"
+            source: car.fuelPercent <= 12 || fuelTracker.destStatus === "short" || fuelTracker.destStatus === "tight"
+                    ? "icons/fuel_warn.png" : "icons/fuel.png"
         }
-        Text {
+        Text {           // amber/red when the range will not comfortably reach the destination
             text: Units.withUnit(car.useMph ? car.rangeMiles : car.range, car.useMph)
-            color: "#e9edf2"; font.pixelSize: 28; font.family: stage.fontName
+            color: fuelTracker.destStatus === "short" ? Theme.critical
+                 : fuelTracker.destStatus === "tight" ? Theme.warn : Theme.ink
+            font.pixelSize: 28; font.family: stage.fontName
         }
     }
     MediaTab {

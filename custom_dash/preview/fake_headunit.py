@@ -5,6 +5,7 @@ Serves the same JSON on ws://127.0.0.1:8765/nav and writes /tmp/nav_gateway, so 
 dash's real Nav.qml connection code is exercised. Drives a short simulated route.
 """
 import base64
+import os
 import hashlib
 import json
 import socket
@@ -73,9 +74,14 @@ class FakeHeadUnit:
                           "Connection: Upgrade\r\nSec-WebSocket-Accept: %s\r\n\r\n" % accept).encode())
             with self.lock:
                 self.clients.append(conn)
-            if MODE in ("media", "call"):
-                self._send({"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
-                            "album": "After Hours", "playing": True})
+            if MODE in ("media", "call", "media_art"):
+                msg = {"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
+                       "album": "After Hours", "playing": True}
+                if MODE == "media_art":       # cover as a data: URL, as the head unit would send it
+                    art = base64.b64encode(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                             "sample_cover.jpg"), "rb").read()).decode()
+                    msg["art"] = "data:image/jpeg;base64," + art
+                self._send(msg)
             if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits
                 self._send({"type": "limit", "kph": int(MODE[5:])})
             if MODE == "settings":      # as saved from the phone settings page

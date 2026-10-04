@@ -29,6 +29,7 @@ Item {
     property string mediaTitle: ""
     property string mediaArtist: ""
     property bool mediaPlaying: false
+    property string mediaArt: ""       // album art as a data: URL, when the head unit sends one
     property bool callActive: false
     property int callState: 0          // AA PhoneStatus: 1 in call, 2 on hold, 3 hanging up, 4 incoming
     property string callerName: ""
@@ -69,6 +70,7 @@ Item {
             mediaTitle = d.title || ""
             mediaArtist = d.artist || ""
             mediaPlaying = d.playing === true
+            mediaArt = d.art || ""
             return
         }
         if (d.type === "call") {
