@@ -8,6 +8,7 @@ Column {
 
     property var car
     property var nav
+    property var updates      // UpdateWatch
 
     width: 440
     spacing: 6
@@ -30,7 +31,8 @@ Column {
     Stat {
         fit: true
         width: 440; label: "DASH"
-        value: parseInt(page.release) > 0 ? "Release " + parseInt(page.release) : "Development build"
+        value: (parseInt(page.release) > 0 ? "Release " + parseInt(page.release) : "Development build")
+               + (page.updates && page.updates.pending > 0 ? "  ·  " + page.updates.pending + " loads next start" : "")
     }
     Stat { fit: true; width: 440; label: "EVENTHUB / CAN"; value: page.orDash(page.car.hubVersion) + "  ·  " + page.orDash(page.car.mcuVersion) }
     Stat {

@@ -19,6 +19,7 @@ Window {
     PerfTimer { id: perfTimer; car: car }
     FuelTracker { id: fuelTracker; car: car; nav: navData }
     CarWarnings { id: carWarnings; car: car }
+    UpdateWatch { id: updateWatch }
     Nav {
         id: navData
         onSettingsReceived: car.applySettings(settings, true)
@@ -358,7 +359,9 @@ Window {
         mph: car.useMph
         mapStreaming: mapLoader.status === Loader.Ready && mapLoader.item.streaming
         fuel: fuelTracker
+        updates: updateWatch
         dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
+                || updatePopup.shown
     }
     WarningPopup {
         id: popup
@@ -418,6 +421,16 @@ Window {
         customIcon: "icons/timer.png"
         durationMs: 8000
         seq: perfTimer.resultSeq
+    }
+    WarningPopup {       // over-the-air release downloaded
+        id: updatePopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown && !fuelPopup.shown && !perfPopup.shown
+        customText: updateWatch.pending > 0 ? "Release " + updateWatch.pending + " ready — loads at next start" : ""
+        customIcon: "icons/update.png"
+        durationMs: 8000
+        seq: updateWatch.seq
     }
     Rectangle {          // backdrop so the door picture sits on its own over the menu
         x: 700; y: stage.lineTop + 2

@@ -14,6 +14,7 @@ Item {
     property bool mapStreaming: false     // set by Dashboard when the live map has a picture
     property bool dimmed: false           // a check-control message is showing over the page
     property var fuel                     // FuelTracker, for the FUEL page
+    property var updates                  // UpdateWatch, for the INFO page
 
     // Pages are referred to by name; the last one, DEVELOPER, is hidden (hold BC on INFO).
     readonly property var titles: ["TRIP", "FUEL", "VEHICLE", "NAVIGATION", "INFO", "DEVELOPER"]
@@ -145,6 +146,7 @@ Item {
             visible: menu.current === "INFO"
             car: menu.car
             nav: menu.nav
+            updates: menu.updates
         }
         DevPage {
             anchors.horizontalCenter: parent.horizontalCenter

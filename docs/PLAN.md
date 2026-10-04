@@ -46,6 +46,7 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 - **Album art card:** cover, title and artist. The head unit sends the cover once per track as a `mediaart` message (128×128 JPEG). Without art it falls back to the one-line pill.
 - **Song progress line:** across the bottom of the media card. `media` messages now carry `duration` and `position` (seconds); the cluster advances the position itself between updates.
 - **"Classic BMW" theme:** always-on amber text and dials, chosen in the phone settings (Theme: Standard / Classic BMW). No automatic night switching (Tristan's choice).
+- **"Update ready" notice:** when `S61dashupdate` installs a newer release mid-drive, a popup says "Release N ready — loads at next start" and the INFO page adds "N loads next start". It only triggers on a change to `/etc/dash_active` seen while running, so a release that d.qml fell back from is not announced. (`UpdateWatch.qml`; preview scenes `update`, `update_info`.)
 
 ### Factory HUD turn arrows: research result
 

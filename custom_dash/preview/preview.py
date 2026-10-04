@@ -94,6 +94,9 @@ SCENES = {
     "cold": {"gear": "D2", "oil": 45},
     "launch": {"launch": True, "gear": "S1", "rpm": 4800},
     "carwarn": {"coolant": "118°C", "volts": 121},
+    # S61dashupdate installs release 99 a second in (UpdateWatch popup); "update_info" then opens INFO
+    "update": {"update": True},
+    "update_info": {"update": True, "keys": [(10.0, 26), (10.3, 26), (10.6, 26), (10.9, 26)]},
 }
 SCENE = SCENES["normal"]
 WRITABLE = {"port": int, "packetDebug": int, "MPH": int, "verified": int, "menuId": int, "uiStyle": int}
@@ -264,6 +267,15 @@ def main():
         engine.rootContext().setContextProperty("dashFastFuel", True)
     if args.classic:
         engine.rootContext().setContextProperty("dashClassic", True)
+    if SCENE.get("update"):                      # stands in for /etc/dash_active
+        active = os.path.join(tempfile.mkdtemp(prefix="dashactive-"), "dash_active")
+        with open(active, "w") as f:
+            f.write("0\n")
+        def install():
+            with open(active, "w") as f:
+                f.write("99\n")
+        QTimer.singleShot(1000, install)
+        engine.rootContext().setContextProperty("dashActiveFile", QUrl.fromLocalFile(active).toString())
     if SCENE.get("map"):
         engine.addImportPath(os.path.join(HERE, "qml"))
     engine.rootContext().setContextProperty("dashIconBase", QUrl.fromLocalFile(os.path.abspath(ICON_BASE) + "/").toString())
