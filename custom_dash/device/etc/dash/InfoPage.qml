@@ -10,22 +10,41 @@ Column {
     property var nav
 
     width: 440
-    spacing: 14
+    spacing: 6
 
     function orDash(s) { return s && s !== "" ? s : "--" }
 
-    Stat { width: 440; label: "DASH"; value: "Custom JLR-style dash" }
-    Stat { width: 440; label: "EVENTHUB / CAN"; value: page.orDash(page.car.hubVersion) + "  ·  " + page.orDash(page.car.mcuVersion) }
+    // the RELEASE file beside the dash files actually loaded (OTA folder or the USB install)
+    property string release: ""
+    Component.onCompleted: {
+        var xhr = new XMLHttpRequest()
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            page.release = (xhr.responseText || "").trim()
+            console.log("[dash] running release " + (page.release || "unknown"))
+        }
+        xhr.open("GET", Qt.resolvedUrl("RELEASE"))
+        xhr.send()
+    }
+
     Stat {
+        fit: true
+        width: 440; label: "DASH"
+        value: parseInt(page.release) > 0 ? "Release " + parseInt(page.release) : "Development build"
+    }
+    Stat { fit: true; width: 440; label: "EVENTHUB / CAN"; value: page.orDash(page.car.hubVersion) + "  ·  " + page.orDash(page.car.mcuVersion) }
+    Stat {
+        fit: true
         width: 440
         label: "HEAD UNIT LINK"
         value: page.nav.gateway === "" ? "Not on the hotspot"
              : (page.nav.connected ? "Connected to " + page.nav.gateway : "Hotspot " + page.nav.gateway + ", app not answering")
     }
     Stat {
+        fit: true
         width: 440
-        label: "SETTINGS (PHONE BROWSER ON THE CAR WI-FI)"
+        label: "SETTINGS PAGE"
         value: page.nav.gateway === "" ? "--" : "http://" + page.nav.gateway + ":8765/settings"
     }
-    Stat { width: 440; label: "LAST BUTTON CODE"; value: page.car.lastButton > 0 ? String(page.car.lastButton) : "--" }
+    Stat { fit: true; width: 440; label: "LAST BUTTON CODE"; value: page.car.lastButton > 0 ? String(page.car.lastButton) : "--" }
 }

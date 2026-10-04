@@ -99,13 +99,18 @@ def build_dash(n, outdir):
     return path
 
 
-def build_apk(n, outdir):
+def build_env():
     env = dict(os.environ)
     jdk = os.path.expanduser("~/tools/jdk")
     homes = [os.path.join(jdk, d, "Contents", "Home") for d in sorted(os.listdir(jdk))] if os.path.isdir(jdk) else []
     if homes and not os.path.isdir(env.get("JAVA_HOME", "")):
         env["JAVA_HOME"] = homes[0]
     env.setdefault("ANDROID_HOME", os.path.expanduser("~/Library/Android/sdk"))
+    return env
+
+
+def build_apk(n, outdir):
+    env = build_env()
     subprocess.run(["./gradlew", "--no-daemon", "-q", f"-Pe60Release={n}", "assembleGithubDebug"],
                    cwd=HEADUNIT, env=env, check=True)
     built = os.path.join(HEADUNIT, "app", "build", "outputs", "apk", "github", "debug")
@@ -113,6 +118,21 @@ def build_apk(n, outdir):
     if len(apks) != 1:
         sys.exit(f"expected one APK in {built}, found {apks}")
     path = os.path.join(outdir, f"OpenHeadunit-e60-{n}.apk")
+    shutil.copy2(os.path.join(built, apks[0]), path)
+    return path
+
+
+def build_phone(n, outdir, env):
+    """E60CarUpdater.apk numbered with this release. Attached to the release for installing on
+    the phone; not in the manifest, since the car never receives it."""
+    phone = os.path.join(JLY, "phone_updater")
+    subprocess.run(["./gradlew", "--no-daemon", "-q", f"-Pe60Release={n}", "assembleDebug"],
+                   cwd=phone, env=env, check=True)
+    built = os.path.join(phone, "app", "build", "outputs", "apk", "debug")
+    apks = [f for f in os.listdir(built) if f.endswith(".apk")]
+    if len(apks) != 1:
+        sys.exit(f"expected one APK in {built}, found {apks}")
+    path = os.path.join(outdir, "E60CarUpdater.apk")
     shutil.copy2(os.path.join(built, apks[0]), path)
     return path
 
@@ -186,6 +206,7 @@ def main():
     with open(mpath, "w") as fh:
         json.dump(manifest, fh, indent=1)
     files.insert(0, mpath)
+    files.append(build_phone(n, outdir, build_env()))
 
     if args.publish:
         title = f"E60 v{n}"

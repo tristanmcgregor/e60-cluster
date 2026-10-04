@@ -26,8 +26,10 @@ android {
         minSdk = 26
         // 34 keeps the classic (non edge-to-edge) window layout on Android 15.
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        // -Pe60Release=N (updater/release.py) gives the app the release number it shipped with
+        val e60Release = (project.findProperty("e60Release") as String?)?.toIntOrNull() ?: 0
+        versionCode = 1 + e60Release
+        versionName = if (e60Release > 0) "release $e60Release" else "dev build"
         buildConfigField("String", "GITHUB_REPO", quoted("github.repo"))
         buildConfigField("String", "GITHUB_TOKEN", quoted("github.token"))
     }

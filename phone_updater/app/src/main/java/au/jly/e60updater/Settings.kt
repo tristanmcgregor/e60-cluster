@@ -46,6 +46,7 @@ class Settings(context: Context) {
             .putInt(KEY_APK, status.apkRelease)
             .putInt(KEY_PENDING_APK, status.pendingApkRelease)
             .putInt(KEY_DASH, status.dashRelease)
+            .putInt(KEY_SPEED, status.speedLimitsRelease)
             .putInt(KEY_CLUSTER, status.clusterDashRelease)
             .putLong(KEY_SEEN, System.currentTimeMillis())
             .apply()
@@ -53,13 +54,15 @@ class Settings(context: Context) {
 
     fun versionsText(): String {
         val seen = prefs.getLong(KEY_SEEN, 0)
-        if (seen == 0L) return "Car not seen yet."
+        val me = "This app: ${BuildConfig.VERSION_NAME}\n"
+        if (seen == 0L) return me + "Car not seen yet."
         fun v(key: String) = prefs.getInt(key, 0).let { if (it == 0) "none" else "v$it" }
         val at = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date(seen))
-        return "Last seen $at\n" +
+        return me + "Car last seen $at\n" +
             "Head unit app: ${v(KEY_APK)} (staged: ${v(KEY_PENDING_APK)})\n" +
-            "Head unit dash: ${v(KEY_DASH)}\n" +
-            "Cluster dash: ${v(KEY_CLUSTER)}"
+            "Dash on the head unit: ${v(KEY_DASH)}\n" +
+            "Dash on the cluster: ${v(KEY_CLUSTER)}\n" +
+            "Speed-limit data: ${v(KEY_SPEED)}"
     }
 
     companion object {
@@ -72,6 +75,7 @@ class Settings(context: Context) {
         const val KEY_APK = "hu.apkRelease"
         const val KEY_PENDING_APK = "hu.pendingApkRelease"
         const val KEY_DASH = "hu.dashRelease"
+        const val KEY_SPEED = "hu.speedLimitsRelease"
         const val KEY_CLUSTER = "hu.clusterDashRelease"
         const val KEY_SEEN = "hu.seenAt"
         private const val MAX_LOG_LINES = 40
