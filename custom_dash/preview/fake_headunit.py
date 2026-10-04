@@ -54,6 +54,8 @@ class FakeHeadUnit:
         threading.Thread(target=self._accept, args=(srv,), daemon=True).start()
         if MODE == "nav":
             threading.Thread(target=self._drive, daemon=True).start()
+        if MODE in ("camera", "redlight", "gps"):
+            threading.Thread(target=self._gps, daemon=True).start()
 
     def _accept(self, srv):
         while True:
@@ -85,6 +87,10 @@ class FakeHeadUnit:
             self._send({"type": "clustermap", "width": 1280, "height": 480})
             if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits
                 self._send({"type": "limit", "kph": int(MODE[5:])})
+            if MODE == "school":           # a school-zone limit in force
+                self._send({"type": "limit", "kph": 40, "school": True})
+            if MODE in ("camera", "redlight"):
+                self._send({"type": "limit", "kph": 60})
             if MODE == "settings":      # as saved from the phone settings page
                 self._send({"type": "settings", "speedCorrection": 0, "sport": "always", "shiftLights": True,
                             "shiftWindow": 1500, "shiftMargin": 300, "redline": [[0, 5000], [60, 6000], [90, 7000]],
@@ -101,6 +107,21 @@ class FakeHeadUnit:
                     c.sendall(frame)
                 except OSError:
                     self.clients.remove(c)
+
+    def _gps(self):
+        """GPS speed every second (the preview car's speed is ~5 % above the MCU's), and for the
+        camera modes a camera counting down from 400 m, then passed."""
+        dist = 400
+        while True:
+            self._send({"type": "gps", "kph": 104.6, "acc": 4})
+            if MODE in ("camera", "redlight"):
+                if dist >= 0:
+                    self._send({"type": "camera", "kind": "speed" if MODE == "camera" else "redlight",
+                                "kph": 60, "distM": dist})
+                    dist -= 30
+                else:
+                    self._send({"type": "camera", "distM": -1})
+            time.sleep(1)
 
     def _drive(self):
         total = sum(step[2] for step in ROUTE)

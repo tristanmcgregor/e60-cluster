@@ -15,6 +15,7 @@ Item {
     property bool dimmed: false           // a check-control message is showing over the page
     property var fuel                     // FuelTracker, for the FUEL page
     property var updates                  // UpdateWatch, for the INFO page
+    property var gps                      // GpsCheck, for the DEVELOPER page
 
     // Pages are referred to by name; the last one, DEVELOPER, is hidden (hold BC on INFO).
     readonly property var titles: ["TRIP", "FUEL", "VEHICLE", "NAVIGATION", "INFO", "DEVELOPER"]
@@ -152,6 +153,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: menu.current === "DEVELOPER"
             car: menu.car
+            gps: menu.gps
         }
     }
 }

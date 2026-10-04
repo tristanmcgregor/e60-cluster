@@ -57,6 +57,17 @@ Item {
     signal settingsReceived(var settings)
     // limit of the road the car is on, km/h (head unit SpeedLimits); 0 = unknown
     property int speedLimitKph: 0
+    property bool speedLimitSchool: false   // a school-zone limit is in force right now
+    // camera ahead (head unit SpeedLimits): kind "speed" | "redlight" | "average"; distance -1 = none
+    property string cameraKind: ""
+    property int cameraDistM: -1
+    property int cameraKph: 0
+    property real cameraAt: 0               // Date.now() of the last camera message
+    // GPS speed from the head unit, km/h; -1 = none yet (see GpsCheck)
+    property real gpsKph: -1
+    property int gpsAcc: 0
+    property real gpsAt: 0
+    signal gpsFix()
     // size of the map the phone draws in the cluster video (head unit "clustermap" message)
     property int mapWidth: 800
     property int mapHeight: 480
@@ -75,6 +86,22 @@ Item {
         }
         if (d.type === "limit") {
             speedLimitKph = d.kph || 0
+            speedLimitSchool = d.school === true
+            return
+        }
+        if (d.type === "camera") {
+            cameraAt = Date.now()
+            if ((d.distM || 0) < 0) { cameraDistM = -1; return }
+            cameraKind = d.kind || "speed"
+            cameraKph = d.kph || 0
+            cameraDistM = d.distM
+            return
+        }
+        if (d.type === "gps") {
+            gpsKph = d.kph
+            gpsAcc = d.acc || 0
+            gpsAt = Date.now()
+            gpsFix()
             return
         }
         if (d.type === "media") {
@@ -122,9 +149,16 @@ Item {
                 nav.active = false
                 nav.callActive = false
                 nav.mediaTitle = ""
+                nav.cameraDistM = -1
                 active = false              // the retry timer reopens it
             }
         }
+    }
+
+    // a camera countdown goes stale if the head unit stops sending (GPS lost, link dropped)
+    Timer {
+        interval: 1000; repeat: true; running: nav.cameraDistM >= 0
+        onTriggered: if (Date.now() - nav.cameraAt > 5000) nav.cameraDistM = -1
     }
 
     // Find the head unit, then (re)connect every few seconds while not connected.

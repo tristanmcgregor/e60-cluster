@@ -94,6 +94,11 @@ SCENES = {
     "cold": {"gear": "D2", "oil": 45},
     "launch": {"launch": True, "gear": "S1", "rpm": 4800},
     "carwarn": {"coolant": "118°C", "volts": 121},
+    # head unit GPS features (SpeedLimits): school zone in force, camera countdown, GPS speed check
+    "school": {"nav": True, "fh": "school"},
+    "camera": {"nav": True, "fh": "camera"},
+    "redlight": {"nav": True, "fh": "redlight"},
+    "gps_dev": {"nav": True, "fh": "gps", "keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26), (2.3, 26 + 128)]},
     # S61dashupdate installs release 99 a second in (UpdateWatch popup); "update_info" then opens INFO
     "update": {"update": True},
     "update_info": {"update": True, "keys": [(10.0, 26), (10.3, 26), (10.6, 26), (10.9, 26)]},

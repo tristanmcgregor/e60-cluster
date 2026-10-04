@@ -144,6 +144,7 @@ Item {
     property bool mapAuto: false         // full-screen map whenever a route starts
     property int speedLimitMargin: 3
     property bool speedLimitOn: true
+    property bool cameraAlertsOn: true      // the head unit also stops sending when this is off
     property int defaultPage: 0
     signal settingsApplied()
 
@@ -158,6 +159,7 @@ Item {
         if (s.redline !== undefined && s.redline.length) redlineTable = s.redline
         if (s.speedLimit !== undefined) speedLimitOn = s.speedLimit === true
         if (s.speedLimitMargin !== undefined) speedLimitMargin = s.speedLimitMargin
+        if (s.cameraAlerts !== undefined) cameraAlertsOn = s.cameraAlerts === true
         if (s.defaultPage !== undefined) defaultPage = s.defaultPage
         if (s.perfPopups !== undefined) perfPopups = s.perfPopups
         if (s.tankLitres !== undefined) tankLitres = s.tankLitres

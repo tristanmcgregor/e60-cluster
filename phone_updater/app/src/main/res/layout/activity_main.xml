@@ -32,6 +32,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:text="Where I parked"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/parkText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/parkMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show on map" />
+
+        <Button
+            android:id="@+id/parkSetup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set up parking spot" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:text="GitHub repo (owner/name)" />
 
         <EditText

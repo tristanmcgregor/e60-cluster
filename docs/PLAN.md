@@ -57,6 +57,14 @@ Not available through current interfaces:
 
 Doing it would need sniffing the E60 CCC→HUD navigation CAN messages from a working car, plus MCU firmware changes. Parked.
 
+## Built after release 5 (not yet released)
+
+- **School zones:** OpenStreetMap `maxspeed:conditional` on ~9,000 road segments in SEQ (nearly all `40 @ Mo-Fr 07:00-09:00,14:00-16:00; PH off; SH off`). The head unit applies them on weekdays in those hours, skipping Queensland public holidays (computed) and days outside state school terms (education.qld.gov.au, 2026–2029; after 2029 every weekday counts until the list is extended in `speedlimits.py`). The sign gets a yellow SCHOOL plate and a popup on entry. Phone setting "School zones".
+- **Camera alerts:** 72 cameras mapped in OSM for SEQ (49 speed, 19 red-light, 4 average-speed starts). Within 350–800 m ahead (25 s at current speed) and within 30° of the heading: popup once, then a countdown in the speedo where the cruise readout sits. Mobile cameras are not in OSM. Phone setting "Camera alerts".
+- **GPS speed check:** DEVELOPER page shows GPS / MCU / dash speed and the measured correction (steady driving above 40 km/h, ≥30 s). This is the number for the HUD firmware fix.
+- **Where I parked (phone app):** when the phone's Bluetooth link to the car drops, the phone saves its own location and shows a "Car parked" notification that opens the map; also in the app. Set up in the app: choose the car's Bluetooth, allow Nearby devices and Location "Allow all the time". (The head unit can't be asked: Android Auto owns the car Wi-Fi during a drive.)
+- **To ship:** needs a speed-limit data release as well: `release.py --speedlimits --osm-cache updater/out/osm_cache --publish`. Old head unit builds ignore the new data; the new build reads old data without school zones/cameras. The phone APK is attached to the release for manual install.
+
 ## Next: custom home screen for the head unit
 
 **Goal:** replace the ZLH launcher with our own home screen, styled to match the cluster. It must be fully usable with the iDrive and delivered through the existing OTA pipeline.

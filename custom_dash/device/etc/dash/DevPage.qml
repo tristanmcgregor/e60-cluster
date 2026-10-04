@@ -7,6 +7,7 @@ Item {
     id: page
 
     property var car
+    property var gps          // GpsCheck
     readonly property var names: [
         "rpm", "speed", "gear", "gearAuto", "gearManual", "gearShow",
         "oilTempInt", "oilTemp", "waterTemperature", "waterTemperatureRaw", "gearBoxTempInt",
@@ -15,6 +16,16 @@ Item {
     ]
     // read in the timer, not in bindings: most of these have no NOTIFY signal
     property var values: []
+    property string gpsLine: ""
+
+    function gpsText() {
+        var g = page.gps, n = g ? g.nav : null
+        if (!n || n.gpsKph < 0 || Date.now() - n.gpsAt > 3000) return "No GPS speed from the head unit"
+        var raw = g.rawKph()
+        return "GPS " + n.gpsKph.toFixed(1) + " km/h (\u00b1" + n.gpsAcc + " m)   \u00b7   MCU " + raw +
+               "   \u00b7   dash " + page.car.speed
+    }
+    function pct(v) { return (v >= 0 ? "+" : "") + v.toFixed(1) + " %" }
 
     width: 480
     height: 400
@@ -28,10 +39,12 @@ Item {
                 out.push(v === undefined ? "n/a" : String(v))
             }
             page.values = out
+            page.gpsLine = page.gpsText()
         }
     }
 
     Grid {
+        id: grid
         columns: 2
         columnSpacing: 24
         rowSpacing: 3
@@ -57,6 +70,35 @@ Item {
                     elide: Text.ElideRight
                 }
             }
+        }
+    }
+
+    // GPS speed check (GpsCheck): what the speed correction should be
+    Column {
+        anchors.top: grid.bottom
+        anchors.topMargin: 18
+        spacing: 4
+        Text {
+            text: "GPS SPEED CHECK"
+            color: Theme.textDim
+            font.pixelSize: 15
+            font.letterSpacing: 1.5
+            font.family: Theme.font
+        }
+        Text {
+            text: page.gpsLine
+            color: Theme.text
+            font.pixelSize: 17
+            font.family: Theme.font
+        }
+        Text {
+            text: !page.gps ? "" : isNaN(page.gps.measured)
+                  ? "Measured: drive steadily above 40 km/h (" + page.gps.samples + "/30 s)"
+                  : "Measured " + page.pct(page.gps.measured) + " over " + page.gps.samples + " s   \u00b7   setting "
+                    + page.pct((page.car.speedFactor - 1) * 100)
+            color: Theme.text
+            font.pixelSize: 17
+            font.family: Theme.font
         }
     }
 }

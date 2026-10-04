@@ -20,6 +20,7 @@ Window {
     FuelTracker { id: fuelTracker; car: car; nav: navData }
     CarWarnings { id: carWarnings; car: car }
     UpdateWatch { id: updateWatch }
+    GpsCheck { id: gpsCheck; car: car; nav: navData }
     Nav {
         id: navData
         onSettingsReceived: car.applySettings(settings, true)
@@ -206,9 +207,26 @@ Window {
             Item {                       // cruise badge where the photo has its badge
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 160; height: 44
+                Row {                    // camera ahead: icon and countdown, in place of cruise
+                    anchors.centerIn: parent
+                    visible: stage.cameraShown
+                    spacing: 8
+                    Image {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 34; height: 34; smooth: true
+                        source: navData.cameraKind === "redlight" ? "icons/redlight.png" : "icons/camera.png"
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: navData.cameraDistM + " m"
+                        color: "#ffb340"
+                        font.pixelSize: 28
+                        font.family: stage.fontName
+                    }
+                }
                 Text {
                     anchors.centerIn: parent
-                    visible: car.cruiseActive
+                    visible: car.cruiseActive && !stage.cameraShown
                     text: "◎ " + car.cruiseSetSpeed
                     color: Theme.ok
                     font.pixelSize: 30
@@ -243,7 +261,9 @@ Window {
         y: stage.dialY + 70
         limit: stage.limitShown
         over: stage.overLimit
+        school: navData.speedLimitSchool
     }
+    readonly property bool cameraShown: car.cameraAlertsOn && navData.cameraDistM >= 0
 
     // ── tachometer
     JlrDial {
@@ -360,8 +380,9 @@ Window {
         mapStreaming: mapLoader.status === Loader.Ready && mapLoader.item.streaming
         fuel: fuelTracker
         updates: updateWatch
+        gps: gpsCheck
         dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
-                || updatePopup.shown
+                || updatePopup.shown || cameraPopup.shown || schoolPopup.shown
     }
     WarningPopup {
         id: popup
@@ -421,6 +442,42 @@ Window {
         customIcon: "icons/timer.png"
         durationMs: 8000
         seq: perfTimer.resultSeq
+    }
+    WarningPopup {       // camera ahead: once per camera, then the countdown stays in the speedo
+        id: cameraPopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown
+        property int hits: 0
+        property bool wasShown: false
+        Connections {
+            target: stage
+            onCameraShownChanged: {
+                if (stage.cameraShown && !cameraPopup.wasShown) cameraPopup.hits++
+                cameraPopup.wasShown = stage.cameraShown
+            }
+        }
+        customText: navData.cameraKind === "redlight" ? "Red-light camera ahead"
+                  : navData.cameraKind === "average" ? "Average speed zone ahead" + (navData.cameraKph > 0 ? " \u2014 " + navData.cameraKph : "")
+                  : "Speed camera ahead" + (navData.cameraKph > 0 ? " \u2014 " + navData.cameraKph : "")
+        customIcon: navData.cameraKind === "redlight" ? "icons/redlight_warn.png" : "icons/camera_warn.png"
+        durationMs: 5000
+        seq: cameraPopup.hits
+    }
+    WarningPopup {       // entering a school zone while its limit is in force
+        id: schoolPopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown && !cameraPopup.shown
+        property int hits: 0
+        Connections {
+            target: navData
+            onSpeedLimitSchoolChanged: if (navData.speedLimitSchool && car.speedLimitOn) schoolPopup.hits++
+        }
+        customText: "School zone \u2014 " + stage.limitShown + (car.useMph ? " mph" : " km/h")
+        customIcon: "icons/school_warn.png"
+        durationMs: 5000
+        seq: schoolPopup.hits
     }
     WarningPopup {       // over-the-air release downloaded
         id: updatePopup

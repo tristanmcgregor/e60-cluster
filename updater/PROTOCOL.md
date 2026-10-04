@@ -20,7 +20,7 @@ Assets:
    "apk":  {"name": "OpenHeadunit-e60-N.apk", "sha256": "<hex>", "size": 123, "versionCode": 200000,
             "sig": "<base64>"}}
   ```
-  `dash`, `apk` and `speedlimits` are each optional. `speedlimits` (`speedlimits-N.bin.gz`) is gzip-compressed road speed-limit data built by `updater/speedlimits.py`.
+  `dash`, `apk` and `speedlimits` are each optional. `speedlimits` (`speedlimits-N.bin.gz`) is gzip-compressed road speed-limit data built by `updater/speedlimits.py` (format in its docstring). Since release 6 it also carries school-zone times, cameras, Queensland public holidays and school terms, in an extension older head unit builds skip.
   `sig` is the release signature; see "Signing" below.
 - The files named in the manifest.
 
@@ -86,7 +86,9 @@ Neither app contains a secret.
 Besides `nav` and `call`, these messages go to the cluster:
 
 - `{"type":"settings", ...}`: display settings from the phone page at `http://<head unit>:8765/settings` (`GET`/`POST /settings.json`).
-- `{"type":"limit","kph":N}`: the speed limit of the current road, from GPS matched to the speed-limit data. `0` means unknown.
+- `{"type":"limit","kph":N,"school":bool}`: the speed limit of the current road, from GPS matched to the speed-limit data. `0` means unknown. `school` is true while a school-zone limit is in force (weekday school hours, in term, not a public holiday); `kph` is then that limit.
+- `{"type":"camera","kind":"speed"|"redlight"|"average","kph":N,"distM":M}`: a camera ahead (an average-speed zone at its start), sent every GPS fix while approaching; `{"type":"camera","distM":-1}` once passed. Not replayed.
+- `{"type":"gps","kph":X,"acc":M}`: the head unit's GPS speed (one decimal) and position accuracy in metres, every fix. Not replayed. Used by the developer page's speed check.
 - `{"type":"media","title":...,"artist":...,"album":...,"playing":bool,"duration":S,"position":S}`: now playing. `duration` and `position` are in seconds; `0` means unknown.
 - `{"type":"mediaart","art":"data:image/jpeg;base64,..."}`: the cover of the current track (128×128 JPEG), sent once per track. An empty `art` clears it.
 
