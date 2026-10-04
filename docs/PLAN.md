@@ -31,6 +31,31 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 - **Cluster OTA:** is the cluster pulling updates? The updater showed "cluster v0", so the USB `dashboard.zip` with `S61dashupdate` may not be installed yet.
 - **Hotspot auto-start:** turns on at start-up with Auto-start on boot + Auto-enable hotspot.
 
+## Built after release 4 (not yet released)
+
+- **Full-screen map mode:**
+  - The AA map fills the cluster, with compact speed/limit (left) and gear/revs/rev bar (right).
+  - Hold BC to switch (any page but INFO). Phone setting "Full-screen map when a route starts".
+  - The head unit now asks for a **1280×720 cluster stream with 240 px bottom margin** (1280×480 map, the cluster's shape) and tells the cluster the map size.
+  - **To test in the car:** decode smoothness on the cluster CPU (software decode + RGB conversion). If it stutters, turn off "Wide map stream" in settings.
+- **FUEL page:** level, range, now; 30-min consumption graph; this tank (km, average, litres, cost); refuel log (≥10 % jump starts a new tank). Settings: tank 70 L, price, reserve.
+- **Fuel to destination:**
+  - range compared with AA remaining route;
+  - bottom range turns amber (arrive inside the reserve) or red (short);
+  - one warning per route.
+- **Album art card and night theme (amber):** built but inert, waiting on Tristan's approval of the mock-ups.
+  - Album art needs the head unit to send `art` with media messages.
+  - Night theme needs a trigger: Theme.night, e.g. from AA night mode.
+
+### Factory HUD turn arrows: research result
+
+Not available through current interfaces:
+- EventHub has no navigation/HUD setters, only turn-signal reads.
+- The JLY MCU firmware has no navigation messages.
+- "Bmw hud turn show/hide" refers to the indicator arrows.
+
+Doing it would need sniffing the E60 CCC→HUD navigation CAN messages from a working car, plus MCU firmware changes. Parked.
+
 ## Next: custom home screen for the head unit
 
 **Goal:** replace the ZLH launcher with our own home screen, styled to match the cluster. It must be fully usable with the iDrive and delivered through the existing OTA pipeline.
@@ -84,7 +109,7 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 ## Backlog
 
 - **HUD speed:** if the drive confirms the HUD reads ~6% low, patch the cluster MCU firmware (`jly_can1293.bin`) to ×1.06. Rework the September speedfix (it divides; it needs to multiply). Trace that the HUD message uses the patched value, then remove the dash's ×1.06. Original firmware is the fallback.
-- **Brightness setting:** cluster day/night brightness via `hub.lightBrightness` / `darkBrightness`, once the developer page shows the value range.
+- Brightness already follows day/night (confirmed by Tristan).
 - **Trip history:** per-drive stats and best times on the settings page.
 - **Parking sensors:** reverse graphic on the cluster, if the developer page shows the radar values are filled in.
 - **Speed-limit data refresh:** `release.py --speedlimits` (Overpass is slow; `--osm-cache` reuses tiles).
