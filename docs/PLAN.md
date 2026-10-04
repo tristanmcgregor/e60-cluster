@@ -34,7 +34,7 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 ## Built after release 4 (not yet released)
 
 - **Full-screen map mode:**
-  - The AA map fills the cluster, with compact speed/limit (left) and gear/revs/rev bar (right).
+  - The AA map fills the whole cluster behind the dials (dial faces 95 % opaque); the centre menu gives way to open map. Top/bottom fades keep the status and bottom rows legible.
   - Hold BC to switch (any page but INFO). Phone setting "Full-screen map when a route starts".
   - The head unit now asks for a **1280×720 cluster stream with 240 px bottom margin** (1280×480 map, the cluster's shape) and tells the cluster the map size.
   - **To test in the car:** decode smoothness on the cluster CPU (software decode + RGB conversion). If it stutters, turn off "Wide map stream" in settings.
