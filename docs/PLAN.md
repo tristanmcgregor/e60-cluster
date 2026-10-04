@@ -4,7 +4,7 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 
 ## Where things stand
 
-**Released:** v4 at https://github.com/tristanmcgregor/e60-cluster/releases.
+**Released:** v5 at https://github.com/tristanmcgregor/e60-cluster/releases.
 
 | Part | State |
 |---|---|
@@ -31,7 +31,7 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
 - **Cluster OTA:** is the cluster pulling updates? The updater showed "cluster v0", so the USB `dashboard.zip` with `S61dashupdate` may not be installed yet.
 - **Hotspot auto-start:** turns on at start-up with Auto-start on boot + Auto-enable hotspot.
 
-## Built after release 4 (not yet released)
+## In release 5
 
 - **Full-screen map mode:**
   - The AA map fills the whole cluster behind the dials (dial faces 95 % opaque); the centre menu gives way to open map. Top/bottom fades keep the status and bottom rows legible.
