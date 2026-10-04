@@ -117,11 +117,14 @@ def build_apk(n, outdir):
     return path
 
 
-def build_speedlimits(n, outdir):
-    """speedlimits-N.bin.gz: updater/speedlimits.py output, gzipped (the head unit unpacks it)."""
+def build_speedlimits(n, outdir, cache=None):
+    """speedlimits-N.bin.gz: updater/speedlimits.py output, gzipped (the head unit unpacks it).
+
+    Downloads fresh OpenStreetMap tiles unless [cache] names a folder of tiles to reuse
+    (the public Overpass server is often slow or busy)."""
     raw = os.path.join(outdir, "speedlimits.bin")
     subprocess.run([sys.executable, os.path.join(HERE, "speedlimits.py"), raw,
-                    "--cache", os.path.join(outdir, "osm_cache")], check=True)   # fresh data each release
+                    "--cache", cache or os.path.join(outdir, "osm_cache")], check=True)
     path = os.path.join(outdir, f"speedlimits-{n}.bin.gz")
     with open(raw, "rb") as src, gzip.open(path, "wb", compresslevel=9) as dst:
         shutil.copyfileobj(src, dst)
@@ -134,6 +137,7 @@ def main():
     ap.add_argument("--dash", action="store_true", help="include a dash bundle")
     ap.add_argument("--apk", action="store_true", help="include the head unit APK")
     ap.add_argument("--speedlimits", action="store_true", help="include fresh speed-limit data")
+    ap.add_argument("--osm-cache", help="reuse OpenStreetMap tiles from this folder instead of downloading")
     ap.add_argument("--publish", action="store_true", help="upload as a GitHub release")
     ap.add_argument("--notes", default="", help="release notes")
     args = ap.parse_args()
@@ -173,7 +177,7 @@ def main():
                            "versionCode": 200000 + n, "sig": sign("apk", n, digest)}
         files.append(f)
     if args.speedlimits:
-        f = build_speedlimits(n, outdir)
+        f = build_speedlimits(n, outdir, args.osm_cache)
         digest = sha256(f)
         manifest["speedlimits"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
                                    "sig": sign("speedlimits", n, digest)}
