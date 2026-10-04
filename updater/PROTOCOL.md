@@ -83,9 +83,11 @@ Neither app contains a secret.
 
 ## Cluster messages (ClusterLink WebSocket, port 8765)
 
-Besides `nav`, `media` and `call`, two more message types go to the cluster:
+Besides `nav` and `call`, these messages go to the cluster:
 
 - `{"type":"settings", ...}`: display settings from the phone page at `http://<head unit>:8765/settings` (`GET`/`POST /settings.json`).
 - `{"type":"limit","kph":N}`: the speed limit of the current road, from GPS matched to the speed-limit data. `0` means unknown.
+- `{"type":"media","title":...,"artist":...,"album":...,"playing":bool,"duration":S,"position":S}`: now playing. `duration` and `position` are in seconds; `0` means unknown.
+- `{"type":"mediaart","art":"data:image/jpeg;base64,..."}`: the cover of the current track (128×128 JPEG), sent once per track. An empty `art` clears it.
 
 The latest message of each type is replayed when the cluster connects.

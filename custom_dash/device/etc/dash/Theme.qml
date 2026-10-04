@@ -10,25 +10,25 @@ QtObject {
     readonly property color hairline: "#1f2731"
     readonly property color track: "#1a212b"
 
-    // Night theme: BMW-style amber markings, like the car's own instrument lighting.
-    // dashNight: optional override from the desktop preview.
-    property bool night: typeof dashNight !== "undefined" ? dashNight : false
+    // "Classic BMW" theme (phone setting "theme"): amber markings like the E60's own instrument
+    // lighting, on all the time. Set by Car.applySettings; dashClassic: desktop preview override.
+    property bool classic: typeof dashClassic !== "undefined" ? dashClassic : false
 
     // text
-    readonly property color text: night ? "#f0b070" : "#eef2f7"
-    readonly property color textDim: night ? "#94693f" : "#8b96a7"
+    readonly property color text: classic ? "#efa457" : "#eef2f7"
+    readonly property color textDim: classic ? "#94693f" : "#8b96a7"
 
     // dial and status-row ink (numerals, ticks, rings, needles, big digits)
-    readonly property color ink: night ? "#f2a858" : "#f4f6f8"
-    readonly property color inkTick: night ? "#e09a50" : "#e9edf2"
-    readonly property color inkSoft: night ? "#a8743e" : "#aeb5bd"
-    readonly property color inkDim: night ? "#7d5833" : "#8f979f"
-    readonly property color ring: night ? "#b4793a" : "#d9dde2"
-    readonly property color needle: night ? "#ff7a2e" : "#ffffff"
-    readonly property color beadHi: night ? "#f0b06a" : "#ffffff"
-    readonly property color beadMid: night ? "#b07840" : "#c8cdd3"
-    readonly property color beadLo: night ? "#3c2a18" : "#4d535a"
-    readonly property color bezelLine: night ? "#7a5a38" : "#8d949c"
+    readonly property color ink: classic ? "#f2a858" : "#f4f6f8"
+    readonly property color inkTick: classic ? "#e09a50" : "#e9edf2"
+    readonly property color inkSoft: classic ? "#a8743e" : "#aeb5bd"
+    readonly property color inkDim: classic ? "#7d5833" : "#8f979f"
+    readonly property color ring: classic ? "#b4793a" : "#d9dde2"
+    readonly property color needle: classic ? "#ff7a2e" : "#ffffff"
+    readonly property color beadHi: classic ? "#f0b06a" : "#ffffff"
+    readonly property color beadMid: classic ? "#b07840" : "#c8cdd3"
+    readonly property color beadLo: classic ? "#3c2a18" : "#4d535a"
+    readonly property color bezelLine: classic ? "#7a5a38" : "#8d949c"
     readonly property color textFaint: "#4f5968"
 
     // accents

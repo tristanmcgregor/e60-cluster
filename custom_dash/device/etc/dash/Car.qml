@@ -6,6 +6,7 @@
 // speedM and rpm, etc.), so each handler copies the whole group out.
 import QtQuick 2.14
 import QtQuick.LocalStorage 2.0
+import "."
 import plugins.EventHub 1.0
 
 Item {
@@ -163,6 +164,7 @@ Item {
         if (s.fuelPrice !== undefined) fuelPrice = s.fuelPrice
         if (s.fuelReserveKm !== undefined) fuelReserveKm = s.fuelReserveKm
         if (s.mapAuto !== undefined) mapAuto = s.mapAuto === true
+        if (s.theme !== undefined) Theme.classic = s.theme === "classic"
         settingsApplied()
         if (store) {
             try {

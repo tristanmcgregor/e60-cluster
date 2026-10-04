@@ -12,8 +12,18 @@ Item {
     readonly property bool hasMedia: nav.mediaTitle !== ""
     readonly property bool showArt: !calling && hasMedia && nav.mediaArt !== ""
 
+    // song progress, advanced locally between the head unit's position updates
+    property real progress: 0
+    function updateProgress() {
+        if (nav.mediaDuration <= 0) { progress = 0; return }
+        var pos = nav.mediaPosition + (nav.mediaPlaying ? (Date.now() - nav.mediaPositionAt) / 1000 : 0)
+        progress = Math.max(0, Math.min(1, pos / nav.mediaDuration))
+    }
+    Timer { interval: 500; running: tab.visible; repeat: true; triggeredOnStart: true; onTriggered: tab.updateProgress() }
+
     width: showArt ? 420 : 400          // fits between the odometer and the range
-    height: showArt ? 62 : 44
+    readonly property bool hasProgress: !calling && nav.mediaDuration > 0
+    height: showArt ? 66 : (hasProgress ? 50 : 44)
     opacity: (calling || hasMedia) ? 1 : 0
     visible: opacity > 0.01
     Behavior on opacity { NumberAnimation { duration: 250 } }
@@ -33,6 +43,22 @@ Item {
         border.color: tab.calling ? "#2f7a4c" : Theme.hairline
         border.width: 1
     }
+    // song progress along the bottom edge
+    Item {
+        visible: tab.hasProgress
+        // card: under the title and artist, clear of the cover; pill: across the bottom
+        x: tab.showArt ? 8 + 48 + 14 : 22
+        width: tab.width - x - (tab.showArt ? 20 : 22)
+        anchors.bottom: parent.bottom; anchors.bottomMargin: tab.showArt ? 9 : 7
+        height: 3
+        Rectangle { anchors.fill: parent; radius: 1.5; color: Theme.track }
+        Rectangle {
+            width: parent.width * tab.progress; height: parent.height; radius: 1.5
+            color: Theme.text; opacity: nav.mediaPlaying ? 0.9 : 0.5
+            Behavior on width { NumberAnimation { duration: 500 } }
+        }
+    }
+
     // now-playing card: cover, title, artist
     Row {
         visible: tab.showArt
@@ -52,6 +78,7 @@ Item {
         }
         Column {
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: tab.hasProgress ? -7 : 0
             width: tab.width - 8 - 48 - 14 - 20
             Text {
                 width: parent.width
@@ -74,12 +101,13 @@ Item {
     Row {
         visible: !tab.showArt
         anchors.centerIn: parent
+        anchors.verticalCenterOffset: tab.hasProgress ? -4 : 0
         spacing: 12
         width: Math.min(implicitWidth, tab.width - 36)
         Image {
             anchors.verticalCenter: parent.verticalCenter
             width: 26; height: 26; smooth: true
-            source: tab.calling ? "icons/call_in.png" : "icons/media_note.png"
+            source: tab.calling ? "icons/call_in.png" : Theme.classic ? "icons/media_note_classic.png" : "icons/media_note.png"
         }
         Text {
             anchors.verticalCenter: parent.verticalCenter

@@ -41,6 +41,10 @@ ICONS["oil_warn"] = ("oil_barrel", "#ff6b60", 128)
 ICONS["coolant_warn"] = ("thermostat", "#ff6b60", 128)
 ICONS["warmup"] = ("oil_barrel", "#8a7cff", 64)
 ICONS["timer"] = ("timer", "#ff3b30", 64)
+# Classic BMW amber theme (Theme.classic)
+ICONS["fuel_classic"] = ("local_gas_station", "#e09a50", 64)
+ICONS["temp_classic"] = ("thermostat", "#e09a50", 64)
+ICONS["media_note_classic"] = ("music_note", "#e09a50", 64)
 
 def main():
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")

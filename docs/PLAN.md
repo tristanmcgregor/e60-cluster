@@ -43,9 +43,9 @@ Last updated 2026-10-04. Covers the cluster dash, the head unit app (Open Headun
   - range compared with AA remaining route;
   - bottom range turns amber (arrive inside the reserve) or red (short);
   - one warning per route.
-- **Album art card and night theme (amber):** built but inert, waiting on Tristan's approval of the mock-ups.
-  - Album art needs the head unit to send `art` with media messages.
-  - Night theme needs a trigger: Theme.night, e.g. from AA night mode.
+- **Album art card:** cover, title and artist. The head unit sends the cover once per track as a `mediaart` message (128×128 JPEG). Without art it falls back to the one-line pill.
+- **Song progress line:** across the bottom of the media card. `media` messages now carry `duration` and `position` (seconds); the cluster advances the position itself between updates.
+- **"Classic BMW" theme:** always-on amber text and dials, chosen in the phone settings (Theme: Standard / Classic BMW). No automatic night switching (Tristan's choice).
 
 ### Factory HUD turn arrows: research result
 

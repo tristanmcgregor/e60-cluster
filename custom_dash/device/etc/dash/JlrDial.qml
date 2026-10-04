@@ -61,7 +61,7 @@ Item {
     onRedFromChanged: face.requestPaint()
     Connections {
         target: Theme
-        onNightChanged: face.requestPaint()
+        onClassicChanged: face.requestPaint()
     }
     onRingColorChanged: face.requestPaint()
 
@@ -187,7 +187,7 @@ Item {
         width: dial.size * 0.045; height: width
         visible: dial.gapIcon !== ""
         smooth: true
-        source: dial.gapIcon === "" ? "" : "icons/" + dial.gapIcon + (dial.gapWarn ? "_warn" : "") + ".png"
+        source: dial.gapIcon === "" ? "" : "icons/" + dial.gapIcon + (dial.gapWarn ? "_warn" : Theme.classic ? "_classic" : "") + ".png"
     }
 
     Text {

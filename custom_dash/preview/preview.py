@@ -230,7 +230,7 @@ def make_hub_class():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shot", help="write a single frame to this PNG and exit")
-    ap.add_argument("--night", action="store_true", help="night theme (Theme.night)")
+    ap.add_argument("--classic", action="store_true", help="Classic BMW amber theme (Theme.classic)")
     ap.add_argument("--time", type=float, default=2.5, help="sim seconds before --shot")
     ap.add_argument("--scene", choices=sorted(SCENES), default="normal")
     ap.add_argument("--font", help="override the dash typeface (family name)")
@@ -262,8 +262,8 @@ def main():
         engine.rootContext().setContextProperty("dashFont", args.font)
     if SCENE.get("fastfuel"):                    # FuelTracker: one graph bar per 0.25 s
         engine.rootContext().setContextProperty("dashFastFuel", True)
-    if args.night:
-        engine.rootContext().setContextProperty("dashNight", True)
+    if args.classic:
+        engine.rootContext().setContextProperty("dashClassic", True)
     if SCENE.get("map"):
         engine.addImportPath(os.path.join(HERE, "qml"))
     engine.rootContext().setContextProperty("dashIconBase", QUrl.fromLocalFile(os.path.abspath(ICON_BASE) + "/").toString())

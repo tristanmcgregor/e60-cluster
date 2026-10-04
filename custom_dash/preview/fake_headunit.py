@@ -75,13 +75,12 @@ class FakeHeadUnit:
             with self.lock:
                 self.clients.append(conn)
             if MODE in ("media", "call", "media_art"):
-                msg = {"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
-                       "album": "After Hours", "playing": True}
-                if MODE == "media_art":       # cover as a data: URL, as the head unit would send it
+                self._send({"type": "media", "title": "Blinding Lights", "artist": "The Weeknd",
+                            "album": "After Hours", "playing": True, "duration": 200, "position": 74})
+                if MODE == "media_art":       # cover as a data: URL, sent once per track like the head unit
                     art = base64.b64encode(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                              "sample_cover.jpg"), "rb").read()).decode()
-                    msg["art"] = "data:image/jpeg;base64," + art
-                self._send(msg)
+                    self._send({"type": "mediaart", "art": "data:image/jpeg;base64," + art})
             # size of the map in the cluster video (the head unit's wide stream: 1280x480 drawn)
             self._send({"type": "clustermap", "width": 1280, "height": 480})
             if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits

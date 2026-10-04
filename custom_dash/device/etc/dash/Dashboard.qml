@@ -453,7 +453,7 @@ Window {
             anchors.verticalCenter: parent.verticalCenter
             width: 30; height: 30; smooth: true
             source: car.fuelPercent <= 12 || fuelTracker.destStatus === "short" || fuelTracker.destStatus === "tight"
-                    ? "icons/fuel_warn.png" : "icons/fuel.png"
+                    ? "icons/fuel_warn.png" : Theme.classic ? "icons/fuel_classic.png" : "icons/fuel.png"
         }
         Text {           // amber/red when the range will not comfortably reach the destination
             text: Units.withUnit(car.useMph ? car.rangeMiles : car.range, car.useMph)

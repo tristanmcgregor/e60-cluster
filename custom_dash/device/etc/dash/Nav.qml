@@ -29,7 +29,10 @@ Item {
     property string mediaTitle: ""
     property string mediaArtist: ""
     property bool mediaPlaying: false
-    property string mediaArt: ""       // album art as a data: URL, when the head unit sends one
+    property string mediaArt: ""       // album art as a data: URL (head unit "mediaart" message)
+    property int mediaDuration: 0      // seconds, 0 = unknown
+    property int mediaPosition: 0      // seconds, as of mediaPositionAt
+    property real mediaPositionAt: 0   // Date.now() when mediaPosition was received
     property bool callActive: false
     property int callState: 0          // AA PhoneStatus: 1 in call, 2 on hold, 3 hanging up, 4 incoming
     property string callerName: ""
@@ -78,6 +81,13 @@ Item {
             mediaTitle = d.title || ""
             mediaArtist = d.artist || ""
             mediaPlaying = d.playing === true
+            mediaDuration = d.duration || 0
+            mediaPosition = d.position || 0
+            mediaPositionAt = Date.now()
+            if (d.art !== undefined) mediaArt = d.art
+            return
+        }
+        if (d.type === "mediaart") {
             mediaArt = d.art || ""
             return
         }
