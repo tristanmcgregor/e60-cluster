@@ -17,6 +17,7 @@ Item {
     property real redFrom: -1          // tach red zone (moves with the warm-up redline)
     property color ringColor: Theme.ring
     property color needleColor: Theme.needle
+    property real faceOpacity: 1           // below 1 lets a background (the full-screen map) show through
     property string scaleLabel: ""     // e.g. "km/h" or "rpm x 1000" under the top numeral
     property real size: 600
 
@@ -42,6 +43,8 @@ Item {
     // dark face with a faint centre lift
     Rectangle {
         anchors.centerIn: parent
+        opacity: dial.faceOpacity
+        Behavior on opacity { NumberAnimation { duration: 350 } }
         width: dial.size * 0.94; height: width; radius: width / 2
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#16191d" }

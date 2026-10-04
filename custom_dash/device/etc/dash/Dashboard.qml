@@ -45,12 +45,13 @@ Window {
     property bool sweeping: false
     property real gearOffset: 0       // moves the gear text so its capitals sit on the dial centre
 
-    // Full-screen map: the Android Auto map fills the panel and the dials give way to MapHud.
+    // Full-screen map: the Android Auto map fills the panel behind the dials; the centre menu
+    // gives way to open map and the dial faces turn slightly see-through.
     // Hold BC to switch (on any page but INFO, where it opens DEVELOPER); with the phone
     // setting "mapAuto" it also follows the route starting and ending.
     property bool mapMode: false
     readonly property bool fullMap: mapMode && mapLoader.status === Loader.Ready && mapLoader.item.streaming
-    property real chrome: fullMap ? 0 : 1          // opacity of the dials and centre menu
+    property real chrome: fullMap ? 0 : 1          // opacity of the centre menu and hairlines
     Behavior on chrome { NumberAnimation { duration: 350 } }
     Connections {
         target: car
@@ -169,6 +170,11 @@ Window {
         onStatusChanged: if (status === Loader.Error) console.warn("[dash] cluster map unavailable; using the directions card")
     }
 
+    MapFades {            // keep the status row and bottom row legible over the full-screen map
+        opacity: 1 - stage.chrome
+        visible: opacity > 0.01
+    }
+
     // ── the two hairlines that run the width of the panel
     Repeater {
         model: [stage.lineTop, stage.lineBottom]
@@ -178,8 +184,7 @@ Window {
     // ── speedometer
     JlrDial {
         id: speedo
-        opacity: stage.chrome
-        visible: opacity > 0.01
+        faceOpacity: stage.fullMap ? 0.95 : 1
         x: stage.speedoX - size / 2; y: stage.dialY - size / 2
         size: stage.dialSize
         maxValue: car.useMph ? 180 : 280
@@ -235,15 +240,14 @@ Window {
     LimitSign {                                       // takes the place of the "km/h" label
         x: stage.speedoX - width / 2
         y: stage.dialY + 70
-        limit: stage.fullMap ? 0 : stage.limitShown      // MapHud shows its own in map mode
+        limit: stage.limitShown
         over: stage.overLimit
     }
 
     // ── tachometer
     JlrDial {
         id: tach
-        opacity: stage.chrome
-        visible: opacity > 0.01
+        faceOpacity: stage.fullMap ? 0.95 : 1
         x: stage.tachX - size / 2; y: stage.dialY - size / 2
         size: stage.dialSize
         maxValue: 8000
@@ -288,16 +292,6 @@ Window {
         }
     }
 
-    MapHud {
-        car: car
-        opacity: 1 - stage.chrome
-        visible: opacity > 0.01
-        speed: stage.speedShown
-        speedUnit: car.useMph ? "mph" : "km/h"
-        limit: stage.limitShown
-        overLimit: stage.overLimit
-        fontName: stage.fontName
-    }
 
     // ── status row: clock, warning lights, indicators, outside temperature
     Text {
