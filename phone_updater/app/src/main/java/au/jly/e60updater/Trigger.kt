@@ -49,13 +49,17 @@ object Trigger {
      * Schedules one update pass. A JobScheduler job gets its own execution window (up to ~10 min)
      * even when the app is in the background, which a broadcast receiver does not.
      */
-    fun scheduleCheck(context: Context, reason: String, delayMs: Long = 0) {
+    const val EXTRA_INTERACTIVE = "interactive"
+
+    /** [interactive]: started from the app's screen, so a car Wi-Fi request may prompt the user. */
+    fun scheduleCheck(context: Context, reason: String, delayMs: Long = 0, interactive: Boolean = false) {
         val js = context.getSystemService(JobScheduler::class.java)
         // schedule() with the ID of a running job would stop it; let the current pass finish instead.
         if (UpdateJobService.running || js.getPendingJob(JOB_ID) != null) return
         val job = JobInfo.Builder(JOB_ID, ComponentName(context, UpdateJobService::class.java))
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             .setMinimumLatency(delayMs)
+            .setExtras(android.os.PersistableBundle().apply { putBoolean(EXTRA_INTERACTIVE, interactive) })
             .build()
         val ok = js.schedule(job) == JobScheduler.RESULT_SUCCESS
         if (!ok) Settings(context).log("Could not schedule check ($reason)")

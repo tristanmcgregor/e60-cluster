@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CarSettingsActivity"
+            android:label="Car settings"
+            android:exported="false" />
+
         <!-- Fired by ConnectivityService through our PendingIntent; not exported because
              the PendingIntent is sent with this app's own identity. -->
         <receiver

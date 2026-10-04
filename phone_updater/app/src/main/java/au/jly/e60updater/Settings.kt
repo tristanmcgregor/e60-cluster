@@ -14,14 +14,20 @@ class Settings(context: Context) {
     // A blank override falls back to the build-time default.
     val repo: String get() = pick(KEY_REPO, BuildConfig.GITHUB_REPO)
     val token: String get() = pick(KEY_TOKEN, BuildConfig.GITHUB_TOKEN)
+    // The car hotspot, for asking Android for our own access to it (CarWifi). Entered on the
+    // phone, never built in: this APK is published.
+    val carSsid: String get() = pick(KEY_CAR_SSID, "Bmw")
+    val carPassword: String get() = prefs.getString(KEY_CAR_PASSWORD, "") ?: ""
 
     private fun pick(key: String, default: String): String =
         prefs.getString(key, null)?.trim()?.takeIf { it.isNotEmpty() } ?: default.trim()
 
-    fun save(repo: String, token: String) {
+    fun save(repo: String, token: String, carSsid: String, carPassword: String) {
         prefs.edit()
             .putString(KEY_REPO, repo.trim())
             .putString(KEY_TOKEN, token.trim())
+            .putString(KEY_CAR_SSID, carSsid.trim())
+            .putString(KEY_CAR_PASSWORD, carPassword)
             .apply()
     }
 
@@ -60,6 +66,8 @@ class Settings(context: Context) {
         const val PREFS = "e60_updater"
         const val KEY_REPO = "github.repo"
         const val KEY_TOKEN = "github.token"
+        const val KEY_CAR_SSID = "car.ssid"
+        const val KEY_CAR_PASSWORD = "car.password"
         const val KEY_LOG = "log"
         const val KEY_APK = "hu.apkRelease"
         const val KEY_PENDING_APK = "hu.pendingApkRelease"

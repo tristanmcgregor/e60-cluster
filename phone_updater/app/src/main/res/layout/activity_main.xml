@@ -53,6 +53,30 @@
             android:inputType="textPassword"
             android:importantForAutofill="no" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Car Wi-Fi name (for connecting alongside Android Auto)" />
+
+        <EditText
+            android:id="@+id/carSsid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Car Wi-Fi password" />
+
+        <EditText
+            android:id="@+id/carPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
         <Button
             android:id="@+id/save"
             android:layout_width="match_parent"

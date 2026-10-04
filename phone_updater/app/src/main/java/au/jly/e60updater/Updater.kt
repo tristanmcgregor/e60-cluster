@@ -6,7 +6,11 @@ import java.io.File
 import java.io.IOException
 
 /** One update pass: find the car, fetch what it lacks from GitHub, push it. Never throws. */
-class Updater(private val context: Context, private val isCancelled: () -> Boolean) {
+class Updater(
+    private val context: Context,
+    private val interactive: Boolean = false,   // started from "Check now", app on screen
+    private val isCancelled: () -> Boolean,
+) {
 
     /** [notify] is null when there is nothing worth a notification (no car, already up to date). */
     data class Outcome(val notify: String?)
@@ -31,10 +35,26 @@ class Updater(private val context: Context, private val isCancelled: () -> Boole
         }
         GitHub.checkRepo(repo)
 
-        val (car, status) = findCar() ?: run {
-            settings.log("Car not found on any Wi-Fi network")
-            return Outcome(null)
+        var ownWifi: CarWifi? = null
+        try {
+            val found = findCar() ?: if (interactive) {
+                // The phone's car connection may belong to Android Auto; ask for our own.
+                settings.log("Asking Android for access to \"${settings.carSsid}\" (approve the prompt)")
+                ownWifi = CarWifi.request(cm, settings.carSsid, settings.carPassword)
+                ownWifi?.let { HeadUnit.probe(cm, it.network, settings::log) }
+                    ?: null.also { if (ownWifi == null) settings.log("Car Wi-Fi not granted (check its name and password)") }
+            } else null
+            val (car, status) = found ?: run {
+                settings.log("Car not found on any Wi-Fi network")
+                return Outcome(null)
+            }
+            return pass(repo, car, status)
+        } finally {
+            ownWifi?.close()
         }
+    }
+
+    private fun pass(repo: String, car: HeadUnit, status: HeadUnitStatus): Outcome {
         settings.saveStatus(status)
         settings.log("Car found: app v${status.apkRelease} (staged v${status.pendingApkRelease}), " +
             "dash v${status.dashRelease}, cluster v${status.clusterDashRelease}")

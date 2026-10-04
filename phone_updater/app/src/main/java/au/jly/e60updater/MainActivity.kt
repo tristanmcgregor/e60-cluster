@@ -30,31 +30,28 @@ class MainActivity : Activity() {
 
         val repo = findViewById<EditText>(R.id.repo)
         val token = findViewById<EditText>(R.id.token)
+        val carSsid = findViewById<EditText>(R.id.carSsid)
+        val carPassword = findViewById<EditText>(R.id.carPassword)
         repo.setText(settings.repo)
         token.setText(settings.token)
+        carSsid.setText(settings.carSsid)
+        carPassword.setText(settings.carPassword)
 
         findViewById<Button>(R.id.save).setOnClickListener {
-            settings.save(repo.text.toString(), token.text.toString())
+            settings.save(repo.text.toString(), token.text.toString(), carSsid.text.toString(), carPassword.text.toString())
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         }
-        // The car's settings page is served by the head unit, the gateway of the car Wi-Fi.
-        // Its address changes when the head unit restarts its hotspot, so look it up now.
+        // The car's settings page, shown in-app on the car Wi-Fi (CarSettingsActivity), so it
+        // works even when a browser could not reach the car (VPN, Android Auto's network).
         findViewById<Button>(R.id.openSettings).setOnClickListener {
-            val gw = HeadUnit.wifiGateway(getSystemService(android.net.ConnectivityManager::class.java))
-            if (gw == null) {
-                Toast.makeText(this, "Connect to the car's Wi-Fi first", Toast.LENGTH_LONG).show()
-            } else {
-                val host = if (gw.contains(':')) "[$gw]" else gw
-                startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
-                    android.net.Uri.parse("http://$host:${HeadUnit.PORT}/settings")))
-            }
+            startActivity(android.content.Intent(this, CarSettingsActivity::class.java))
         }
         findViewById<Button>(R.id.checkNow).setOnClickListener {
             if (settings.repo.isEmpty()) {
                 settings.log("Set the GitHub repo")
             } else {
                 settings.log("Check requested")
-                Trigger.scheduleCheck(this, "Check now")
+                Trigger.scheduleCheck(this, "Check now", interactive = true)
             }
         }
 

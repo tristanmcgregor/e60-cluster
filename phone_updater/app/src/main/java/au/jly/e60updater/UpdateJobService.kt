@@ -12,7 +12,8 @@ class UpdateJobService : JobService() {
         stopped = false
         Thread({
             try {
-                val outcome = Updater(applicationContext) { stopped }.run()
+                val interactive = params.extras.getBoolean(Trigger.EXTRA_INTERACTIVE, false)
+                val outcome = Updater(applicationContext, interactive) { stopped }.run()
                 outcome.notify?.let { Notifier.show(applicationContext, it) }
             } finally {
                 running = false

@@ -58,6 +58,8 @@ class HeadUnit(val network: Network, private val host: String) {
         }
     }
 
+    fun url(path: String) = base + path
+
     private val base: String
         get() = "http://" + (if (host.contains(':')) "[$host]" else host) + ":$PORT"
 
@@ -82,6 +84,18 @@ class HeadUnit(val network: Network, private val host: String) {
             return null
         }
 
+        /** The head unit on one specific network (e.g. our own CarWifi request), or null. */
+        fun probe(cm: ConnectivityManager, network: Network, log: (String) -> Unit): Pair<HeadUnit, HeadUnitStatus>? {
+            val gateway = gatewayOf(cm, network)?.hostAddress ?: return null.also { log("Car Wi-Fi has no gateway address") }
+            val hu = HeadUnit(network, gateway)
+            return try {
+                hu to hu.status()
+            } catch (e: Exception) {
+                log("No car at $gateway on our own Wi-Fi request: ${e.message ?: e.javaClass.simpleName}")
+                null
+            }
+        }
+
         /** Default gateway of the first Wi-Fi network: the head unit when on the car hotspot. */
         @Suppress("DEPRECATION")
         fun wifiGateway(cm: ConnectivityManager): String? = cm.allNetworks
@@ -92,7 +106,13 @@ class HeadUnit(val network: Network, private val host: String) {
             val routes = cm.getLinkProperties(network)?.routes ?: return null
             val gateways = routes.filter { it.isDefaultRoute && it.hasGateway() }.mapNotNull { it.gateway }
             // Prefer IPv4: the hotspot head unit is reached on its IPv4 gateway address.
-            return gateways.firstOrNull { it is Inet4Address } ?: gateways.firstOrNull()
+            gateways.firstOrNull { it is Inet4Address }?.let { return it }
+            // A local-only network (our own CarWifi request) may carry no default route; on a
+            // hotspot the DHCP server is the head unit too.
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                cm.getLinkProperties(network)?.dhcpServerAddress?.let { return it }
+            }
+            return gateways.firstOrNull()
         }
     }
 }
