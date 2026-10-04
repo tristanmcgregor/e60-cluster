@@ -42,6 +42,7 @@ Window {
     property real reveal: 0          // 0 = black, 1 = dash visible
     property real sweep: 0           // 0..1 of full scale while sweeping
     property bool sweeping: false
+    property real gearOffset: 0       // moves the gear text so its capitals sit on the dial centre
 
     SequentialAnimation {
         id: startup
@@ -231,29 +232,28 @@ Window {
         gapLowColor: "#8a7cff"       // cold end: blue/violet like the reference
         gapHighColor: "#e0453a"      // hot end: red
 
-        Column {
+        Text {                          // gear, centred on the dial (offset: cap-height centring)
+            id: gearText
             anchors.centerIn: parent
-            spacing: 2
-            Item { width: 1; height: 40 }
+            anchors.verticalCenterOffset: stage.gearOffset
+            text: car.gearShow && car.gear !== "" ? car.gear : "P"
+            color: car.gear === "R" ? Theme.critical : "#f4f6f8"
+            font.pixelSize: 100
+            font.family: stage.fontName
+        }
+        Row {                           // engine warming up: cold oil, redline still lowered
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: gearText.bottom
+            anchors.topMargin: 2
+            spacing: 8
+            visible: car.oilTempInt > 0 && car.oilTempInt < 70 && car.rpm > 300
+            Image { width: 26; height: 26; source: "icons/warmup.png"; anchors.verticalCenter: parent.verticalCenter }
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: car.gearShow && car.gear !== "" ? car.gear : "P"
-                color: car.gear === "R" ? Theme.critical : "#f4f6f8"
-                font.pixelSize: 100
+                text: "WARMING UP  " + car.oilTempInt + "°C"
+                color: "#8a7cff"
+                font.pixelSize: 20
                 font.family: stage.fontName
-            }
-            Row {                       // engine warming up: cold oil, redline still lowered
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 8
-                visible: car.oilTempInt > 0 && car.oilTempInt < 70 && car.rpm > 300
-                Image { width: 26; height: 26; source: "icons/warmup.png"; anchors.verticalCenter: parent.verticalCenter }
-                Text {
-                    text: "WARMING UP  " + car.oilTempInt + "°C"
-                    color: "#8a7cff"
-                    font.pixelSize: 20
-                    font.family: stage.fontName
-                    font.letterSpacing: 1
-                }
+                font.letterSpacing: 1
             }
         }
     }
