@@ -3,6 +3,7 @@
 /*
 !/.gitignore
 !/README.md
+!/docs/
 
 !/custom_dash/
 /custom_dash/*
