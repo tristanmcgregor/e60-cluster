@@ -8,6 +8,7 @@
 /custom_dash/*
 !/custom_dash/device/
 !/custom_dash/tools/
+!/custom_dash/icons/
 !/custom_dash/preview/
 /custom_dash/preview/fonts/
 /custom_dash/preview/*.png

@@ -7,14 +7,15 @@ Item {
     id: card
 
     property var car
+    property var perf
 
     width: 520
     height: 470
 
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 34
-        spacing: 6
+        y: 26
+        spacing: 4
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -28,7 +29,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: card.car.rpm
             color: card.car.rpm >= card.car.shiftRpm ? Theme.sportAccent : Theme.text
-            font.pixelSize: 112
+            font.pixelSize: 96
             font.family: Theme.font
         }
         Text {
@@ -38,7 +39,7 @@ Item {
             font.pixelSize: Theme.tBody
             font.family: Theme.font
         }
-        Item { width: 1; height: 26 }
+        Item { width: 1; height: 12 }
 
         Repeater {
             model: [
@@ -75,6 +76,40 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     text: modelData.temp > 0 ? modelData.temp + "°C" : "--"
                     color: Theme.text
+                    font.pixelSize: Theme.tBody
+                    font.family: Theme.font
+                }
+            }
+        }
+
+        Item { width: 1; height: 8 }
+        Repeater {                    // performance timer: last and best times
+            model: card.perf ? [
+                { label: "0–100", last: card.perf.last0100, best: card.perf.best0100 },
+                { label: "80–120", last: card.perf.last80120, best: card.perf.best80120 }
+            ] : []
+            Row {
+                spacing: 16
+                Text {
+                    width: 110
+                    text: modelData.label
+                    color: Theme.textDim
+                    font.pixelSize: Theme.tLabel
+                    font.family: Theme.font
+                    font.letterSpacing: 1.5
+                }
+                Text {
+                    width: 160
+                    text: modelData.last > 0 ? modelData.last.toFixed(2) + " s" : "--"
+                    color: Theme.text
+                    font.pixelSize: Theme.tBody
+                    font.family: Theme.font
+                }
+                Text {
+                    width: 160
+                    horizontalAlignment: Text.AlignRight
+                    text: modelData.best > 0 ? "best " + modelData.best.toFixed(2) : ""
+                    color: Theme.textDim
                     font.pixelSize: Theme.tBody
                     font.family: Theme.font
                 }

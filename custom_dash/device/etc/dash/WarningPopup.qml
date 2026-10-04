@@ -17,7 +17,8 @@ Item {
     property string customText: ""
     property string customIcon: ""
 
-    readonly property bool critical: customText === "" && Notify.critical(alarmId)
+    property bool forceCritical: false     // red strip for a custom message (CarWarnings)
+    readonly property bool critical: forceCritical || (customText === "" && Notify.critical(alarmId))
     property bool shown: false
 
     width: 500
@@ -58,8 +59,13 @@ Item {
             width: 64; height: 64
             fillMode: Image.PreserveAspectFit
             smooth: true
-            source: pop.customIcon !== "" ? pop.customIcon : pop.iconBase + Notify.icon(pop.alarmId)
-            onStatusChanged: if (status === Image.Error) source = pop.iconBase + "images/notify/001.png"
+            // a missing icon falls back to the generic one; tracked in a flag rather than by
+            // assigning source, which would cut the binding and freeze the icon from then on
+            property string wanted: pop.customIcon !== "" ? pop.customIcon : pop.iconBase + Notify.icon(pop.alarmId)
+            property bool failed: false
+            onWantedChanged: failed = false
+            source: failed ? pop.iconBase + "images/notify/001.png" : wanted
+            onStatusChanged: if (status === Image.Error && !failed) failed = true
         }
         Text {
             anchors.verticalCenter: parent.verticalCenter

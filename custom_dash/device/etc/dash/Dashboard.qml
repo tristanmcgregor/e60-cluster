@@ -16,6 +16,8 @@ Window {
 
     property alias car: car
     Car { id: car }
+    PerfTimer { id: perfTimer; car: car }
+    CarWarnings { id: carWarnings; car: car }
     Nav {
         id: navData
         onSettingsReceived: car.applySettings(settings, true)
@@ -240,6 +242,19 @@ Window {
                 font.pixelSize: 100
                 font.family: stage.fontName
             }
+            Row {                       // engine warming up: cold oil, redline still lowered
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 8
+                visible: car.oilTempInt > 0 && car.oilTempInt < 70 && car.rpm > 300
+                Image { width: 26; height: 26; source: "icons/warmup.png"; anchors.verticalCenter: parent.verticalCenter }
+                Text {
+                    text: "WARMING UP  " + car.oilTempInt + "°C"
+                    color: "#8a7cff"
+                    font.pixelSize: 20
+                    font.family: stage.fontName
+                    font.letterSpacing: 1
+                }
+            }
         }
     }
 
@@ -290,6 +305,7 @@ Window {
     SportCard {
         x: 700; y: stage.lineTop + 2
         car: car
+        perf: perfTimer
         visible: opacity > 0.01
         opacity: car.sportMode ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 300 } }
@@ -306,7 +322,7 @@ Window {
         nav: navData
         mph: car.useMph
         mapStreaming: mapLoader.status === Loader.Ready && mapLoader.item.streaming
-        dimmed: popup.shown || servicePopup.shown
+        dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown
     }
     WarningPopup {
         id: popup
@@ -334,6 +350,27 @@ Window {
         }
         durationMs: car.serviceAlertMs
         seq: car.serviceAlertSeq
+    }
+    WarningPopup {       // our own warnings: temperatures, charging, battery
+        id: carWarningPopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown
+        forceCritical: true
+        customText: carWarnings.text
+        customIcon: carWarnings.icon
+        durationMs: 10000
+        seq: carWarnings.seq
+    }
+    WarningPopup {       // performance timer result
+        id: perfPopup
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: stage.lineBottom - height - 26
+        visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown
+        customText: perfTimer.resultText
+        customIcon: "icons/timer.png"
+        durationMs: 8000
+        seq: perfTimer.resultSeq
     }
     Rectangle {          // backdrop so the door picture sits on its own over the menu
         x: 700; y: stage.lineTop + 2

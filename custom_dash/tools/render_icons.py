@@ -35,6 +35,12 @@ ICONS["service"] = ("build", "#ffb340", 128)
 ICONS["media_note"] = ("music_note", "#c9d0da", 64)
 ICONS["call_in"] = ("call", "#35d07f", 64)
 ICONS["call_end"] = ("call_end", "#ff4d4d", 64)
+# car warnings (CarWarnings.qml) and the performance timer
+ICONS["battery_warn"] = ("battery_alert", "#ff6b60", 128)
+ICONS["oil_warn"] = ("oil_barrel", "#ff6b60", 128)
+ICONS["coolant_warn"] = ("thermostat", "#ff6b60", 128)
+ICONS["warmup"] = ("oil_barrel", "#8a7cff", 64)
+ICONS["timer"] = ("timer", "#ff3b30", 64)
 
 def main():
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")

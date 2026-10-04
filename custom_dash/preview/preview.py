@@ -89,6 +89,8 @@ SCENES = {
     "sport_shift": {"gear": "M4", "rpm": 6900},
     "sport_cold": {"gear": "S2", "rpm": 3900, "oil": 45},
     "cold": {"gear": "D2", "oil": 45},
+    "launch": {"launch": True, "gear": "S1", "rpm": 4800},
+    "carwarn": {"coolant": "118°C", "volts": 121},
 }
 SCENE = SCENES["normal"]
 WRITABLE = {"port": int, "packetDebug": int, "MPH": int, "verified": int, "menuId": int, "uiStyle": int}
@@ -156,6 +158,8 @@ def make_hub_class():
         t = self._t = self._t + 0.05
         v = self._v
         kmh = int(60 + 55 * math.sin(t / 4))
+        if SCENE.get("launch"):                  # stand 2 s, then a steady 12.5 km/h per second
+            kmh = 0 if t < 2 else min(130, int((t - 2) * 12.5))
         v["speed"], v["speedM"] = kmh, int(kmh / 1.609)
         v["rpm"] = int(1800 + 2600 * (0.5 + 0.5 * math.sin(t * 1.3)) + 900 * math.sin(t / 4))
         if "rpm" in SCENE:                       # sport scenes: a fixed rpm, or a rising pull
@@ -165,11 +169,11 @@ def make_hub_class():
             v["fuel"] = 62
             v["remindingRange"], v["remindingRangeM"] = "438", "272"
             v["waterPercetage"] = 52
-            v["waterTemperature"], v["waterTemperatureF"] = "90°C", "194°F"
+            v["waterTemperature"], v["waterTemperatureF"] = SCENE.get("coolant", "90°C"), "194°F"
             v["odo"], v["odoM"] = "187432km", "116464mi"
             v["tripA"], v["tripAmile"] = "312.4km", "194.1mi"
             oil = SCENE.get("oil", 104)
-            v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", f"{oil}°C", oil, 142
+            v["outsideTemp"], v["oilTemp"], v["oilTempInt"], v["batteryVoltage"] = "18°C", f"{oil}°C", oil, SCENE.get("volts", 142)
             v["gear"], v["gearShow"] = SCENE.get("gear", "D3"), True
             v["instantFuel"], v["instantFuelUnit"] = "9.8", "L/100km"
             v["tripB"], v["tripBmile"] = "1204.6km", "748.5mi"
