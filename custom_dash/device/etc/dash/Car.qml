@@ -107,9 +107,10 @@ Item {
 
     // ---- warm-up redline, shift lights, sport layout ----
     // Defaults; the phone settings page (CarSettings on the head unit) can replace them.
-    // Redline steps on engine oil temperature like BMW's warm-up display: [°C, rpm] rows,
-    // the highest row at or below the current temperature wins. 7000 is the N52 cut-off.
-    property var redlineTable: [[30, 4500], [50, 5000], [70, 5500], [80, 6000], [90, 6500], [100, 7000]]
+    // Warm-up redline from engine oil temperature: [°C, rpm] rows, linear between rows and
+    // flat beyond the first and last (7250 is the normal limit once warm).
+    property var redlineTable: [[20, 4500], [40, 5166], [50, 5500], [60, 6000], [70, 6500], [80, 6875], [90, 7250]]
+    property string perfPopups: "sport"     // timer results: sport (layout) | always | off
     property bool shiftLightsOn: true
     property int shiftWindow: 2000      // lights start this far below the shift point
     property int shiftMargin: 200       // flash this far below the redline
@@ -118,11 +119,17 @@ Item {
     // Oil temperature when the MCU reports it, otherwise coolant; 0 = unknown.
     readonly property int engineTemp: oilTempInt > 0 ? oilTempInt : (parseInt(coolantTemp) || 0)
     readonly property int redlineRpm: {
-        var table = redlineTable, rpm = table.length ? table[0][1] : 7000
-        if (engineTemp <= 0) return table.length ? table[table.length - 1][1] : 7000   // unknown: full range
-        for (var i = 0; i < table.length; i++)
-            if (engineTemp >= table[i][0]) rpm = table[i][1]
-        return rpm
+        var t = redlineTable
+        if (!t.length) return 7250
+        if (engineTemp <= 0) return t[t.length - 1][1]          // temperature unknown: normal limit
+        if (engineTemp <= t[0][0]) return t[0][1]
+        for (var i = 1; i < t.length; i++) {
+            if (engineTemp <= t[i][0]) {
+                var f = (engineTemp - t[i - 1][0]) / (t[i][0] - t[i - 1][0])
+                return Math.round(t[i - 1][1] + f * (t[i][1] - t[i - 1][1]))
+            }
+        }
+        return t[t.length - 1][1]
     }
     readonly property int shiftRpm: redlineRpm - shiftMargin
     // S or M on the selector. TODO(after the Phase 0 drive): confirm this car's gear strings.
@@ -146,6 +153,7 @@ Item {
         if (s.speedLimit !== undefined) speedLimitOn = s.speedLimit === true
         if (s.speedLimitMargin !== undefined) speedLimitMargin = s.speedLimitMargin
         if (s.defaultPage !== undefined) defaultPage = s.defaultPage
+        if (s.perfPopups !== undefined) perfPopups = s.perfPopups
         settingsApplied()
         if (store) {
             try {

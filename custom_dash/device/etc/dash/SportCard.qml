@@ -85,8 +85,8 @@ Item {
         Item { width: 1; height: 8 }
         Repeater {                    // performance timer: last and best times
             model: card.perf ? [
-                { label: "0–100", last: card.perf.last0100, best: card.perf.best0100 },
-                { label: "80–120", last: card.perf.last80120, best: card.perf.best80120 }
+                { label: "0–60", last: card.perf.last060, best: card.perf.best060 },
+                { label: "0–100", last: card.perf.last0100, best: card.perf.best0100 }
             ] : []
             Row {
                 spacing: 16
