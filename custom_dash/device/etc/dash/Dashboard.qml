@@ -45,6 +45,25 @@ Window {
     property bool sweeping: false
     property real gearOffset: 0       // moves the gear text so its capitals sit on the dial centre
 
+    // Full-screen map: the Android Auto map fills the panel and the dials give way to MapHud.
+    // Hold BC to switch (on any page but INFO, where it opens DEVELOPER); with the phone
+    // setting "mapAuto" it also follows the route starting and ending.
+    property bool mapMode: false
+    readonly property bool fullMap: mapMode && mapLoader.status === Loader.Ready && mapLoader.item.streaming
+    property real chrome: fullMap ? 0 : 1          // opacity of the dials and centre menu
+    Behavior on chrome { NumberAnimation { duration: 350 } }
+    Connections {
+        target: car
+        onButton: if (code === 26 + 128 && centreMenu.current !== "INFO") {
+            stage.mapMode = !stage.mapMode
+            console.log("[dash] full-screen map " + (stage.mapMode ? "on" : "off"))
+        }
+    }
+    Connections {
+        target: navData
+        onActiveChanged: if (car.mapAuto) stage.mapMode = navData.active
+    }
+
     SequentialAnimation {
         id: startup
         ScriptAction { script: { stage.sweeping = true; stage.sweep = 0 } }
@@ -129,30 +148,38 @@ Window {
         x: 560; y: stage.lineTop + 2
         width: 800; height: stage.lineBottom - stage.lineTop - 4
         color: "#000000"
-        opacity: centreMenu.onNavPage ? 0 : 0.72
+        opacity: centreMenu.onNavPage || stage.fullMap ? 0 : 0.72
         Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     // ── live Android Auto map: fills the band, edges tucked behind the dials (drawn after it)
     Loader {
         id: mapLoader
-        x: 560; y: stage.lineTop + 2
-        width: 800; height: stage.lineBottom - stage.lineTop - 4
+        // the band between the dials, or the whole panel in full-screen map mode
+        x: stage.fullMap ? 0 : 560; y: stage.fullMap ? 0 : stage.lineTop + 2
+        width: stage.fullMap ? 1920 : 800; height: stage.fullMap ? 720 : stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
-        visible: status === Loader.Ready && item.streaming && centreMenu.onNavPage && !car.sportMode
-        onLoaded: item.host = Qt.binding(function() { return navData.gateway })
+        visible: status === Loader.Ready && item.streaming && (stage.fullMap || (centreMenu.onNavPage && !car.sportMode))
+        onLoaded: {
+            item.host = Qt.binding(function() { return navData.gateway })
+            item.mapWidth = Qt.binding(function() { return navData.mapWidth })
+            item.mapHeight = Qt.binding(function() { return navData.mapHeight })
+            item.full = Qt.binding(function() { return stage.mapMode })
+        }
         onStatusChanged: if (status === Loader.Error) console.warn("[dash] cluster map unavailable; using the directions card")
     }
 
     // ── the two hairlines that run the width of the panel
     Repeater {
         model: [stage.lineTop, stage.lineBottom]
-        Rectangle { x: 40; y: modelData; width: 1840; height: 2; color: "#4a4f55" }
+        Rectangle { x: 40; y: modelData; width: 1840; height: 2; color: "#4a4f55"; opacity: stage.chrome }
     }
 
     // ── speedometer
     JlrDial {
         id: speedo
+        opacity: stage.chrome
+        visible: opacity > 0.01
         x: stage.speedoX - size / 2; y: stage.dialY - size / 2
         size: stage.dialSize
         maxValue: car.useMph ? 180 : 280
@@ -208,13 +235,15 @@ Window {
     LimitSign {                                       // takes the place of the "km/h" label
         x: stage.speedoX - width / 2
         y: stage.dialY + 70
-        limit: stage.limitShown
+        limit: stage.fullMap ? 0 : stage.limitShown      // MapHud shows its own in map mode
         over: stage.overLimit
     }
 
     // ── tachometer
     JlrDial {
         id: tach
+        opacity: stage.chrome
+        visible: opacity > 0.01
         x: stage.tachX - size / 2; y: stage.dialY - size / 2
         size: stage.dialSize
         maxValue: 8000
@@ -257,6 +286,17 @@ Window {
                 font.letterSpacing: 1
             }
         }
+    }
+
+    MapHud {
+        car: car
+        opacity: 1 - stage.chrome
+        visible: opacity > 0.01
+        speed: stage.speedShown
+        speedUnit: car.useMph ? "mph" : "km/h"
+        limit: stage.limitShown
+        overLimit: stage.overLimit
+        fontName: stage.fontName
     }
 
     // ── status row: clock, warning lights, indicators, outside temperature
@@ -308,14 +348,14 @@ Window {
         car: car
         perf: perfTimer
         visible: opacity > 0.01
-        opacity: car.sportMode ? 1 : 0
+        opacity: car.sportMode && !stage.fullMap ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
     CentreMenu {
         id: centreMenu
         visible: opacity > 0.01
-        opacity: car.sportMode ? 0 : 1
+        opacity: car.sportMode || stage.fullMap ? 0 : 1
         Behavior on opacity { NumberAnimation { duration: 300 } }
         x: 700; y: stage.lineTop + 2
         width: 520; height: stage.lineBottom - stage.lineTop - 4

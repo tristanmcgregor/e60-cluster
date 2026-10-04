@@ -82,6 +82,8 @@ class FakeHeadUnit:
                                                              "sample_cover.jpg"), "rb").read()).decode()
                     msg["art"] = "data:image/jpeg;base64," + art
                 self._send(msg)
+            # size of the map in the cluster video (the head unit's wide stream: 1280x480 drawn)
+            self._send({"type": "clustermap", "width": 1280, "height": 480})
             if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits
                 self._send({"type": "limit", "kph": int(MODE[5:])})
             if MODE == "settings":      # as saved from the phone settings page

@@ -140,6 +140,7 @@ Item {
     property real tankLitres: 70         // E60 525i
     property real fuelPrice: 2.0         // per litre, for cost per tank
     property int fuelReserveKm: 30       // warn when arriving with less range than this
+    property bool mapAuto: false         // full-screen map whenever a route starts
     property int speedLimitMargin: 3
     property bool speedLimitOn: true
     property int defaultPage: 0
@@ -161,6 +162,7 @@ Item {
         if (s.tankLitres !== undefined) tankLitres = s.tankLitres
         if (s.fuelPrice !== undefined) fuelPrice = s.fuelPrice
         if (s.fuelReserveKm !== undefined) fuelReserveKm = s.fuelReserveKm
+        if (s.mapAuto !== undefined) mapAuto = s.mapAuto === true
         settingsApplied()
         if (store) {
             try {

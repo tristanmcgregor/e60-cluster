@@ -71,6 +71,7 @@ SCENES = {
     "cruise": {"cruise": True},
     # nav + a stand-in for the native map plugin (preview/qml/ClusterVideo)
     "map": {"nav": True, "map": True},
+    "fullmap": {"nav": True, "map": True, "fh": "limit60", "keys": [(4.0, 26 + 128)]},
     # centre menu pages: BC (26) presses step TRIP -> VEHICLE -> NAVIGATION -> INFO
     "page_trip": {},
     "page_fuel": {"keys": [(13.0, 21), (13.3, 21)], "fastfuel": True, "fueljump": (20, 75, 6.0), "range": "25", "nav": True},

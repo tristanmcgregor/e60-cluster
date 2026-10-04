@@ -54,12 +54,20 @@ Item {
     signal settingsReceived(var settings)
     // limit of the road the car is on, km/h (head unit SpeedLimits); 0 = unknown
     property int speedLimitKph: 0
+    // size of the map the phone draws in the cluster video (head unit "clustermap" message)
+    property int mapWidth: 800
+    property int mapHeight: 480
 
     function apply(msg) {
         var d
         try { d = JSON.parse(msg) } catch (e) { return }
         if (d.type === "settings") {
             settingsReceived(d)
+            return
+        }
+        if (d.type === "clustermap") {
+            mapWidth = d.width || 800
+            mapHeight = d.height || 480
             return
         }
         if (d.type === "limit") {
