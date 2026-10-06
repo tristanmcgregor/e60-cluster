@@ -65,6 +65,10 @@ Doing it would need sniffing the E60 CCC→HUD navigation CAN messages from a wo
 - **Where I parked (phone app):** when the phone's Bluetooth link to the car drops, the phone saves its own location and shows a "Car parked" notification that opens the map; also in the app. Set up in the app: choose the car's Bluetooth, allow Nearby devices and Location "Allow all the time". (The head unit can't be asked: Android Auto owns the car Wi-Fi during a drive.)
 - **To ship:** needs a speed-limit data release as well: `release.py --speedlimits --osm-cache updater/out/osm_cache --publish`. Old head unit builds ignore the new data; the new build reads old data without school zones/cameras. The phone APK is attached to the release for manual install.
 
+## Built after release 6 (not yet released)
+
+- **Automatic speed correction:** the cluster learns the correction from GPS (GpsCheck: steady driving above 40 km/h, GPS/MCU within 25 %), kept across drives in LocalStorage, halved past an hour of samples so tyre changes work in. Used once 2 minutes are measured; the manual % applies until then or with "Learn correction from GPS" off. "Start learning again" in the phone settings clears it. The developer page shows the measured value and which one is in use. The HUD still shows the uncorrected MCU speed.
+
 ## Next: custom home screen for the head unit
 
 **Goal:** replace the ZLH launcher with our own home screen, styled to match the cluster. It must be fully usable with the iDrive and delivered through the existing OTA pipeline.

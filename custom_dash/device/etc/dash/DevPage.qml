@@ -93,9 +93,15 @@ Item {
         }
         Text {
             text: !page.gps ? "" : isNaN(page.gps.measured)
-                  ? "Measured: drive steadily above 40 km/h (" + page.gps.samples + "/30 s)"
-                  : "Measured " + page.pct(page.gps.measured) + " over " + page.gps.samples + " s   \u00b7   setting "
-                    + page.pct((page.car.speedFactor - 1) * 100)
+                  ? "Learning: drive steadily above 40 km/h (" + page.gps.samples + "/" + page.gps.minSamples + " s)"
+                  : "Measured " + page.pct(page.gps.measured) + " over " + page.gps.samples + " s"
+            color: Theme.text
+            font.pixelSize: 17
+            font.family: Theme.font
+        }
+        Text {
+            text: !page.car ? "" : "In use: " + page.pct((page.car.speedFactor - 1) * 100) +
+                  (page.car.usingLearned ? " (learned from GPS)" : page.car.speedAuto ? " (manual, until learned)" : " (manual)")
             color: Theme.text
             font.pixelSize: 17
             font.family: Theme.font
