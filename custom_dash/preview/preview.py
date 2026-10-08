@@ -79,6 +79,8 @@ SCENES = {
     "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26)]},
     "page_dev": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26), (2.3, 26 + 128)]},
     "msg": {"warning": (58, 8)},
+    # the MCU repeating one check-control message every 3 s: shown once, not again
+    "msg_repeat": {"warning": (58, 8), "warningEvery": 3.0},
     "media": {"nav": True, "fh": "media"},
     "call": {"nav": True, "fh": "call"},
     "media_art": {"nav": True, "fh": "media_art"},
@@ -208,6 +210,10 @@ def make_hub_class():
                 self.swcChanged.emit()
                 v["swcKeyPress"] = False
                 self.swcChanged.emit()
+        every = SCENE.get("warningEvery")
+        if every and t > 1 and abs((t - 0.5) % every) < 0.026:
+            v["warningId"], v["warningDuration"] = SCENE["warning"]
+            self.warningChanged.emit()
         if abs(t - 0.5) < 0.026:
             self.alarmtableChanged.emit()
             for k, val in SCENE.get("doors", {}).items():

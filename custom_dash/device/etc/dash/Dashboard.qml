@@ -86,7 +86,7 @@ Window {
     Connections {
         target: car
         onIgnitionOnChanged: {
-            if (car.ignitionOn) { shutdown.stop(); startup.start() }
+            if (car.ignitionOn) { shutdown.stop(); startup.start(); popup.forget(); servicePopup.forget() }
             else shutdown.start()
         }
     }
@@ -167,6 +167,8 @@ Window {
             item.host = Qt.binding(function() { return navData.gateway })
             item.mapWidth = Qt.binding(function() { return navData.mapWidth })
             item.mapHeight = Qt.binding(function() { return navData.mapHeight })
+            item.videoWidth = Qt.binding(function() { return navData.videoWidth })
+            item.videoHeight = Qt.binding(function() { return navData.videoHeight })
             item.full = Qt.binding(function() { return stage.mapMode })
         }
         onStatusChanged: if (status === Loader.Error) console.warn("[dash] cluster map unavailable; using the directions card")
@@ -391,6 +393,8 @@ Window {
         alarmId: car.warningId
         durationMs: car.warningMs
         seq: car.warningSeq
+        showOnce: true
+        maxMs: 10000
         iconBase: stage.iconBase
         fontName: stage.fontName
     }
@@ -410,6 +414,8 @@ Window {
         }
         durationMs: car.serviceAlertMs
         seq: car.serviceAlertSeq
+        showOnce: true
+        maxMs: 10000
     }
     WarningPopup {       // our own warnings: temperatures, charging, battery
         id: carWarningPopup

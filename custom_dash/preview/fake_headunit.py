@@ -84,7 +84,7 @@ class FakeHeadUnit:
                                                              "sample_cover.jpg"), "rb").read()).decode()
                     self._send({"type": "mediaart", "art": "data:image/jpeg;base64," + art})
             # size of the map in the cluster video (the head unit's wide stream: 1280x480 drawn)
-            self._send({"type": "clustermap", "width": 1280, "height": 480})
+            self._send({"type": "clustermap", "width": 1280, "height": 480, "videoWidth": 1280, "videoHeight": 720})
             if MODE.startswith("limit"):   # e.g. limit60: the road's speed limit from SpeedLimits
                 self._send({"type": "limit", "kph": int(MODE[5:])})
             if MODE == "school":           # a school-zone limit in force

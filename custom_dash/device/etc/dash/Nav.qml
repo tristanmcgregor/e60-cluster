@@ -71,6 +71,8 @@ Item {
     // size of the map the phone draws in the cluster video (head unit "clustermap" message)
     property int mapWidth: 800
     property int mapHeight: 480
+    property int videoWidth: 0      // whole video; 0 = not reported (ClusterMap works it out)
+    property int videoHeight: 0
 
     function apply(msg) {
         var d
@@ -82,6 +84,8 @@ Item {
         if (d.type === "clustermap") {
             mapWidth = d.width || 800
             mapHeight = d.height || 480
+            videoWidth = d.videoWidth || 0
+            videoHeight = d.videoHeight || 0
             return
         }
         if (d.type === "limit") {

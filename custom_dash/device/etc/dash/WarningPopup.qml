@@ -18,6 +18,12 @@ Item {
     property string customIcon: ""
 
     property bool forceCritical: false     // red strip for a custom message (CarWarnings)
+    // Show each message only once until forget() (the dash calls it when the ignition comes
+    // on), however often the MCU repeats it; the warning light stays on in the status row.
+    property bool showOnce: false
+    property int maxMs: 0                  // longest time on screen; 0 = as long as asked
+    property var seen: ({})
+    function forget() { seen = {} }
     readonly property bool critical: forceCritical || (customText === "" && Notify.critical(alarmId))
     property bool shown: false
 
@@ -31,10 +37,15 @@ Item {
     transform: Translate { y: pop.shown ? 0 : 14; Behavior on y { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } } }
 
     onSeqChanged: {
-        // like the stock UI: shown only while the MCU gives it a duration
+        // shown only while the MCU gives it a duration (like the stock UI), at most maxMs
         if ((alarmId <= 0 && customText === "") || durationMs <= 0) { shown = false; return }
+        if (showOnce) {
+            var key = customText !== "" ? customText : "id" + alarmId
+            if (seen[key]) return
+            seen[key] = true
+        }
         shown = true
-        hide.interval = durationMs
+        hide.interval = maxMs > 0 ? Math.min(durationMs, maxMs) : durationMs
         hide.restart()
     }
     Timer { id: hide; onTriggered: pop.shown = false }

@@ -15,10 +15,10 @@ Item {
     // speed group (km/h, mph, rpm) - clamped like the stock UI
     property int speed: 0
     property int speedMph: 0
-    // Calibration: the MCU's speed reads 6% low against GPS, so scale it up for display.
+    // Calibration: the MCU's speed reads about 6% high, so scale it down for display.
     // speedFactor is the learned GPS correction (GpsCheck) when "Learn from GPS" is on and
     // enough steady driving has been measured, else the manual percentage.
-    property real manualCorrection: 6
+    property real manualCorrection: -6
     property bool speedAuto: true
     property real learnedCorrection: NaN
     property real speedRelearn: 0        // phone "Start learning again" stamp; GpsCheck resets on a new one
@@ -158,7 +158,10 @@ Item {
     // Settings from the phone settings page (head unit CarSettings). Applied live, and kept
     // with LocalStorage so the next start-up uses them before the head unit is reachable.
     function applySettings(s, store) {
-        if (s.speedCorrection !== undefined) manualCorrection = Number(s.speedCorrection)
+        // settings without a version come from head unit builds whose default was +6 %; that
+        // default is now -6 % (CarSettings version 2), so a +6 from them is read as -6
+        if (s.speedCorrection !== undefined)
+            manualCorrection = s.version === undefined && Number(s.speedCorrection) === 6 ? -6 : Number(s.speedCorrection)
         if (s.speedAuto !== undefined) speedAuto = s.speedAuto === true
         if (s.speedRelearn !== undefined) speedRelearn = Number(s.speedRelearn) || 0
         if (s.sport !== undefined) sportSetting = s.sport

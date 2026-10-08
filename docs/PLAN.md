@@ -68,6 +68,10 @@ Doing it would need sniffing the E60 CCC→HUD navigation CAN messages from a wo
 ## Built after release 6 (not yet released)
 
 - **Automatic speed correction:** the cluster learns the correction from GPS (GpsCheck: steady driving above 40 km/h, GPS/MCU within 25 %), kept across drives in LocalStorage, halved past an hour of samples so tyre changes work in. Used once 2 minutes are measured; the manual % applies until then or with "Learn correction from GPS" off. "Start learning again" in the phone settings clears it. The developer page shows the measured value and which one is in use. The HUD still shows the uncorrected MCU speed.
+- **Speed correction now −6 %:** the speedo read high with +6 %, so the default manual correction is −6 % (dash and head unit). A stored +6 from older settings (no `version`) is read as −6; anything else set on the phone is kept. A GPS-learned value still takes over once measured, with learning on.
+- **Live map position fix:** Android Auto centres the map between equal margins, so the wide 1280×720 stream has its 1280×480 map at y 120, not at the top. The cluster cropped from the top: a black strip over the map and the car arrow cut off. ClusterMap now crops the centred area; the head unit's `clustermap` message also carries `videoWidth`/`videoHeight` (older builds: the dash infers 1280×720 / 800×480). Dash-only fix; the native plugin is unchanged.
+- **Check-control messages once per drive:** a message the MCU keeps repeating is shown once (at most 10 s) and not again until the ignition next comes on; service reminders the same. The warning light stays in the status row. Preview scene `msg_repeat`.
+- **Head unit (open-headunit `e60`):** −6 % default with the settings migration, and `videoWidth`/`videoHeight` in `clustermap`. Needs a head unit release as well as the dash one.
 
 ## Next: custom home screen for the head unit
 
@@ -121,7 +125,7 @@ Doing it would need sniffing the E60 CCC→HUD navigation CAN messages from a wo
 
 ## Backlog
 
-- **HUD speed:** if the drive confirms the HUD reads ~6% low, patch the cluster MCU firmware (`jly_can1293.bin`) to ×1.06. Rework the September speedfix (it divides; it needs to multiply). Trace that the HUD message uses the patched value, then remove the dash's ×1.06. Original firmware is the fallback.
+- **HUD speed:** (the speedo was found to read high, not low; recheck with the GPS check before any of this) if the drive confirms the HUD reads ~6% low, patch the cluster MCU firmware (`jly_can1293.bin`) to ×1.06. Rework the September speedfix (it divides; it needs to multiply). Trace that the HUD message uses the patched value, then remove the dash's ×1.06. Original firmware is the fallback.
 - Brightness already follows day/night (confirmed by Tristan).
 - **Trip history:** per-drive stats and best times on the settings page.
 - **Parking sensors:** reverse graphic on the cluster, if the developer page shows the radar values are filled in.
