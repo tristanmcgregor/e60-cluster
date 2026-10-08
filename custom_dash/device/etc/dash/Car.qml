@@ -353,8 +353,10 @@ Item {
             car.warningSeq++
         }
         onDoorChanged: {
-            car.doorFL = hub.lfDoor !== 0
-            car.doorFR = hub.rfDoor !== 0
+            // this car's MCU reports the front doors swapped (opening the driver's door, front
+            // right, shows as lfDoor); the rear doors are the right way round
+            car.doorFL = hub.rfDoor !== 0
+            car.doorFR = hub.lfDoor !== 0
             car.doorRL = hub.lrDoor !== 0
             car.doorRR = hub.rrDoor !== 0
             car.trunkOpen = hub.trunk !== 0

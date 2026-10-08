@@ -13,6 +13,7 @@ Item {
     property bool mph: false
     property bool mapStreaming: false     // set by Dashboard when the live map has a picture
     property bool dimmed: false           // a check-control message is showing over the page
+    property bool cleared: false          // the door picture is showing: page fully out
     property var fuel                     // FuelTracker, for the FUEL page
     property var updates                  // UpdateWatch, for the INFO page
     property var gps                      // GpsCheck, for the DEVELOPER page
@@ -101,7 +102,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
         height: parent.height - header.height - 12
-        opacity: menu.dimmed ? 0.08 : 1
+        opacity: menu.cleared ? 0 : menu.dimmed ? 0.08 : 1
         Behavior on opacity { NumberAnimation { duration: 220 } }
 
         TripCard {

@@ -317,10 +317,20 @@ def main():
         def snap():
             from PyQt5 import sip
             from PyQt5.QtQuick import QQuickWindow
-            img = sip.cast(win, QQuickWindow).grabWindow()
-            print("grab", img.width(), img.height(), img.isNull(), "saved", img.save(os.path.abspath(args.shot)))
-            print("wrote", args.shot)
-            app.quit()
+            w = sip.cast(win, QQuickWindow)
+            img = w.grabWindow()
+            if not img.isNull():
+                print("grab", img.width(), img.height(), "saved", img.save(os.path.abspath(args.shot)))
+                print("wrote", args.shot)
+                app.quit()
+                return
+            # no OpenGL (headless, e.g. QT_QUICK_BACKEND=software): grab the scene instead
+            res = w.contentItem().grabToImage()
+            def done():
+                print("grab (item)", "saved", res.saveToFile(os.path.abspath(args.shot)))
+                print("wrote", args.shot)
+                app.quit()
+            res.ready.connect(done)
         QTimer.singleShot(int(args.time * 1000), snap)
     sys.exit(app.exec_())
 

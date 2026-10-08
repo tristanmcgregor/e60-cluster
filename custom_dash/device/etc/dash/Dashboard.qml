@@ -157,7 +157,7 @@ Window {
         x: 560; y: stage.lineTop + 2
         width: 800; height: stage.lineBottom - stage.lineTop - 4
         color: "#000000"
-        opacity: centreMenu.onNavPage || stage.fullMap ? 0 : 0.72
+        opacity: (centreMenu.onNavPage && !car.anyDoorOpen) || stage.fullMap ? 0 : 0.72
         Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     // ── live Android Auto map: fills the band, edges tucked behind the dials (drawn after it)
@@ -168,6 +168,8 @@ Window {
         width: stage.fullMap ? 1920 : 800; height: stage.fullMap ? 720 : stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
+        opacity: car.anyDoorOpen && !stage.fullMap ? 0.2 : 1     // under the door picture
+        Behavior on opacity { NumberAnimation { duration: 220 } }
         visible: status === Loader.Ready && item.streaming && (stage.fullMap || (centreMenu.onNavPage && !car.sportMode))
         onLoaded: {
             item.host = Qt.binding(function() { return navData.gateway })
@@ -389,6 +391,7 @@ Window {
         fuel: fuelTracker
         updates: updateWatch
         gps: gpsCheck
+        cleared: car.anyDoorOpen
         dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
                 || updatePopup.shown || cameraPopup.shown || schoolPopup.shown
     }
@@ -501,17 +504,15 @@ Window {
         durationMs: 8000
         seq: updateWatch.seq
     }
-    Rectangle {          // backdrop so the door picture sits on its own over the menu
-        x: 700; y: stage.lineTop + 2
-        width: 520; height: stage.lineBottom - stage.lineTop - 4
-        visible: doors.visible
-        color: "#e6000000"
-    }
+    // door picture: the centre page fades out under it (centreMenu.cleared) and the band's own
+    // darkening stays on, rather than a hard-edged box behind it
     DoorCard {
         id: doors
         anchors.horizontalCenter: parent.horizontalCenter
         y: 180
-        visible: car.anyDoorOpen
+        opacity: car.anyDoorOpen ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { NumberAnimation { duration: 220 } }
         fl: car.doorFL; fr: car.doorFR; rl: car.doorRL; rr: car.doorRR
         trunk: car.trunkOpen; hood: car.hoodOpen
         fontName: stage.fontName
