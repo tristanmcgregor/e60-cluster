@@ -77,6 +77,9 @@ SCENES = {
     "page_fuel": {"keys": [(13.0, 21), (13.3, 21)], "fastfuel": True, "fueljump": (20, 75, 6.0), "range": "25", "nav": True},
     "page_vehicle": {"keys": [(1.0, 26), (1.3, 26)]},
     "page_info": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26)]},
+    # BC physically held (the MCU sends plain 26 on press and release; the dash times the hold)
+    "fullmap_hold": {"nav": True, "map": True, "fh": "limit60", "keys": [(3.0, 26, 1.5)]},
+    "page_dev_hold": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26), (2.3, 26, 1.2)]},
     "page_dev": {"keys": [(1.0, 26), (1.3, 26), (1.6, 26), (1.9, 26), (2.3, 26 + 128)]},
     "msg": {"warning": (58, 8)},
     # the MCU repeating one check-control message every 3 s: shown once, not again
@@ -203,12 +206,15 @@ def make_hub_class():
             for sig in ("fuelChanged", "waterChanged", "tripChanged", "dashboardChanged", "gearChanged",
                         "cruiseChanged", "resetChanged", "tpmsChanged", "versionNotify"):
                 getattr(self, sig).emit()
-        # scripted button presses: SCENE["keys"] = [(seconds, code), ...], sent as press + release
-        for at, code in SCENE.get("keys", []):
+        # scripted button presses: SCENE["keys"] = [(seconds, code), ...], sent as press + release;
+        # (seconds, code, held seconds) holds the button down that long before the release
+        for key in SCENE.get("keys", []):
+            at, code, held = key if len(key) == 3 else key + (0,)
             if abs(t - at) < 0.026:
                 v["swcKey"], v["swcKeyPress"] = code, True
                 self.swcChanged.emit()
-                v["swcKeyPress"] = False
+            if abs(t - at - held) < 0.026:
+                v["swcKey"], v["swcKeyPress"] = code, False
                 self.swcChanged.emit()
         every = SCENE.get("warningEvery")
         if every and t > 1 and abs((t - 0.5) % every) < 0.026:

@@ -39,7 +39,8 @@ Item {
 
     // tell the MCU which page is up (stock EventHub.MenuId per page; see Car.menuId)
     readonly property var menuIds: ({ TRIP: 257, FUEL: 258, VEHICLE: 519, NAVIGATION: 769, INFO: 1030, DEVELOPER: 1032 })
-    onPageChanged: if (car) car.menuId = menuIds[current]
+    // titles[page], not current: current has not been updated yet when this runs
+    onPageChanged: if (car) car.menuId = menuIds[titles[page]]
 
     Connections {
         target: menu.car
@@ -48,7 +49,7 @@ Item {
             switch (code) {
             case 21: menu.step(-1); break           // left
             case 22: case 26: menu.step(1); break   // right, BC single press
-            case 26 + 128: if (menu.current === "INFO") menu.show("DEVELOPER"); break
+            // hold BC (26 + 128) is handled in Dashboard: DEVELOPER from INFO, else the full map
             }
         }
     }

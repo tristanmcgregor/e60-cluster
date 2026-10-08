@@ -57,7 +57,13 @@ Window {
     Behavior on chrome { NumberAnimation { duration: 350 } }
     Connections {
         target: car
-        onButton: if (code === 26 + 128 && centreMenu.current !== "INFO") {
+        // one handler for the hold, so INFO -> DEVELOPER does not also switch the map
+        onButton: {
+            if (code !== 26 + 128) return
+            if (centreMenu.current === "INFO" && !stage.fullMap) {
+                centreMenu.show("DEVELOPER")
+                return
+            }
             stage.mapMode = !stage.mapMode
             console.log("[dash] full-screen map " + (stage.mapMode ? "on" : "off"))
         }

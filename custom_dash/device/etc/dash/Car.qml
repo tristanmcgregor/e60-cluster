@@ -110,8 +110,11 @@ Item {
 
     // Steering-wheel / stalk buttons. Like the stock UI, a press is reported on release.
     // Codes (from the stock Launcher): 19 up, 20 down, 21 left, 22 right, 23 enter,
-    // 26 single (BC); a hold arrives as code + 128.
+    // 26 single (BC). A hold is reported as code + 128: the dash times the press itself
+    // (held holdMs, sent while still held, the release then swallowed), and also passes on
+    // a code + 128 if the MCU sends one.
     signal button(int code)
+    readonly property int holdMs: 800
 
     // ---- warm-up redline, shift lights, sport layout ----
     // Defaults; the phone settings page (CarSettings on the head unit) can replace them.
@@ -239,6 +242,24 @@ Item {
 
     property int lastButton: 0
     property bool buttonDown: false
+    property int pressCode: 0            // code seen with the press, 0 if the MCU sent none
+    property bool holdSent: false
+    Timer {
+        id: holdTimer
+        interval: car.holdMs
+        onTriggered: {
+            var c = car.pressCode || hub.swcKey
+            if (!car.buttonDown || c <= 0 || c >= 128) return
+            car.holdSent = true
+            car.pressCode = c
+            car.sendButton(c + 128)
+        }
+    }
+    function sendButton(code) {
+        lastButton = code
+        console.log("[dash] button " + code)
+        button(code)
+    }
 
     // fuel group extras
     property string instantFuel: ""
@@ -345,12 +366,22 @@ Item {
         }
         onSwcChanged: {
             if (hub.swcKeyPress) {
+                if (car.buttonDown) return          // repeated while held
                 car.buttonDown = true
+                car.holdSent = false
+                car.pressCode = hub.swcKey
+                holdTimer.restart()
+                console.log("[dash] button " + hub.swcKey + " down")
             } else {
+                var code = hub.swcKey
                 car.buttonDown = false
-                car.lastButton = hub.swcKey
-                console.log("[dash] button " + hub.swcKey)
-                car.button(hub.swcKey)
+                holdTimer.stop()
+                if (car.holdSent) {
+                    car.holdSent = false
+                    // the hold already went out; the release (plain or + 128) is not a second press
+                    if (code === car.pressCode || code === car.pressCode + 128) return
+                }
+                car.sendButton(code)
             }
         }
         onCruiseChanged: {
