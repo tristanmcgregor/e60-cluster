@@ -10,7 +10,9 @@ Item {
     property rect sourceRect
     readonly property bool connected: host !== ""
     readonly property bool streaming: host !== ""
-    readonly property int framesDecoded: 0
+    property int framesDecoded: 0
+    property bool paused: false              // tests: stop "frames" like a still Android Auto map
+    Timer { interval: 100; repeat: true; running: item.host !== "" && !item.paused; onTriggered: item.framesDecoded++ }
 
     Canvas {
         anchors.fill: parent

@@ -27,7 +27,19 @@ Item {
         return Qt.size(mapWidth, mapHeight)
     }
     property bool full: false
-    readonly property bool streaming: video.streaming
+    // Android Auto only sends a frame when the picture changes, so a still map (stopped at
+    // lights) can go quiet for a while. The plugin's own "streaming" drops after 2 s without a
+    // frame, which hid the map (and left full-screen map mode) until the next one. Keep the
+    // last picture up while connected, and only give up after idleMs without a frame.
+    property int idleMs: 15000
+    property bool hasPicture: false
+    readonly property bool streaming: hasPicture && video.connected
+    Connections {
+        target: video
+        onFramesDecodedChanged: { map.hasPicture = true; idle.restart() }
+        onConnectedChanged: if (!video.connected) map.hasPicture = false
+    }
+    Timer { id: idle; interval: map.idleMs; onTriggered: map.hasPicture = false }
 
     // centred crop of the drawn map with the aspect ratio of the area it fills, in video pixels
     readonly property real aspect: full ? 1920 / 720 : 800 / 476
@@ -45,6 +57,6 @@ Item {
         host: map.host
         port: 8766
         sourceRect: map.crop
-        visible: streaming
+        visible: map.streaming
     }
 }
