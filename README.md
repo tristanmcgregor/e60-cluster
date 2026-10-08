@@ -18,7 +18,7 @@ Custom software for a BMW E60 with a JLY aftermarket digital instrument cluster 
 | `updater/` | Release tool and the update protocol (`PROTOCOL.md`) |
 | `phone_updater/` | Phone app: downloads releases over mobile data and pushes them to the car |
 
-The head unit app is a fork of [Open Headunit](https://github.com/andreknieriem/open-headunit) (AGPL-3.0), kept on the [`e60` branch of tristanmcgregor/open-headunit](https://github.com/tristanmcgregor/open-headunit/tree/e60).
+The head unit app is a fork of [Open Headunit](https://github.com/andreknieriem/open-headunit) (AGPL-3.0), kept on the `main` branch of [tristanmcgregor/open-headunit](https://github.com/tristanmcgregor/open-headunit) (merged with upstream 3.5.0-beta3; the old `e60` branch is retired). Both repos use `main` only.
 
 ## Releasing
 
