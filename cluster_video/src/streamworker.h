@@ -1,8 +1,10 @@
 // Network + decode thread: reads [u32 BE length][Annex-B access unit] from the
-// head unit, decodes with OpenH264, converts the cropped region to RGB.
+// head unit, decodes with OpenH264, converts the cropped region to RGB. Sends 'K' back
+// when the picture broke and it needs a keyframe.
 #pragma once
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QImage>
 #include <QObject>
 #include <QRect>
@@ -34,7 +36,8 @@ private slots:
 private:
     bool openDecoder();
     void closeDecoder();
-    void decode(const QByteArray &au);
+    void decode(const QByteArray &au, bool show);
+    void askKeyframe();
     QImage toRgb(unsigned char *const planes[3], const int strides[2], int width, int height);
 
     QString m_host;
@@ -45,4 +48,6 @@ private:
     QByteArray m_buffer;
     ISVCDecoder *m_decoder = nullptr;
     bool m_stopping = false;
+    bool m_waitIdr = true;
+    QElapsedTimer m_askClock;
 };

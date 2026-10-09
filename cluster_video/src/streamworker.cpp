@@ -1,6 +1,7 @@
 #include "streamworker.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QTcpSocket>
 #include <QTimer>
 #include <QtEndian>
@@ -10,6 +11,18 @@
 namespace {
 const int kMaxUnitBytes = 1 << 20;     // matches ClusterVideo.MAX_AU_BYTES on the head unit
 const int kRetryMs = 2000;
+const qint64 kAskEveryMs = 500;        // 'K' to the head unit at most this often
+
+inline bool hasIdr(const QByteArray &au)
+{
+    const uchar *p = reinterpret_cast<const uchar *>(au.constData());
+    for (int i = 0; i + 3 < au.size(); ++i)
+        if (p[i] == 0 && p[i + 1] == 0 && p[i + 2] == 1) {
+            if ((p[i + 3] & 0x1f) == 5) return true;
+            i += 2;
+        }
+    return false;
+}
 
 inline unsigned char clamp255(int v) { return static_cast<unsigned char>(v < 0 ? 0 : (v > 255 ? 255 : v)); }
 }
@@ -62,7 +75,8 @@ void StreamWorker::reconnect()
     if (m_socket->state() != QAbstractSocket::UnconnectedState)
         return;
     m_buffer.clear();
-    closeDecoder();            // a new connection starts with SPS/PPS + IDR replay
+    closeDecoder();            // a new connection starts with SPS/PPS + IDR
+    m_waitIdr = true;
     m_socket->connectToHost(m_host, static_cast<quint16>(m_port));
 }
 
@@ -89,7 +103,13 @@ void StreamWorker::onReadyRead()
             return;
         const QByteArray au = m_buffer.mid(4, static_cast<int>(len));
         m_buffer.remove(0, static_cast<int>(4 + len));
-        decode(au);
+        // Behind (another whole unit already waiting): decode only, convert just the newest.
+        bool more = false;
+        if (m_buffer.size() >= 4) {
+            const quint32 next = qFromBigEndian<quint32>(reinterpret_cast<const uchar *>(m_buffer.constData()));
+            more = static_cast<quint32>(m_buffer.size()) >= 4 + next;
+        }
+        decode(au, !more);
     }
 }
 
@@ -127,20 +147,33 @@ void StreamWorker::closeDecoder()
     m_decoder = nullptr;
 }
 
-void StreamWorker::decode(const QByteArray &au)
+// Draws nothing from a broken reference chain: after any decode error the last good picture stays
+// up until a keyframe decodes cleanly, and the head unit is asked for one ('K') so that is soon.
+void StreamWorker::decode(const QByteArray &au, bool show)
 {
     if (!openDecoder())
         return;
+    const bool idr = hasIdr(au);
     unsigned char *planes[3] = { nullptr, nullptr, nullptr };
     SBufferInfo info;
     memset(&info, 0, sizeof(info));
     const DECODING_STATE st = m_decoder->DecodeFrameNoDelay(
         reinterpret_cast<const unsigned char *>(au.constData()), au.size(), planes, &info);
-    if (st != dsErrorFree && st != dsRefLost && st != dsBitstreamError) {
-        if (st & dsNoParamSets)
-            return;            // waiting for SPS/PPS
+    if (st != dsErrorFree) {
+        if (!m_waitIdr || idr)
+            qWarning("[clustervideo] decode error 0x%x, holding the picture until a keyframe", st);
+        m_waitIdr = true;
+        askKeyframe();
+        return;
     }
-    if (info.iBufferStatus != 1)
+    if (m_waitIdr) {
+        if (!idr) {
+            askKeyframe();
+            return;
+        }
+        m_waitIdr = false;
+    }
+    if (info.iBufferStatus != 1 || !show)
         return;
     const int w = info.UsrData.sSystemBuffer.iWidth;
     const int h = info.UsrData.sSystemBuffer.iHeight;
@@ -148,6 +181,16 @@ void StreamWorker::decode(const QByteArray &au)
     QImage frame = toRgb(planes, strides, w, h);
     if (!frame.isNull())
         emit frameReady(frame);
+}
+
+void StreamWorker::askKeyframe()
+{
+    if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState)
+        return;
+    if (m_askClock.isValid() && m_askClock.elapsed() < kAskEveryMs)
+        return;
+    m_askClock.start();
+    m_socket->write("K", 1);
 }
 
 // BT.601 limited-range YUV 4:2:0 -> RGB32, only for the crop area (AA's margins are not shown).
