@@ -32,7 +32,7 @@ Column {
         fit: true
         width: 440; label: "DASH"
         value: (parseInt(page.release) > 0 ? "Release " + parseInt(page.release) : "Development build")
-               + (page.updates && page.updates.pending > 0 ? "  ·  " + page.updates.pending + " loads next start" : "")
+               + (page.updates && page.updates.pending > 0 ? "  ·  " + page.updates.pending + " installs when stopped" : "")
     }
     Stat { fit: true; width: 440; label: "EVENTHUB / CAN"; value: page.orDash(page.car.hubVersion) + "  ·  " + page.orDash(page.car.mcuVersion) }
     Stat {

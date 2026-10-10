@@ -27,6 +27,6 @@ python3 updater/release.py --publish            # dash + head unit app
 python3 updater/release.py --dash --publish     # dash only
 ```
 
-The phone updater picks a new release up the next time the phone joins the car's Wi-Fi. The head unit installs the app update once confirmed on its home screen. The cluster switches to the new dash at its next start-up.
+The phone updater picks a new release up the next time the phone joins the car's Wi-Fi. The head unit installs the app update once confirmed on its home screen. The cluster checks every 20 s and switches to the new dash as soon as the car has been stopped for 5 seconds (the dash restarts, a few seconds of black). Each dash release carries its own copy of the live-map plugin, so map fixes also arrive over the air; if that copy will not load, the one installed from USB is used.
 
 Releases are signed with `updater/signing_key.pem`, which stays on the release machine and out of git (keep a backup). The head unit app only accepts uploads that verify against the public key `updater/signing_pub.pem`, so neither app contains a secret. `updater/updater.properties` (not in git) holds local settings such as the JLY USB package password.

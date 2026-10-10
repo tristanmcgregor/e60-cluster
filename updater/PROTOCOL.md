@@ -93,3 +93,16 @@ Besides `nav` and `call`, these messages go to the cluster:
 - `{"type":"mediaart","art":"data:image/jpeg;base64,..."}`: the cover of the current track (128×128 JPEG), sent once per track. An empty `art` clears it.
 
 The latest message of each type is replayed when the cluster connects.
+
+## Applying a dash release (release 10 on)
+
+The dash bundle also carries `ClusterVideo/` (the live-map plugin and a `qmldir` with no
+`module` line, so it loads from whichever `/etc/dashv/N` it is unpacked to). ClusterMap.qml
+imports it through `VideoLocal.qml`, falling back to `/etc/qml/ClusterVideo` (`VideoSystem.qml`).
+
+S61dashupdate checks every 20 s. After an install it writes `/tmp/dash_restart_expected`.
+d.qml sees `/etc/dash_active` change, waits until `car.speed` has been 0 for 5 s and quits;
+the Launcher is respawned by JLY's process.sh, or else by S61dashupdate's guard (same command
+line, environment and directory as the Launcher it last saw), within about 8 s. The guard does
+nothing without a recent install, or when process.sh has stopped too (a JLY USB update).
+d.qml, S61dashupdate and the first plugin-in-bundle support arrive by USB install only.

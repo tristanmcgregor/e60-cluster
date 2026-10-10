@@ -1,13 +1,14 @@
-// Live Android Auto cluster map, decoded by the native ClusterVideo plugin
-// (/etc/qml/ClusterVideo). Dashboard.qml loads this through a Loader, so a missing
-// or broken plugin only means the map never appears; the NavCard still works.
+// Live Android Auto cluster map, decoded by the native ClusterVideo plugin. Each release
+// carries its own copy of the plugin (ClusterVideo/ next to this file, VideoLocal.qml), so
+// an over-the-air update can fix it; if that copy will not load, the one installed from USB
+// (/etc/qml/ClusterVideo, VideoSystem.qml) is used. Dashboard.qml loads this through a
+// Loader, so no working plugin at all only means the map never appears; the NavCard works.
 //
 // The phone draws the map mapWidth x mapHeight (the head unit reports it) centred in the
 // video: Android Auto splits the announced margins evenly, so the wide 1280x720 stream has
 // its 1280x480 map at y 120, not at the top. The crop matches the shape this item is shown
 // at: the 800x476 band between the dials, or the whole 1920x720 panel in full-screen map mode.
 import QtQuick 2.14
-import ClusterVideo 1.0
 
 Item {
     id: map
@@ -33,11 +34,12 @@ Item {
     // last picture up while connected, and only give up after idleMs without a frame.
     property int idleMs: 15000
     property bool hasPicture: false
-    readonly property bool streaming: hasPicture && video.connected
+    readonly property bool streaming: hasPicture && video.status === Loader.Ready && video.item.connected
     Connections {
-        target: video
+        target: video.item
+        ignoreUnknownSignals: true
         onFramesDecodedChanged: { map.hasPicture = true; idle.restart() }
-        onConnectedChanged: if (!video.connected) map.hasPicture = false
+        onConnectedChanged: if (!video.item.connected) map.hasPicture = false
     }
     Timer { id: idle; interval: map.idleMs; onTriggered: map.hasPicture = false }
 
@@ -51,12 +53,22 @@ Item {
         return Qt.rect(x0, y0 + Math.round((h - ch) / 2), w, ch)
     }
 
-    ClusterVideoItem {
+    Loader {
         id: video
         anchors.fill: parent
-        host: map.host
-        port: 8766
-        sourceRect: map.crop
+        source: "VideoLocal.qml"
         visible: map.streaming
+        onStatusChanged: {
+            if (status !== Loader.Error) return
+            if (source.toString().indexOf("VideoLocal.qml") >= 0) {
+                console.warn("[dash] this release's map plugin did not load; using the installed one")
+                source = "VideoSystem.qml"
+            }
+        }
+        onLoaded: {
+            item.host = Qt.binding(function() { return map.host })
+            item.sourceRect = Qt.binding(function() { return map.crop })
+            item.port = 8766
+        }
     }
 }

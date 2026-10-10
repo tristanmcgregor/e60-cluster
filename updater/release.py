@@ -91,6 +91,20 @@ def build_dash(n, outdir):
         for name in sorted(os.listdir(DASH_SRC)):
             if name != "RELEASE":
                 tar.add(os.path.join(DASH_SRC, name), arcname=name, filter=clean)
+        # this release's own copy of the map plugin (ClusterMap.qml's VideoLocal.qml); the
+        # qmldir has no "module" line, so it loads from whichever /etc/dashv/N it lands in
+        plugin = os.path.join(JLY, "cluster_video", "out", "qml", "ClusterVideo")
+        if os.path.isdir(plugin):
+            for name in sorted(os.listdir(plugin)):
+                if name != "qmldir":
+                    tar.add(os.path.join(plugin, name), arcname="ClusterVideo/" + name, filter=clean)
+            qmldir = os.path.join(outdir, "qmldir")
+            with open(qmldir, "w") as f:
+                f.write("plugin clustervideo\n")
+            tar.add(qmldir, arcname="ClusterVideo/qmldir", filter=clean)
+            os.remove(qmldir)
+        else:
+            print("note: cluster_video plugin not built; the bundle has no map plugin of its own")
         rel = os.path.join(outdir, "RELEASE")
         with open(rel, "w") as f:
             f.write(f"{n}\n")

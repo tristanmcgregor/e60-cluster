@@ -1,7 +1,7 @@
 // Notices when /etc/init.d/S61dashupdate installs a newer release during this drive, so
-// the dash can say it loads at the next start-up. Only a change to /etc/dash_active seen
-// while running counts: if a release is already staged at start-up but this dash is an
-// older one, d.qml fell back from it, and "loads next start" would not be true.
+// the dash can say it is about to switch (d.qml restarts onto it once the car is stopped).
+// Only a change to /etc/dash_active seen while running counts: if a release is already
+// staged at start-up but this dash is an older one, d.qml fell back from it.
 import QtQuick 2.14
 
 Item {
@@ -9,7 +9,7 @@ Item {
 
     // the desktop preview points these at a temp file and a quicker poll
     property string activeFile: typeof dashActiveFile !== "undefined" ? dashActiveFile : "file:///etc/dash_active"
-    property int pollMs: typeof dashActiveFile !== "undefined" ? 500 : 30000
+    property int pollMs: typeof dashActiveFile !== "undefined" ? 500 : 2000
     property int running: 0          // release of the loaded dash (InfoPage reads its RELEASE)
     property int pending: 0          // newer release installed this drive, 0 = none
     property int seq: 0              // bumped once per newly installed release, for the popup
@@ -23,7 +23,7 @@ Item {
             var a = parseInt((xhr.responseText || "").trim()) || 0
             if (watch.startActive < 0) { watch.startActive = a; return }
             if (a !== watch.startActive && a > watch.running && a !== watch.pending) {
-                console.log("[dash] release " + a + " installed, loads at next start-up")
+                console.log("[dash] release " + a + " installed, applies when the car is stopped")
                 watch.pending = a
                 watch.seq++
             }
@@ -43,6 +43,6 @@ Item {
         xhr.send()
     }
 
-    // the updater checks once a minute, so this does not need to be quicker
+    // the updater checks every 20 s
     Timer { interval: watch.pollMs; repeat: true; running: true; onTriggered: watch.read() }
 }

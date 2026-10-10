@@ -70,6 +70,11 @@ def main():
             plugin = os.path.join(HERE, "..", "..", "cluster_video", "out", "qml", "ClusterVideo")
             if os.path.isdir(plugin):
                 shutil.copytree(plugin, os.path.join(etc, "qml", "ClusterVideo"))
+                # and the dash's own copy (ClusterMap.qml tries it first, as for OTA releases)
+                own = os.path.join(etc, "dash", "ClusterVideo")
+                shutil.copytree(plugin, own)
+                with open(os.path.join(own, "qmldir"), "w") as f:
+                    f.write("plugin clustervideo\n")
             else:
                 print("note: cluster_video plugin not built; package has no live map")
             # Keep the Wi-Fi startup script in step (it publishes the head unit's address

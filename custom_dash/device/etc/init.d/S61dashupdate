@@ -6,14 +6,17 @@
 # this asks it once a minute for a newer dash bundle. A newer one is downloaded,
 # checked against its sha256 and unpacked into /etc/dashv/<release>; then
 # /etc/dash_active is pointed at it. /etc/d.qml reads that pointer when the
-# Launcher starts, so the new dash appears at the next start-up and never mid-drive.
+# Launcher starts. d.qml notices the new pointer and, once the car has been stopped for
+# a few seconds, quits so the Launcher restarts on the new release; launcher_guard below
+# brings it back if nothing else does (JLY's process.sh normally respawns it).
 # Log: /tmp/dashupdate.log
 
 ETC=${DASH_ETC:-/etc}                       # overridable for testing on a desktop
 GATEWAY_FILE=${DASH_GATEWAY_FILE:-/tmp/nav_gateway}
 TMP=${DASH_TMP:-/tmp}
 PORT=8765
-INTERVAL=60
+INTERVAL=20
+EXPECT=$TMP/dash_restart_expected     # written at install; the guard only acts while it exists
 LOG=$TMP/dashupdate.log
 PIDFILE=$TMP/dashupdate.pid
 
@@ -88,13 +91,69 @@ check_once() {
 		[ "$r" = "$rel" ] || [ "$r" = "$prev" ] || rm -rf $d
 	done
 	sync
-	log "release $rel installed; it loads at the next start-up"
+	date +%s > $EXPECT
+	log "release $rel installed; the dash restarts onto it when the car is stopped"
+}
+
+# Remembers how the running Launcher was started (command line, environment, directory).
+# After an install, if the dash quits to apply it and is not back within 8 s, starts it
+# again the same way. Without a recent install it never starts anything, nor when JLY's
+# process.sh (which runs alongside the Launcher) has gone too: JLY's own USB updater stops
+# both on purpose.
+supervisor() {
+	for f in /proc/[0-9]*/cmdline; do
+		case "$( { tr '\0' ' ' < $f; } 2> /dev/null)" in *process.sh*) echo 1; return ;; esac
+	done
+	echo 0
+}
+launcher_guard() {
+	missing=0
+	while true; do
+		pid=$(pidof Launcher 2> /dev/null | cut -d' ' -f1)
+		if [ -n "$pid" ]; then
+			missing=0
+			if [ "$pid" != "$guard_pid" ] && [ -r /proc/$pid/cmdline ]; then
+				tr '\0' '\n' < /proc/$pid/cmdline > $TMP/launcher.cmd
+				tr '\0' '\n' < /proc/$pid/environ > $TMP/launcher.env 2> /dev/null
+				readlink /proc/$pid/cwd > $TMP/launcher.cwd 2> /dev/null
+				had_supervisor=$(supervisor)
+				[ -n "$guard_pid" ] && [ -f $EXPECT ] && { log "dash restarted (pid $pid)"; rm -f $EXPECT; }
+				guard_pid=$pid
+			fi
+		elif [ -f $EXPECT ] && [ -s $TMP/launcher.cmd ]; then
+			missing=$((missing + 1))
+			if [ $missing -ge 4 ]; then
+				# an install older than 10 minutes is stale: the dash never quit for it
+				if [ $(( $(date +%s) - $(cat $EXPECT) )) -gt 600 ]; then
+					rm -f $EXPECT
+				elif [ "$had_supervisor" = 1 ] && [ "$(supervisor)" = 0 ]; then
+					log "Launcher and process.sh both stopped (JLY update?), not restarting"
+					rm -f $EXPECT
+				else
+					log "dash not back after its restart, starting it"
+					rm -f $EXPECT
+					(
+						cd "$(cat $TMP/launcher.cwd 2> /dev/null || echo /)"
+						while IFS= read -r kv; do case "$kv" in *=*) export "$kv" ;; esac; done < $TMP/launcher.env
+						set --
+						while IFS= read -r a; do set -- "$@" "$a"; done < $TMP/launcher.cmd
+						pidof Launcher > /dev/null 2>&1 && exit 0     # came back meanwhile
+						exec "$@" >> $TMP/Launcher.log 2>&1
+					) &
+				fi
+				missing=0
+			fi
+		fi
+		sleep 2
+	done
 }
 
 watch() {
 	for tool in wget sha256sum gunzip tar; do
 		command -v $tool > /dev/null || log "missing tool: $tool (updates disabled)"
 	done
+	launcher_guard &
+	echo $! > $TMP/dashguard.pid
 	sleep 20
 	while true; do
 		check_once
@@ -112,11 +171,15 @@ case "$1" in
 		;;
 	stop)
 		[ -f $PIDFILE ] && kill $(cat $PIDFILE) 2> /dev/null
-		rm -f $PIDFILE
+		[ -f $TMP/dashguard.pid ] && kill $(cat $TMP/dashguard.pid) 2> /dev/null
+		rm -f $PIDFILE $TMP/dashguard.pid
 		log "stop"
 		;;
 	once)
 		check_once
+		;;
+	guard)          # the restart guard alone, in the foreground (testing)
+		launcher_guard
 		;;
 esac
 exit 0

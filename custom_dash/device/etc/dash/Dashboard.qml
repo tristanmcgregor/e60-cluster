@@ -499,7 +499,7 @@ Window {
         anchors.horizontalCenter: parent.horizontalCenter
         y: stage.lineBottom - height - 26
         visible: opacity > 0.01 && !popup.shown && !carWarningPopup.shown && !fuelPopup.shown && !perfPopup.shown
-        customText: updateWatch.pending > 0 ? "Release " + updateWatch.pending + " ready — loads at next start" : ""
+        customText: updateWatch.pending > 0 ? "Release " + updateWatch.pending + " ready — installs when stopped" : ""
         customIcon: "icons/update.png"
         durationMs: 8000
         seq: updateWatch.seq
