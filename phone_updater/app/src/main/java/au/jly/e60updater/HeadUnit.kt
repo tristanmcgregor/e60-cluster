@@ -16,6 +16,10 @@ data class HeadUnitStatus(
     val dashRelease: Int,
     val speedLimitsRelease: Int,
     val clusterDashRelease: Int,
+    /** The cluster USB package the head unit holds; null when its app predates USB packages. */
+    val usbRelease: Int?,
+    /** The USB package the cluster was last installed from (0: unknown or older than release 11). */
+    val clusterUsbRelease: Int,
 )
 
 /** The car's head unit, reached over the car Wi-Fi network it hosts (it is the gateway). */
@@ -31,6 +35,8 @@ class HeadUnit(val network: Network, private val host: String) {
             dashRelease = json.optInt("dashRelease", 0),
             speedLimitsRelease = json.optInt("speedLimitsRelease", 0),
             clusterDashRelease = json.optInt("clusterDashRelease", 0),
+            usbRelease = if (json.has("usbRelease")) json.optInt("usbRelease", 0) else null,
+            clusterUsbRelease = json.optInt("clusterUsbRelease", 0),
         )
     }
 

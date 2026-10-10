@@ -36,8 +36,11 @@ check_once() {
 	gw=$(cat $GATEWAY_FILE 2> /dev/null)
 	[ -n "$gw" ] || return 0
 	have=$(loaded_release)
+	# usb: the release of the last USB install, so the head unit knows when the cluster needs a
+	# newer USB package (it then copies one onto a stick plugged into it)
+	usb=$(num "$(cat $ETC/dash/RELEASE 2> /dev/null)")
 	rm -f $TMP/dashupd.txt
-	wget -q -T 10 -O $TMP/dashupd.txt "http://$gw:$PORT/dash/manifest.txt?have=$have" 2> /dev/null || return 0
+	wget -q -T 10 -O $TMP/dashupd.txt "http://$gw:$PORT/dash/manifest.txt?have=$have&usb=$usb" 2> /dev/null || return 0
 	rel=$(num "$(sed -n 's/^release=//p' $TMP/dashupd.txt)")
 	sha=$(sed -n 's/^sha256=//p' $TMP/dashupd.txt | tr -cd 0-9a-f)
 	if [ "$rel" -eq 0 ] || [ ${#sha} -ne 64 ]; then

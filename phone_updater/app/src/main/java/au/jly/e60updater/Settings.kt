@@ -48,6 +48,8 @@ class Settings(context: Context) {
             .putInt(KEY_DASH, status.dashRelease)
             .putInt(KEY_SPEED, status.speedLimitsRelease)
             .putInt(KEY_CLUSTER, status.clusterDashRelease)
+            .putInt(KEY_USB, status.usbRelease ?: 0)
+            .putInt(KEY_CLUSTER_USB, status.clusterUsbRelease)
             .putLong(KEY_SEEN, System.currentTimeMillis())
             .apply()
     }
@@ -62,7 +64,8 @@ class Settings(context: Context) {
             "Head unit app: ${v(KEY_APK)} (staged: ${v(KEY_PENDING_APK)})\n" +
             "Dash on the head unit: ${v(KEY_DASH)}\n" +
             "Dash on the cluster: ${v(KEY_CLUSTER)}\n" +
-            "Speed-limit data: ${v(KEY_SPEED)}"
+            "Speed-limit data: ${v(KEY_SPEED)}\n" +
+            "Cluster USB package on the head unit: ${v(KEY_USB)} (cluster has ${v(KEY_CLUSTER_USB)})"
     }
 
     companion object {
@@ -73,6 +76,8 @@ class Settings(context: Context) {
         const val KEY_CAR_PASSWORD = "car.password"
         const val KEY_LOG = "log"
         const val KEY_APK = "hu.apkRelease"
+        const val KEY_USB = "hu.usbRelease"
+        const val KEY_CLUSTER_USB = "hu.clusterUsbRelease"
         const val KEY_PENDING_APK = "hu.pendingApkRelease"
         const val KEY_DASH = "hu.dashRelease"
         const val KEY_SPEED = "hu.speedLimitsRelease"

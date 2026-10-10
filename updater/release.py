@@ -11,7 +11,10 @@ in the format of updater/PROTOCOL.md. --publish uploads them as GitHub release v
 using the gh CLI and github.repo from updater/updater.properties.
 
 Also rebuilds the USB package (custom_dash/out/install/dashboard.zip) stamped with the
-same release, so a USB install and the over-the-air copy agree on what is newest.
+same release, so a USB install and the over-the-air copy agree on what is newest. When the
+parts only a USB install can deliver (Launcher, d.qml, init scripts, Wi-Fi) differ from the
+last published USB package (updater/usb_base), or with --usb, the package goes into the
+release as "usb"; the head unit then copies it onto a USB stick for the cluster.
 """
 import argparse
 import base64
@@ -29,6 +32,9 @@ JLY = os.path.dirname(HERE)
 DASH_SRC = os.path.join(JLY, "custom_dash", "device", "etc", "dash")
 HEADUNIT = os.path.join(JLY, "headunit", "open-headunit")
 COUNTER = os.path.join(HERE, "last_release")
+USB_BASE = os.path.join(HERE, "usb_base")     # "<release>\n<usb_digest>\n" of the last published USB package
+CUSTOM_DASH = os.path.join(JLY, "custom_dash")
+LAUNCHER = os.path.join(CUSTOM_DASH, "out", "Launcher_r19917_customdash")
 GH = shutil.which("gh") or os.path.expanduser("~/tools/gh/bin/gh")
 
 
@@ -113,6 +119,22 @@ def build_dash(n, outdir):
     return path
 
 
+def usb_digest():
+    """Hash of what only a USB install delivers (the dash itself and its map plugin come over the air)."""
+    etc = os.path.join(CUSTOM_DASH, "device", "etc")
+    wifi = os.path.join(JLY, "wifi_driver", "pkg", "install", "dashboard", "etc")
+    paths = [LAUNCHER, os.path.join(CUSTOM_DASH, "device_etc_model"), os.path.join(etc, "d.qml"),
+             os.path.join(etc, "init.d", "S61dashupdate")]
+    for root, dirs, names in os.walk(wifi):
+        dirs.sort()
+        paths += [os.path.join(root, n) for n in sorted(names) if n != ".DS_Store"]
+    h = hashlib.sha256()
+    for p in paths:
+        h.update(os.path.relpath(p, JLY).encode() + b"\0")
+        h.update(sha256(p).encode() if os.path.isfile(p) else b"-")
+    return h.hexdigest()
+
+
 def build_env():
     env = dict(os.environ)
     jdk = os.path.expanduser("~/tools/jdk")
@@ -171,10 +193,14 @@ def main():
     ap.add_argument("--dash", action="store_true", help="include a dash bundle")
     ap.add_argument("--apk", action="store_true", help="include the head unit APK")
     ap.add_argument("--speedlimits", action="store_true", help="include fresh speed-limit data")
+    ap.add_argument("--usb", action="store_true",
+                    help="include the cluster USB package even if its USB-only parts are unchanged (implies --dash)")
     ap.add_argument("--osm-cache", help="reuse OpenStreetMap tiles from this folder instead of downloading")
     ap.add_argument("--publish", action="store_true", help="upload as a GitHub release")
     ap.add_argument("--notes", default="", help="release notes")
     args = ap.parse_args()
+    if args.usb:
+        args.dash = True
     if not args.dash and not args.apk and not args.speedlimits:
         args.dash = args.apk = True
 
@@ -199,11 +225,22 @@ def main():
                             "sig": sign("dash", n, digest)}
         files.append(f)
         # USB package stamped with the same release
-        subprocess.run([sys.executable, os.path.join(JLY, "custom_dash", "tools", "build_dash_package.py"),
-                        "install", "out/Launcher_r19917_customdash", "device_etc_model",
-                        "out/install/dashboard.zip"],
-                       cwd=os.path.join(JLY, "custom_dash"), env=dict(os.environ, DASH_RELEASE=str(n)),
+        usb_zip = os.path.join(CUSTOM_DASH, "out", "install", "dashboard.zip")
+        subprocess.run([sys.executable, os.path.join(CUSTOM_DASH, "tools", "build_dash_package.py"),
+                        "install", LAUNCHER, "device_etc_model", usb_zip],
+                       cwd=CUSTOM_DASH, env=dict(os.environ, DASH_RELEASE=str(n)),
                        check=True, stdout=subprocess.DEVNULL)
+        usb_hash = usb_digest()
+        base = open(USB_BASE).read().split() if os.path.isfile(USB_BASE) else []
+        if args.usb or base[1:2] != [usb_hash]:
+            f = os.path.join(outdir, f"dashboard-{n}.zip")
+            shutil.copy2(usb_zip, f)
+            digest = sha256(f)
+            manifest["usb"] = {"name": os.path.basename(f), "sha256": digest, "size": os.path.getsize(f),
+                               "sig": sign("usb", n, digest)}
+            files.append(f)
+        else:
+            print(f"USB-only parts unchanged since release {base[0]}; no USB package in this release")
     if args.apk:
         f = build_apk(n, outdir)
         digest = sha256(f)
@@ -224,11 +261,14 @@ def main():
 
     if args.publish:
         title = f"E60 v{n}"
-        notes = args.notes or ", ".join(k for k in ("dash", "apk", "speedlimits") if k in manifest)
+        notes = args.notes or ", ".join(k for k in ("dash", "apk", "speedlimits", "usb") if k in manifest)
         subprocess.run([GH, "release", "create", f"v{n}", "--repo", repo, "--title", title,
                         "--notes", notes] + files, check=True)
         with open(COUNTER, "w") as fh:     # only published numbers count
             fh.write(f"{n}\n")
+        if "usb" in manifest:
+            with open(USB_BASE, "w") as fh:
+                fh.write(f"{n}\n{usb_hash}\n")
     print(json.dumps(manifest, indent=1))
     print(f"release {n} in {outdir}" + (" (published)" if args.publish else " (not published)"))
 

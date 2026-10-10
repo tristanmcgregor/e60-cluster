@@ -62,7 +62,10 @@ class Updater(
         // A staged APK counts as present, so we do not upload the same release again.
         val apkHave = maxOf(status.apkRelease, status.pendingApkRelease)
         // Upload order: the APK last, because installing it may restart the head unit app.
-        val have = linkedMapOf("dash" to status.dashRelease, "speedlimits" to status.speedLimitsRelease, "apk" to apkHave)
+        // The cluster USB package only goes to a head unit app that knows the kind.
+        val have = linkedMapOf("dash" to status.dashRelease, "speedlimits" to status.speedLimitsRelease)
+        status.usbRelease?.let { have["usb"] = it }
+        have["apk"] = apkHave
         val files = InternetNetwork.acquire(cm, car.network)?.use { internet ->
             val github = GitHub(internet.network, repo, settings.token)
             val picks = github.pick(have, settings::log)
