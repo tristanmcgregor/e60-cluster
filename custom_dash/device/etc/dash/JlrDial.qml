@@ -146,11 +146,13 @@ Item {
         }
     }
 
-    // bottom-gap mini gauge: segments across the gap, filling left to right
+    // bottom-gap mini gauge: one continuous bar across the gap, filling left to right.
+    // The low end (fuel reserve / cold) and high end (hot) keep their colour bands.
     Canvas {
         anchors.fill: parent
         renderStrategy: Canvas.Cooperative
-        property real f: dial.gapFrac
+        property real f: Math.max(0, Math.min(1, dial.gapFrac))
+        Behavior on f { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
         property bool w: dial.gapWarn
         onFChanged: requestPaint()
         onWChanged: requestPaint()
@@ -158,25 +160,32 @@ Item {
             var ctx = getContext("2d")
             ctx.reset()
             var R = dial.r
-            var n = 6
             var gap = 360 - dial.sweepDeg
             var left = dial.startDeg - 6            // bottom-left end of the gap
             var span = gap - 12
+            var zone = 1 / 6                        // width of the coloured end bands
+            var twoEnds = dial.gapHighColor !== dial.gapLowColor
             ctx.lineWidth = R * 0.03
-            for (var i = 0; i < n; i++) {
-                var hi = dial.rad(left - span * i / n - 1.5)
-                var lo = dial.rad(left - span * (i + 1) / n + 1.5)
-                var lit = (i + 0.5) / n <= f
-                var c
-                if (i === 0) c = dial.gapLowColor
-                else if (i === n - 1 && dial.gapHighColor !== dial.gapLowColor) c = dial.gapHighColor
-                else c = Theme.inkTick
-                if (dial.w && lit) c = "#ff3b30"
-                ctx.strokeStyle = lit || i === 0 || (i === n - 1 && dial.gapHighColor !== dial.gapLowColor) ? c : "#2a2e33"
-                ctx.globalAlpha = lit ? 1.0 : 0.45
+            ctx.lineCap = "butt"
+            function band(from, to, colour, alpha) {     // fractions 0..1 along the gap
+                if (to <= from) return
+                ctx.strokeStyle = colour
+                ctx.globalAlpha = alpha
                 ctx.beginPath()
-                ctx.arc(dial.r, dial.r, R * 0.86, lo, hi, false)
+                ctx.arc(dial.r, dial.r, R * 0.86, dial.rad(left - span * to), dial.rad(left - span * from), false)
                 ctx.stroke()
+            }
+            // unlit track, with the end bands faintly coloured
+            band(0, 1, "#2a2e33", 0.6)
+            band(0, zone, dial.gapLowColor, 0.45)
+            if (twoEnds) band(1 - zone, 1, dial.gapHighColor, 0.45)
+            // lit part
+            if (dial.w) {
+                band(0, f, "#ff3b30", 1.0)
+            } else {
+                band(0, f, Theme.inkTick, 1.0)
+                band(0, Math.min(f, zone), dial.gapLowColor, 1.0)
+                if (twoEnds) band(1 - zone, f, dial.gapHighColor, 1.0)
             }
             ctx.globalAlpha = 1.0
         }

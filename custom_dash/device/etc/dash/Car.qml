@@ -182,6 +182,10 @@ Item {
         if (s.fuelReserveKm !== undefined) fuelReserveKm = s.fuelReserveKm
         if (s.mapAuto !== undefined) mapAuto = s.mapAuto === true
         if (s.theme !== undefined) Theme.classic = s.theme === "classic"
+        if (s.tripBReset !== undefined && Number(s.tripBReset) > tripBResetStamp) {
+            pendingTripBReset = Number(s.tripBReset)
+            resetTripB(pendingTripBReset)
+        }
         settingsApplied()
         if (store) {
             try {
@@ -203,11 +207,18 @@ Item {
         try {
             settingsDb().readTransaction(function(tx) {
                 var r = tx.executeSql("SELECT v FROM kv WHERE k = 'settings'")
+                var t = tx.executeSql("SELECT v FROM kv WHERE k = 'tripB'")
+                if (t.rows.length) {
+                    var b = JSON.parse(t.rows.item(0).v)
+                    car.tripBBaseKm = Number(b.base)
+                    car.tripBResetStamp = Number(b.stamp) || 0
+                }
                 if (r.rows.length) car.applySettings(JSON.parse(r.rows.item(0).v), false)
             })
         } catch (e) {
             console.warn("[dash] no stored settings: " + e)
         }
+        car.tripBLoaded = true
     }
 
     // The EventHub object itself, for the developer page (read-only use).
@@ -264,8 +275,41 @@ Item {
     // fuel group extras
     property string instantFuel: ""
     property string instantFuelUnit: ""
-    property string tripB: ""
-    property string tripBMiles: ""
+    // Trip B: the E60 has one trip counter, and the MCU sends it as both A and B, so the dash
+    // keeps B itself from the odometer, reset from the phone settings ("Reset Trip B").
+    property real odoKm: -1
+    property real tripBBaseKm: -1         // odometer at the last reset, -1 = not yet known
+    property real tripBResetStamp: 0      // phone stamp of the last reset applied here
+    readonly property real tripBKm: odoKm >= 0 && tripBBaseKm >= 0 ? Math.max(0, odoKm - tripBBaseKm) : -1
+    readonly property string tripB: tripBKm >= 0 ? Math.round(tripBKm) + " km" : ""
+    readonly property string tripBMiles: tripBKm >= 0 ? Math.round(tripBKm / 1.609344) + " mi" : ""
+    function storeTripB() {
+        try {
+            settingsDb().transaction(function(tx) {
+                tx.executeSql("INSERT OR REPLACE INTO kv VALUES ('tripB', ?)",
+                              [JSON.stringify({ base: car.tripBBaseKm, stamp: car.tripBResetStamp })])
+            })
+        } catch (e) {
+            console.warn("[dash] trip B not stored: " + e)
+        }
+    }
+    function resetTripB(stamp) {
+        if (car.odoKm < 0) return false     // no odometer yet; tried again when one arrives
+        car.tripBBaseKm = car.odoKm
+        car.tripBResetStamp = stamp
+        storeTripB()
+        console.log("[dash] trip B reset at " + car.odoKm + " km")
+        return true
+    }
+    property real pendingTripBReset: 0
+    property bool tripBLoaded: false      // stored base read; until then an odometer reading waits
+    onOdoKmChanged: checkTripB()
+    onTripBLoadedChanged: checkTripB()
+    function checkTripB() {
+        if (odoKm < 0 || !tripBLoaded) return
+        if (pendingTripBReset > tripBResetStamp) resetTripB(pendingTripBReset)
+        else if (tripBBaseKm < 0 || odoKm < tripBBaseKm) resetTripB(tripBResetStamp)   // first run, or a new odometer
+    }
 
     // cruise control
     property bool cruiseActive: false
@@ -308,8 +352,8 @@ Item {
             car.odoMiles = hub.odoM
             car.tripA = hub.tripA
             car.tripAMiles = hub.tripAmile
-            car.tripB = hub.tripB
-            car.tripBMiles = hub.tripBmile
+            var km = parseFloat(String(hub.odo).replace(/[^0-9.]/g, ""))
+            if (km > 0) car.odoKm = km
         }
         onDashboardChanged: {
             car.outsideTemp = hub.outsideTemp

@@ -161,11 +161,20 @@ Window {
         Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     // ── live Android Auto map: fills the band, edges tucked behind the dials (drawn after it)
+    // Full-screen map mode: the whole map the phone draws, scaled to fit below the status row
+    // (clock, warning lights) and centred. Filling the panel edge to edge put the top of the
+    // map, where Android Auto draws its turn card and street names, under the status row and
+    // the top edge of the cluster.
+    readonly property real fullMapTop: 140
+    readonly property real fullMapH: 720 - fullMapTop
+    readonly property real fullMapW: Math.min(1920, Math.round(fullMapH * navData.mapWidth / Math.max(1, navData.mapHeight)))
     Loader {
         id: mapLoader
-        // the band between the dials, or the whole panel in full-screen map mode
-        x: stage.fullMap ? 0 : 560; y: stage.fullMap ? 0 : stage.lineTop + 2
-        width: stage.fullMap ? 1920 : 800; height: stage.fullMap ? 720 : stage.lineBottom - stage.lineTop - 4
+        // the band between the dials, or the area below the status row in full-screen map mode
+        x: stage.fullMap ? Math.round((1920 - stage.fullMapW) / 2) : 560
+        y: stage.fullMap ? stage.fullMapTop : stage.lineTop + 2
+        width: stage.fullMap ? stage.fullMapW : 800
+        height: stage.fullMap ? stage.fullMapH : stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
         opacity: car.anyDoorOpen && !stage.fullMap ? 0.2 : 1     // under the door picture

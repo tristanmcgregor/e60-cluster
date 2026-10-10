@@ -6,7 +6,7 @@ Item {
     width: 1920
     height: 720
     Rectangle {
-        width: parent.width; height: 190
+        width: parent.width; height: 165     // the map starts at y 140, below the status row
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#e6000000" }
             GradientStop { position: 1.0; color: "#00000000" }

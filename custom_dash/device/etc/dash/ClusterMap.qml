@@ -7,7 +7,8 @@
 // The phone draws the map mapWidth x mapHeight (the head unit reports it) centred in the
 // video: Android Auto splits the announced margins evenly, so the wide 1280x720 stream has
 // its 1280x480 map at y 120, not at the top. The crop matches the shape this item is shown
-// at: the 800x476 band between the dials, or the whole 1920x720 panel in full-screen map mode.
+// at: the 800x476 band between the dials, or in full-screen map mode the area below the status
+// row, sized by Dashboard.qml to the map's own shape so nothing is cut off.
 import QtQuick 2.14
 
 Item {
@@ -44,7 +45,7 @@ Item {
     Timer { id: idle; interval: map.idleMs; onTriggered: map.hasPicture = false }
 
     // centred crop of the drawn map with the aspect ratio of the area it fills, in video pixels
-    readonly property real aspect: full ? 1920 / 720 : 800 / 476
+    readonly property real aspect: width > 0 && height > 0 ? width / height : (full ? 1920 / 720 : 800 / 476)
     readonly property rect crop: {
         var w = mapWidth, h = mapHeight
         var x0 = Math.round((videoSize.width - w) / 2), y0 = Math.round((videoSize.height - h) / 2)
