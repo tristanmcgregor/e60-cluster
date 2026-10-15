@@ -91,10 +91,42 @@ class Updater(
         }
         runCatching { settings.saveStatus(car.status()) }
 
+        // A head unit app too old for the USB package got none above; if this pass just gave it a
+        // newer app, wait for that app to start and send the package now, not on the next pass.
+        if (status.usbRelease == null && files.any { it.kind == "apk" }) {
+            usbAfterApk(car)?.let { pushed += it }
+        }
+
         if (pushed.isEmpty()) return Outcome(null)
         val msg = "Car updated: " + pushed.joinToString(", ")
         settings.log(msg)
         return Outcome(msg)
+    }
+
+    /** Waits up to 2 minutes for the new head unit app, then sends it the cluster USB package. */
+    private fun usbAfterApk(car: HeadUnit): String? {
+        settings.log("Waiting for the new head unit app to send it the cluster USB package")
+        var status: HeadUnitStatus? = null
+        for (i in 0 until 24) {
+            if (isCancelled()) return null
+            Thread.sleep(5_000)
+            status = runCatching { car.status() }.getOrNull()
+            if (status?.usbRelease != null) break
+        }
+        val usbHave = status?.usbRelease ?: run {
+            settings.log("Head unit app did not restart in time; the USB package goes on the next update")
+            return null
+        }
+        settings.saveStatus(status!!)
+        val file = InternetNetwork.acquire(cm, car.network)?.use { internet ->
+            val github = GitHub(internet.network, settings.repo, settings.token)
+            github.pick(mapOf("usb" to usbHave), settings::log)["usb"]?.also { fetch(github, it) }
+        } ?: return null
+        settings.log("Uploading ${file.name} to the car")
+        return when (car.upload(file.kind, file.release, file.sha256, cached(file), file.signature)) {
+            HeadUnit.UploadResult.OK -> "usb v${file.release}".also { runCatching { settings.saveStatus(car.status()) } }
+            HeadUnit.UploadResult.NOT_NEWER -> null
+        }
     }
 
     /** Wi-Fi may report "connected" before routing works, so try a few times. */
