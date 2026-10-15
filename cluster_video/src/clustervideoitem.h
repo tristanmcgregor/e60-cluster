@@ -54,7 +54,7 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 private slots:
-    void onFrame(const QImage &frame);
+    void onFrame();
     void onConnected(bool connected);
 
 private:
@@ -67,6 +67,7 @@ private:
     bool m_streaming = false;
     int m_framesDecoded = 0;
     int m_staleTimer = 0;
+    int m_aliveTimer = 0;
 
     QThread m_thread;
     StreamWorker *m_worker = nullptr;

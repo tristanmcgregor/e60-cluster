@@ -5,8 +5,28 @@
 #include <QSGSimpleTextureNode>
 #include <QTimerEvent>
 
+#include <fcntl.h>
+#include <cstdio>
+#include <unistd.h>
+
 namespace {
 const int kStaleMs = 2000;
+// A counter rewritten from the GUI thread every 2 s; the cluster's watchdog (S61dashupdate)
+// restarts a dash whose counter stops moving, so a frozen dash cannot leave the gauges stuck.
+const char kAliveFile[] = "/tmp/dash_alive";
+const int kAliveMs = 2000;
+
+void touchAlive()
+{
+    static unsigned beats = 0;
+    char text[16];
+    const int n = snprintf(text, sizeof text, "%u\n", ++beats);
+    const int fd = ::open(kAliveFile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) {
+        if (::write(fd, text, n) != n) {}
+        ::close(fd);
+    }
+}
 }
 
 ClusterVideoItem::ClusterVideoItem(QQuickItem *parent)
@@ -23,13 +43,18 @@ ClusterVideoItem::ClusterVideoItem(QQuickItem *parent)
     connect(m_worker, &StreamWorker::connectionChanged, this, &ClusterVideoItem::onConnected, Qt::QueuedConnection);
     m_thread.setObjectName(QStringLiteral("ClusterVideo"));
     m_thread.start();
+    touchAlive();
+    m_aliveTimer = startTimer(kAliveMs);
 }
 
 ClusterVideoItem::~ClusterVideoItem()
 {
-    QMetaObject::invokeMethod(m_worker, "stop", Qt::BlockingQueuedConnection);
+    // queued, never blocking: a busy decoder must not hold up the dash
+    QMetaObject::invokeMethod(m_worker, "stop", Qt::QueuedConnection);
     m_thread.quit();
-    m_thread.wait(2000);
+    if (!m_thread.wait(3000))
+        qWarning("[clustervideo] decoder thread did not stop");
+    ::unlink(kAliveFile);       // no heartbeat without this item: the watchdog stands down
 }
 
 void ClusterVideoItem::setHost(const QString &host)
@@ -68,8 +93,11 @@ void ClusterVideoItem::onConnected(bool connected)
     emit connectedChanged();
 }
 
-void ClusterVideoItem::onFrame(const QImage &frame)
+void ClusterVideoItem::onFrame()
 {
+    const QImage frame = m_worker->takeFrame();
+    if (frame.isNull())
+        return;
     {
         QMutexLocker lock(&m_frameLock);
         m_frame = frame;
@@ -88,6 +116,8 @@ void ClusterVideoItem::onFrame(const QImage &frame)
 
 void ClusterVideoItem::timerEvent(QTimerEvent *event)
 {
+    if (event->timerId() == m_aliveTimer)
+        return touchAlive();
     if (event->timerId() != m_staleTimer)
         return QQuickItem::timerEvent(event);
     killTimer(m_staleTimer);

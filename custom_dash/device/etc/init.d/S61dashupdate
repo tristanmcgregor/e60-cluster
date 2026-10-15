@@ -109,13 +109,71 @@ supervisor() {
 	done
 	echo 0
 }
+#
+# Freeze watchdog: the map plugin rewrites a counter in $ALIVE every 2 s from the dash's main
+# thread. If it stops changing for $FREEZE_CHECKS checks in a row (~30 s; counted in checks,
+# not clock time, so the cluster sleeping is not a freeze) the dash is frozen: what it was
+# doing goes to $FREEZE_LOG (kept across power-off), then it is killed and started again.
+# A dash that vanishes while $ALIVE is still there crashed (a clean quit removes it): that is
+# logged and it is started again too, unless process.sh went with it (JLY update).
+# No $ALIVE (no map plugin loaded) means no watchdog. More than 3 freezes or crashes in
+# 30 minutes and it stands down, so it can never keep the screen blank.
+ALIVE=$TMP/dash_alive
+FREEZE_LOG=${DASH_FREEZE_LOG:-$ETC/dashfreeze.log}
+FREEZE_CHECKS=${DASH_FREEZE_CHECKS:-15}
+# true when this is the 4th freeze/crash within 30 minutes
+too_many() {
+	t=$(cut -d. -f1 /proc/uptime)
+	recent=; for f in $freezes; do [ $((t - f)) -lt 1800 ] && recent="$recent $f"; done
+	freezes="$recent $t"
+	[ $(echo $freezes | wc -w) -gt 3 ]
+}
+freeze_report() {
+	{
+		echo "=== $(date '+%Y-%m-%d %H:%M:%S') dash $2, pid $1, uptime $(cut -d' ' -f1 /proc/uptime)s"
+		grep -E 'MemTotal|MemFree|MemAvailable|Cached' /proc/meminfo
+		grep -E 'VmRSS|VmSize|Threads' /proc/$1/status
+		echo "load $(cat /proc/loadavg)"
+		for t in /proc/$1/task/*; do
+			echo "  $(cat $t/comm 2> /dev/null) state=$(cut -d')' -f2 $t/stat 2> /dev/null | cut -d' ' -f2) wchan=$(cat $t/wchan 2> /dev/null)"
+		done
+		dmesg 2> /dev/null | tail -n 15
+		echo "--- dashupdate.log"; tail -n 10 $LOG 2> /dev/null
+	} >> $FREEZE_LOG 2>&1
+	[ "$(wc -c < $FREEZE_LOG)" -gt 65536 ] && tail -c 32768 $FREEZE_LOG > $FREEZE_LOG.tmp && mv $FREEZE_LOG.tmp $FREEZE_LOG
+	sync
+}
 launcher_guard() {
 	missing=0
+	beat=; still=0; freezes=
 	while true; do
 		pid=$(pidof Launcher 2> /dev/null | cut -d' ' -f1)
 		if [ -n "$pid" ]; then
 			missing=0
+			now=$(cat $ALIVE 2> /dev/null)
+			if [ "$pid" = "$guard_pid" ] && [ -n "$now" ] && [ "$now" = "$beat" ]; then
+				still=$((still + 1))
+			else
+				still=0
+			fi
+			beat=$now
+			if [ $still -ge $FREEZE_CHECKS ]; then
+				still=0; beat=
+				freeze_report $pid frozen
+				if too_many; then
+					log "dash frozen again (pid $pid); too many freezes, watchdog standing down"
+					rm -f $ALIVE
+				else
+					log "dash frozen (pid $pid, heartbeat stopped), restarting it; details in $FREEZE_LOG"
+					date +%s > $EXPECT          # the restart below brings it back if process.sh does not
+					rm -f $ALIVE
+					kill -9 $pid
+				fi
+				sleep 2
+				continue
+			fi
 			if [ "$pid" != "$guard_pid" ] && [ -r /proc/$pid/cmdline ]; then
+				rm -f $ALIVE; beat=; still=0      # a new dash: only its own heartbeat counts
 				tr '\0' '\n' < /proc/$pid/cmdline > $TMP/launcher.cmd
 				tr '\0' '\n' < /proc/$pid/environ > $TMP/launcher.env 2> /dev/null
 				readlink /proc/$pid/cwd > $TMP/launcher.cwd 2> /dev/null
@@ -123,6 +181,16 @@ launcher_guard() {
 				[ -n "$guard_pid" ] && [ -f $EXPECT ] && { log "dash restarted (pid $pid)"; rm -f $EXPECT; }
 				guard_pid=$pid
 			fi
+		elif [ ! -f $EXPECT ] && [ -f $ALIVE ] && [ -s $TMP/launcher.cmd ]; then
+			rm -f $ALIVE
+			freeze_report "$guard_pid" "died (crash?)"
+			if too_many; then
+				log "dash died again (pid $guard_pid); too many crashes, watchdog standing down"
+			else
+				log "dash died unexpectedly (pid $guard_pid); starting it again unless it comes back"
+				date +%s > $EXPECT
+			fi
+			missing=0
 		elif [ -f $EXPECT ] && [ -s $TMP/launcher.cmd ]; then
 			missing=$((missing + 1))
 			if [ $missing -ge 4 ]; then

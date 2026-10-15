@@ -6,6 +6,10 @@
 #include <QTimer>
 #include <QtEndian>
 
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+
 #include <wels/codec_api.h>
 
 namespace {
@@ -37,6 +41,12 @@ StreamWorker::~StreamWorker()
 void StreamWorker::configure(const QString &host, int port, const QRect &crop)
 {
     m_crop = crop;
+    static thread_local bool niced = false;
+    if (!niced) {
+        // decoding is heavy on the T5: the gauges (GUI and render threads) always come first
+        niced = true;
+        setpriority(PRIO_PROCESS, static_cast<id_t>(syscall(SYS_gettid)), 10);
+    }
     if (host == m_host && port == m_port && m_socket)
         return;
     m_host = host;
@@ -179,8 +189,32 @@ void StreamWorker::decode(const QByteArray &au, bool show)
     const int h = info.UsrData.sSystemBuffer.iHeight;
     const int strides[2] = { info.UsrData.sSystemBuffer.iStride[0], info.UsrData.sSystemBuffer.iStride[1] };
     QImage frame = toRgb(planes, strides, w, h);
-    if (!frame.isNull())
-        emit frameReady(frame);
+    if (frame.isNull())
+        return;
+    bool post;
+    {
+        QMutexLocker lock(&m_outLock);
+        if (m_posted) ++m_replaced;
+        m_out = frame;
+        post = !m_posted;
+        m_posted = true;
+    }
+    if (post)
+        emit frameReady();
+    if (m_replaced && (!m_replacedClock.isValid() || m_replacedClock.elapsed() > 10000)) {
+        qWarning("[clustervideo] dash is behind: %d frames replaced before it drew them", m_replaced);
+        m_replaced = 0;
+        m_replacedClock.start();
+    }
+}
+
+QImage StreamWorker::takeFrame()
+{
+    QMutexLocker lock(&m_outLock);
+    m_posted = false;
+    QImage f = m_out;
+    m_out = QImage();
+    return f;
 }
 
 void StreamWorker::askKeyframe()

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <QByteArray>
+#include <QMutex>
 #include <QElapsedTimer>
 #include <QImage>
 #include <QObject>
@@ -24,8 +25,14 @@ public slots:
     void configure(const QString &host, int port, const QRect &crop);
     void stop();
 
+public:
+    // Called from the GUI thread after frameReady: the newest frame (null if already taken).
+    QImage takeFrame();
+
 signals:
-    void frameReady(const QImage &frame);
+    // At most one is ever queued: a frame decoded before the dash took the last one replaces it,
+    // so a dash that draws slower than the video never piles frames up in memory.
+    void frameReady();
     void connectionChanged(bool connected);
 
 private slots:
@@ -50,4 +57,10 @@ private:
     bool m_stopping = false;
     bool m_waitIdr = true;
     QElapsedTimer m_askClock;
+
+    QMutex m_outLock;
+    QImage m_out;
+    bool m_posted = false;      // frameReady sent, frame not taken yet
+    int m_replaced = 0;         // frames the dash never drew because a newer one came first
+    QElapsedTimer m_replacedClock;
 };
