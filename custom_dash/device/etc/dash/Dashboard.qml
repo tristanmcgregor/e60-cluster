@@ -158,7 +158,7 @@ Window {
         x: 560; y: stage.lineTop + 2
         width: 800; height: stage.lineBottom - stage.lineTop - 4
         color: "#000000"
-        opacity: (centreMenu.onNavPage && !car.anyDoorOpen) || stage.fullMap ? 0 : 0.72
+        opacity: (centreMenu.onNavPage && !doorAlert.active) || stage.fullMap ? 0 : 0.72
         Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     // ── live Android Auto map: fills the band, edges tucked behind the dials (drawn after it)
@@ -169,7 +169,7 @@ Window {
         width: stage.fullMap ? 1920 : 800; height: stage.fullMap ? 720 : stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
-        opacity: car.anyDoorOpen && !stage.fullMap ? 0.2 : 1     // under the door picture
+        opacity: doorAlert.active && !stage.fullMap ? 0.2 : 1     // under the door picture
         Behavior on opacity { NumberAnimation { duration: 220 } }
         visible: status === Loader.Ready && item.streaming && (stage.fullMap || (centreMenu.onNavPage && !car.sportMode))
         onLoaded: {
@@ -406,7 +406,7 @@ Window {
         fuel: fuelTracker
         updates: updateWatch
         gps: gpsCheck
-        cleared: car.anyDoorOpen
+        cleared: doorAlert.active
         dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
                 || updatePopup.shown || cameraPopup.shown || schoolPopup.shown
     }
@@ -524,13 +524,28 @@ Window {
         durationMs: 8000
         seq: updateWatch.seq
     }
+    // door picture shows for 15 s when a door, the bonnet or the boot opens, then goes away until
+    // something else opens (closing one, or leaving them open, doesn't bring it back)
+    Item {
+        id: doorAlert
+        property bool active: false
+        readonly property int mask: (car.doorFL ? 1 : 0) | (car.doorFR ? 2 : 0) | (car.doorRL ? 4 : 0)
+                                    | (car.doorRR ? 8 : 0) | (car.trunkOpen ? 16 : 0) | (car.hoodOpen ? 32 : 0)
+        property int seen: 0
+        onMaskChanged: {
+            if (mask & ~seen) { active = true; hold.restart() }
+            else if (mask === 0) { active = false; hold.stop() }
+            seen = mask
+        }
+        Timer { id: hold; interval: 15000; onTriggered: doorAlert.active = false }
+    }
     // door picture: the centre page fades out under it (centreMenu.cleared) and the band's own
     // darkening stays on, rather than a hard-edged box behind it
     DoorCard {
         id: doors
         anchors.horizontalCenter: parent.horizontalCenter
         y: 162
-        opacity: car.anyDoorOpen ? 1 : 0
+        opacity: doorAlert.active ? 1 : 0
         visible: opacity > 0.01
         Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
         fl: car.doorFL; fr: car.doorFR; rl: car.doorRL; rr: car.doorRR
