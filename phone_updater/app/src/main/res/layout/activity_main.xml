@@ -28,6 +28,12 @@
             android:layout_height="wrap_content"
             android:text="Open car settings" />
 
+        <Button
+            android:id="@+id/openLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Head unit log" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -70,6 +70,8 @@ Item {
         id: header
         width: parent.width
         height: 56
+        opacity: menu.cleared ? 0 : 1
+        Behavior on opacity { NumberAnimation { duration: 220 } }
         Text {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -6

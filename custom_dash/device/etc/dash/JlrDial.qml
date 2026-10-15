@@ -27,6 +27,14 @@ Item {
     property string gapIcon: ""
     property color gapLowColor: "#e0453a"   // first segment colour (fuel: red, coolant: blue)
     property color gapHighColor: "#e0453a"  // last segment colour (coolant hot)
+    // optional second bar, drawn just inside the first and touching it (temp: oil inside
+    // coolant). When set, each bar is lit in its own colour instead of the end bands.
+    property bool gapDual: false
+    property color gapColor: Theme.inkTick  // outer bar colour in dual mode
+    property real gap2Frac: 0
+    property bool gap2Warn: false
+    property bool gap2Known: true
+    property color gap2Color: "white"
 
     default property alias content: centre.data
 
@@ -154,8 +162,15 @@ Item {
         property real f: Math.max(0, Math.min(1, dial.gapFrac))
         Behavior on f { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
         property bool w: dial.gapWarn
+        property real f2: Math.max(0, Math.min(1, dial.gap2Frac))
+        Behavior on f2 { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
+        property bool w2: dial.gap2Warn
+        property bool k2: dial.gap2Known
         onFChanged: requestPaint()
         onWChanged: requestPaint()
+        onF2Changed: requestPaint()
+        onW2Changed: requestPaint()
+        onK2Changed: requestPaint()
         onPaint: {
             var ctx = getContext("2d")
             ctx.reset()
@@ -167,13 +182,29 @@ Item {
             var twoEnds = dial.gapHighColor !== dial.gapLowColor
             ctx.lineWidth = R * 0.03
             ctx.lineCap = "butt"
+            var radius = R * 0.86
             function band(from, to, colour, alpha) {     // fractions 0..1 along the gap
                 if (to <= from) return
                 ctx.strokeStyle = colour
                 ctx.globalAlpha = alpha
                 ctx.beginPath()
-                ctx.arc(dial.r, dial.r, R * 0.86, dial.rad(left - span * to), dial.rad(left - span * from), false)
+                ctx.arc(dial.r, dial.r, radius, dial.rad(left - span * to), dial.rad(left - span * from), false)
                 ctx.stroke()
+            }
+            if (dial.gapDual) {
+                // two thin bars sharing the gap's width, edge to edge
+                var bw = R * 0.022
+                ctx.lineWidth = bw
+                function bar(at, frac, warn, colour, known) {
+                    radius = at
+                    band(0, 1, "#2a2e33", 0.6)
+                    band(1 - zone, 1, dial.gapHighColor, 0.35)      // faint hot end
+                    if (known) band(0, frac, warn ? "#ff3b30" : colour, 1.0)
+                }
+                bar(R * 0.86 + bw / 2, f, w, dial.gapColor, true)
+                bar(R * 0.86 - bw / 2, f2, w2, dial.gap2Color, k2)
+                ctx.globalAlpha = 1.0
+                return
             }
             // unlit track, with the end bands faintly coloured
             band(0, 1, "#2a2e33", 0.6)

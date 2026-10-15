@@ -36,6 +36,17 @@
             android:label="Car settings"
             android:exported="false" />
 
+        <activity
+            android:name=".CarLogActivity"
+            android:label="Head unit log"
+            android:exported="false" />
+
+        <provider
+            android:name=".LogFileProvider"
+            android:authorities="au.jly.e60updater.logs"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+
         <!-- Fired by ConnectivityService through our PendingIntent; not exported because
              the PendingIntent is sent with this app's own identity. -->
         <receiver

@@ -12,7 +12,7 @@ using the gh CLI and github.repo from updater/updater.properties.
 
 Also rebuilds the USB package (custom_dash/out/install/dashboard.zip) stamped with the
 same release, so a USB install and the over-the-air copy agree on what is newest. When the
-parts only a USB install can deliver (Launcher, d.qml, init scripts, Wi-Fi) differ from the
+parts only a USB install can deliver (Launcher, d.qml, init scripts, Wi-Fi, boot logo) differ from the
 last published USB package (updater/usb_base), or with --usb, the package goes into the
 release as "usb"; the head unit then copies it onto a USB stick for the cluster.
 """
@@ -124,7 +124,8 @@ def usb_digest():
     etc = os.path.join(CUSTOM_DASH, "device", "etc")
     wifi = os.path.join(JLY, "wifi_driver", "pkg", "install", "dashboard", "etc")
     paths = [LAUNCHER, os.path.join(CUSTOM_DASH, "device_etc_model"), os.path.join(etc, "d.qml"),
-             os.path.join(etc, "init.d", "S61dashupdate")]
+             os.path.join(etc, "init.d", "S61dashupdate"),
+             os.path.join(CUSTOM_DASH, "device", "bootlogo", "bootlogo.bmp")]
     for root, dirs, names in os.walk(wifi):
         dirs.sort()
         paths += [os.path.join(root, n) for n in sorted(names) if n != ".DS_Store"]

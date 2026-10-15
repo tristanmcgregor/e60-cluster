@@ -10,7 +10,8 @@ Item {
     property var gps          // GpsCheck
     readonly property var names: [
         "rpm", "speed", "gear", "gearAuto", "gearManual", "gearShow",
-        "oilTempInt", "oilTemp", "waterTemperature", "waterTemperatureRaw", "gearBoxTempInt",
+        "oilTempInt", "oilTemp", "oilLevel", "oilQuantity", // oil level names are guesses: n/a if EventHub lacks them
+        "waterTemperature", "waterTemperatureRaw", "gearBoxTempInt",
         "batteryVoltage", "steeringAngle", "fuel", "acc",
         "lightBrightness", "darkBrightness", "brightMode", "uiStyle", "menuId"
     ]

@@ -5,7 +5,7 @@ Build USB update packages for the custom dashboard.
     python3 build_dash_package.py install  <patched_Launcher> <etc_model> out/install/dashboard.zip
     python3 build_dash_package.py restore  <Launcher_original> <etc_model> out/restore/dashboard.zip
 
-install: patched Launcher + /etc/model + /etc/d.qml + /etc/dash/* (+ /etc/qml/ClusterVideo if built)
+install: patched Launcher + /etc/model + /etc/d.qml + /etc/dash/* (+ /etc/qml/ClusterVideo if built, + boot logo)
 restore: original Launcher + /etc/model (stock UI comes back; d.qml is left
          on disk but nothing loads it)
 
@@ -77,6 +77,12 @@ def main():
                     f.write("plugin clustervideo\n")
             else:
                 print("note: cluster_video plugin not built; package has no live map")
+            # Boot logo (custom_dash/tools/make_bootlogo.py); the stock installer copies
+            # dashboard/bootlogo/bootlogo.bmp onto the boot partition.
+            logo = os.path.join(DEVICE_ETC, "..", "bootlogo", "bootlogo.bmp")
+            if os.path.isfile(logo):
+                os.makedirs(os.path.join(root, "bootlogo"))
+                shutil.copy2(logo, os.path.join(root, "bootlogo", "bootlogo.bmp"))
             # Keep the Wi-Fi startup script in step (it publishes the head unit's address
             # to /tmp/nav_gateway for Nav.qml / ClusterMap.qml).
             wifi_etc = os.path.join(HERE, "..", "..", "wifi_driver", "pkg", "install", "dashboard", "etc")

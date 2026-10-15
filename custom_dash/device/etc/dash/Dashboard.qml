@@ -88,13 +88,14 @@ Window {
         PauseAnimation { duration: 400 }
         NumberAnimation { target: stage; property: "reveal"; to: 0; duration: 900; easing.type: Easing.InQuad }
     }
-    Component.onCompleted: startup.start()
+    Component.onCompleted: { startup.start(); welcome.showIfStartup() }
     Connections {
         target: car
         onIgnitionOnChanged: {
-            if (car.ignitionOn) { shutdown.stop(); startup.start(); popup.forget(); servicePopup.forget() }
-            else shutdown.start()
+            if (car.ignitionOn) { shutdown.stop(); startup.start(); welcome.show(); popup.forget(); servicePopup.forget() }
+            else { welcome.hide(); shutdown.start() }
         }
+        onAnyDoorOpenChanged: if (car.anyDoorOpen) welcome.hide()
     }
     readonly property string fontName: Theme.font
     readonly property string iconBase: typeof dashIconBase !== "undefined" ? dashIconBase : "qrc:/"
@@ -161,20 +162,11 @@ Window {
         Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     // ── live Android Auto map: fills the band, edges tucked behind the dials (drawn after it)
-    // Full-screen map mode: the whole map the phone draws, scaled to fit below the status row
-    // (clock, warning lights) and centred. Filling the panel edge to edge put the top of the
-    // map, where Android Auto draws its turn card and street names, under the status row and
-    // the top edge of the cluster.
-    readonly property real fullMapTop: 140
-    readonly property real fullMapH: 720 - fullMapTop
-    readonly property real fullMapW: Math.min(1920, Math.round(fullMapH * navData.mapWidth / Math.max(1, navData.mapHeight)))
     Loader {
         id: mapLoader
-        // the band between the dials, or the area below the status row in full-screen map mode
-        x: stage.fullMap ? Math.round((1920 - stage.fullMapW) / 2) : 560
-        y: stage.fullMap ? stage.fullMapTop : stage.lineTop + 2
-        width: stage.fullMap ? stage.fullMapW : 800
-        height: stage.fullMap ? stage.fullMapH : stage.lineBottom - stage.lineTop - 4
+        // the band between the dials, or the whole panel in full-screen map mode
+        x: stage.fullMap ? 0 : 560; y: stage.fullMap ? 0 : stage.lineTop + 2
+        width: stage.fullMap ? 1920 : 800; height: stage.fullMap ? 720 : stage.lineBottom - stage.lineTop - 4
         active: navData.gateway !== ""
         source: "ClusterMap.qml"
         opacity: car.anyDoorOpen && !stage.fullMap ? 0.2 : 1     // under the door picture
@@ -305,6 +297,13 @@ Window {
         gapIcon: "temp"
         gapLowColor: "#8a7cff"       // cold end: blue/violet like the reference
         gapHighColor: "#e0453a"      // hot end: red
+        // coolant (outer, green) and oil (inner, white) bars side by side
+        gapDual: true
+        gapColor: "#3ddc6b"
+        gap2Color: "#ffffff"
+        gap2Known: car.oilTempInt > 0
+        gap2Frac: (car.oilTempInt - 40) / (150 - 40)    // 40–150 °C across the bar
+        gap2Warn: car.oilTempInt >= 140
 
         Text {                          // gear, centred on the dial (offset: cap-height centring)
             id: gearText
@@ -338,8 +337,15 @@ Window {
         id: clock
         x: 640 - width; y: 104
         color: Theme.ink; font.pixelSize: 30; font.family: stage.fontName
-        text: Qt.formatTime(new Date(), "hh:mm")
-        Timer { interval: 10000; running: true; repeat: true; onTriggered: clock.text = Qt.formatTime(new Date(), "hh:mm") }
+        textFormat: Text.RichText
+        // 12-hour time with a smaller AM/PM, so "12:59 PM" still clears the speedo ring
+        function now() {
+            var d = new Date(), h = d.getHours()
+            return (h % 12 || 12) + Qt.formatTime(d, ":mm")
+                 + "<span style=\"font-size:20px\">&nbsp;" + (h < 12 ? "AM" : "PM") + "</span>"
+        }
+        text: now()
+        Timer { interval: 10000; running: true; repeat: true; onTriggered: clock.text = clock.now() }
     }
     AlarmBar {
         x: 700; y: 98
@@ -389,8 +395,8 @@ Window {
     CentreMenu {
         id: centreMenu
         visible: opacity > 0.01
-        opacity: car.sportMode || stage.fullMap ? 0 : 1
-        Behavior on opacity { NumberAnimation { duration: 300 } }
+        opacity: car.sportMode || stage.fullMap ? 0 : 1 - welcome.opacity
+        Behavior on opacity { enabled: !welcome.shown; NumberAnimation { duration: 300 } }
         x: 700; y: stage.lineTop + 2
         width: 520; height: stage.lineBottom - stage.lineTop - 4
         car: car
@@ -403,6 +409,11 @@ Window {
         cleared: car.anyDoorOpen
         dimmed: popup.shown || servicePopup.shown || carWarningPopup.shown || perfPopup.shown || fuelPopup.shown
                 || updatePopup.shown || cameraPopup.shown || schoolPopup.shown
+    }
+    WelcomeCard {          // start-up greeting; the centre menu fades back in as it goes
+        id: welcome
+        x: 700; y: stage.lineTop + (stage.lineBottom - stage.lineTop - height) / 2
+        fontName: stage.fontName
     }
     WarningPopup {
         id: popup
@@ -518,10 +529,10 @@ Window {
     DoorCard {
         id: doors
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 180
+        y: 162
         opacity: car.anyDoorOpen ? 1 : 0
         visible: opacity > 0.01
-        Behavior on opacity { NumberAnimation { duration: 220 } }
+        Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
         fl: car.doorFL; fr: car.doorFR; rl: car.doorRL; rr: car.doorRR
         trunk: car.trunkOpen; hood: car.hoodOpen
         fontName: stage.fontName

@@ -62,6 +62,9 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.openSettings).setOnClickListener {
             startActivity(android.content.Intent(this, CarSettingsActivity::class.java))
         }
+        findViewById<Button>(R.id.openLog).setOnClickListener {
+            startActivity(android.content.Intent(this, CarLogActivity::class.java))
+        }
         findViewById<Button>(R.id.checkNow).setOnClickListener {
             if (settings.repo.isEmpty()) {
                 settings.log("Set the GitHub repo")
